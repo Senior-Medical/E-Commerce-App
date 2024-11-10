@@ -1,19 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 // import { doubleCsrf } from 'csrf-csrf';
+import { Headers } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  // for test
+  // app.use((req, res, next) => {
+  //   console.log(req.headers.authorization);
+  // })
 
   const configService = app.get(ConfigService);
 
   const GLOBAL_PREFIX = configService.get<string>("GLOBAL_PREFIX")
   app.setGlobalPrefix(GLOBAL_PREFIX);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }));
   
   app.use(helmet());
 

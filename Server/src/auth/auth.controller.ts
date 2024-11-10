@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Headers, Patch, Post, ValidationPipe } from "@nestjs/common";
-import { LoginDto } from "./dtos/login.dto";
+import { Body, Controller, Patch, Post, Request, UseGuards } from "@nestjs/common";
 import { ResetPasswordDto } from "./dtos/reset-password.dto";
 import { AuthService } from './auth.service';
 import { RequestToResetPasswordDto } from "./dtos/request-to-reset-password.dto";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { CreateUserValidationPipe } from "src/users/pipes/createUserValidation.pipe";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -15,15 +15,17 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post("login")
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  login(@Request() req) {
+    return this.authService.login(req.user);
   }
 
-  @Get("logout")
-  logout(@Headers("x-auth-token") token: string) {
-    return this.authService.logout(token);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get("logout")
+  // logout(@Request() req) {
+  //   return "logout..!";
+  // }
 
   @Post("resetPassword")
   requestToResetPassword(@Body() requestToResetPasswordDto: RequestToResetPasswordDto) {

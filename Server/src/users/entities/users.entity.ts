@@ -1,6 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Roles } from "src/common/enums/roles.enum";
 import * as bcrypt from 'bcrypt';
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 @Schema({ timestamps: true })
 export class User {
@@ -74,7 +75,7 @@ export const createUserSchema = (saltNumber: number = 10) => {
         // await this.model("Token").deleteMany({ user: this._id });
         next();
       } catch (err) {
-        throw err;
+        throw new HttpException("Encryption Password Error.", HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
   })
