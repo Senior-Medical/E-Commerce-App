@@ -15,7 +15,7 @@ export class CreateUserValidationPipe implements PipeTransform {
         { username },
       ]
     });
-    if (user) throw new HttpException('Oops..! User already exist.', HttpStatus.CONFLICT);
+    if (user) throw new HttpException('User already exist.', HttpStatus.CONFLICT);
     else return body;
   }
 }
