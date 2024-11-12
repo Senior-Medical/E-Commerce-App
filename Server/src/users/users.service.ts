@@ -13,12 +13,12 @@ export class UsersService {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  find() {
-    this.usersModel.find()
+  find(condition: any) {
+    return this.usersModel.find(condition)
   }
   
-  async findOne(condition: any) {
-    const user = await this.usersModel.findOne(condition);
+  async findOne(id: string) {
+    const user = await this.usersModel.findById(id);
     return user;
   }
 

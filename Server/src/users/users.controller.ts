@@ -7,12 +7,12 @@ export class UsersController{
   
   @Get()
   find() {
-    return this.usersService.find();
+    return this.usersService.find({});
   }
     
-  @Get(":id")
-  findOne(@Param("id") _id: string) {
-    return this.usersService.findOne({_id});
+  @Get(":userId")
+  findOne(@Param("userId") userId: string) {
+    return this.usersService.findOne(userId);
   }
 
   @Patch(":userId")

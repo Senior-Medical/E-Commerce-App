@@ -67,7 +67,7 @@
   GET /api/v1/categories - Get all categories.
   GET /api/v1/categories/:categoryId - Get a single category by ID.
   POST /api/v1/categories - Create a new category (admin only).
-  PUT /api/v1/categories/:categoryId - Update a category by ID (admin only).
+  PATCH /api/v1/categories/:categoryId - Update a category by ID (admin only).
   DELETE /api/v1/categories/:categoryId - Delete a category by ID (admin only).
 ```
 
