@@ -5,62 +5,62 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({required: true})
-  name: string
+  @Prop({ required: true })
+  name: string;
   
-  @Prop({unique: true, index: true})
-  username: string
+  @Prop({ unique: true, index: true })
+  username: string;
   
-  @Prop({unique: true, index: true})
-  phone: string
+  @Prop({ unique: true, index: true })
+  phone: string;
   
-  @Prop({unique: true, required: true, index: true})
-  email: string
+  @Prop({ unique: true, required: true, index: true })
+  email: string;
 
-  @Prop({required: true})
-  password: string
+  @Prop({ required: true })
+  password: string;
 
-  @Prop({enum: Roles, default: "customer" })
-  role: string
+  @Prop({ enum: Roles, default: "customer" })
+  role: string;
 
   @Prop()
-  avatar: string
+  avatar: string;
 
   @Prop()
-  bio: string
+  bio: string;
 
   @Prop()
-  company: string
+  company: string;
 
-  @Prop({default: false})
-  verified: boolean
+  @Prop({ default: false })
+  verified: boolean;
 
-  @Prop({default: false})
-  emailValidated: boolean
+  @Prop({ default: false })
+  emailValidated: boolean;
   
-  @Prop({default: false})
-  phoneValidated: boolean
+  @Prop({ default: false })
+  phoneValidated: boolean;
   
-  @Prop({default: new Date()})
-  lastLogin: Date
+  @Prop({ default: new Date() })
+  lastLogin: Date;
 
-  @Prop({default: new Date()})
-  changePasswordAt: Date
+  @Prop({ default: new Date() })
+  changePasswordAt: Date;
   
   @Prop(raw({
-    code: {type: String},
-    expireAt: {type: Date}
+    code: { type: String },
+    expireAt: { type: Date }
   }))
-  emailVerificationCode: Record<string, any>
+  emailVerificationCode: Record<string, any>;
   
   @Prop(raw({
-    code: {type: String},
-    expireAt: {type: Date}
+    code: { type: String },
+    expireAt: { type: Date }
   }))
-  resetPasswordCode: Record<string, any>
+  resetPasswordCode: Record<string, any>;
 
-  @Prop({default: 0})
-  cartTotal: number
+  @Prop({ default: 0 })
+  cartTotal: number;
 }
 
 export const createUserSchema = (saltNumber: number = 10) => {

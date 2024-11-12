@@ -1,10 +1,12 @@
-import { Body, Controller, Patch, Post, Request, UseGuards } from "@nestjs/common";
-import { ResetPasswordDto } from "./dtos/reset-password.dto";
-import { AuthService } from './auth.service';
-import { RequestToResetPasswordDto } from "./dtos/request-to-reset-password.dto";
+import { Body, Controller, Get, Patch, Post, Request, UseGuards } from "@nestjs/common";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { CreateUserValidationPipe } from "src/users/pipes/createUserValidation.pipe";
-import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { AuthService } from './auth.service';
+import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
+import { ResetPasswordDto } from "./dtos/resetPassword.dto";
+import { LocalAuthGuard } from "./guards/localAuth.guard";
+import { UserDecorator } from "src/common/decorators/user.decorator";
+import { JwtAuthGuard } from "./guards/jwtAuth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -17,14 +19,14 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post("login")
-  login(@Request() req) {
-    return this.authService.login(req.user);
+  login(@UserDecorator() user) {
+    return this.authService.login(user);
   }
 
   // @UseGuards(JwtAuthGuard)
   // @Get("logout")
   // logout(@Request() req) {
-  //   return "logout..!";
+  //   return req.user;
   // }
 
   @Post("resetPassword")

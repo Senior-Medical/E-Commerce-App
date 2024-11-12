@@ -1,8 +1,8 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
-import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { RequestToResetPasswordDto } from "./dtos/request-to-reset-password.dto";
 import { UsersService } from '../users/users.service';
+import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
+import { ResetPasswordDto } from './dtos/resetPassword.dto';
 // import DeviceDetector from "device-detector-js";
 import { JwtService } from "@nestjs/jwt";
 
@@ -15,15 +15,16 @@ export class AuthService{
   ) { }
   
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findOne({
+    const users = await this.usersService.find({
       $or: [
         {username: email},
         {email: email},
         {phone: email}
       ]
     });
-    if (!user) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
+    if (users.length === 0) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
 
+    const user = users[0];
     if (!user.verified) throw new HttpException("User not verified.", HttpStatus.FORBIDDEN);
 
     const match = await this.usersService.comparePassword(password, user.password);
