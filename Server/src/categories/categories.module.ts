@@ -5,6 +5,7 @@ import { CategoriesController } from "./categories.controller";
 import { CategoriesServices } from "./categories.service";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
+import { RolesGuard } from "src/auth/guards/roles.guard";
 
 @Module({
   imports: [
@@ -18,10 +19,6 @@ import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
   controllers: [CategoriesController],
   providers: [
     CategoriesServices,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard
-    // }
   ]
 })
 export class CategoriesModule{ }

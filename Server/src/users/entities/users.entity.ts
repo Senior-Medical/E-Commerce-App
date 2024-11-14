@@ -1,5 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Roles } from "src/common/enums/roles.enum";
+import { Role } from "src/common/enums/roles.enum";
 import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from "@nestjs/common";
 
@@ -20,7 +20,7 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ enum: Roles, default: "customer" })
+  @Prop({ enum: Role, default: "customer" })
   role: string;
 
   @Prop()

@@ -7,9 +7,13 @@ import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { UserDecorator } from "../common/decorators/user.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { Role } from "src/common/enums/roles.enum";
+import { RolesGuard } from "src/auth/guards/roles.guard";
 
 @Controller("categories")
-@UseGuards(JwtAuthGuard)
+@Roles(Role.admin, Role.staff)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CategoriesController{
   constructor(private readonly categoriesServices: CategoriesServices) { }
   
