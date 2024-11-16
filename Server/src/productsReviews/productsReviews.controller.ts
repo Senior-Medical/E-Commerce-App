@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -10,6 +10,7 @@ import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
+import { CheckReviewOwnerGuard } from "./guards/checkReviewOwner.guard";
 
 @Controller("products/reviews")
 export class ProductsReviewsController {
@@ -34,15 +35,17 @@ export class ProductsReviewsController {
   }
 
   @Patch(":reviewId")
-  @Roles(Role.customer)
   @HttpCode(HttpStatus.ACCEPTED)
+  @Roles(Role.customer)
+  @UseGuards(CheckReviewOwnerGuard)
   update(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document, @Body() reviewData: UpdateProductReviewDto) {
     return this.productsReviewsService.update(review, reviewData);
   }
 
   @Delete(":reviewId")
-  @Roles(Role.customer)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(Role.customer)
+  @UseGuards(CheckReviewOwnerGuard)
   async remove(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
     await this.productsReviewsService.remove(review);
   }
