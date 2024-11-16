@@ -1,7 +1,7 @@
-import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Role } from "src/common/enums/roles.enum";
-import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
+import * as bcrypt from 'bcrypt';
+import { Role } from "src/auth/enums/roles.enum";
 
 @Schema({ timestamps: true })
 export class User {

@@ -1,9 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
-import { RolesGuard } from "src/auth/guards/roles.guard";
-import { Role } from "src/common/enums/roles.enum";
+import { Role } from "src/auth/enums/roles.enum";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "../common/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
