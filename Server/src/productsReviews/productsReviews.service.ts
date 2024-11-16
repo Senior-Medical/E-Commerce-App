@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
@@ -6,10 +6,14 @@ import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductsReviews } from "./entities/productsReviews.entity";
 import { CreateProductReview } from "./types/createProductReview.type";
 import { UpdateProductReview } from "./types/updateProductReview.type";
+import { ProductsService } from "src/products/products.service";
 
 @Injectable()
 export class ProductsReviewsService {
-  constructor(@InjectModel(ProductsReviews.name) private productsReviewsModel: Model<ProductsReviews>) {}
+  constructor(
+    @InjectModel(ProductsReviews.name) private productsReviewsModel: Model<ProductsReviews>,
+    private readonly productsService: ProductsService
+  ) { }
 
   find(conditions: object = {}) {
     return this.productsReviewsModel.find(conditions);
@@ -19,10 +23,14 @@ export class ProductsReviewsService {
     return this.productsReviewsModel.findById(id);
   }
 
-  create(reviewData: CreateProductReviewDto, product: Document, user: Document) {
+  async create(reviewData: CreateProductReviewDto, user: Document) {
+    // check if product id is valid
+    const product = await this.productsService.findOne(reviewData.product.toString());
+    if (!product) throw new NotFoundException("Product not found.");
+
+    reviewData.product = product._id;
     const reviewInput: CreateProductReview = {
       ...reviewData,
-      product: new Types.ObjectId(product._id as string),
       user: new Types.ObjectId(user._id as string)
     };
     return this.productsReviewsModel.create(reviewInput);

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { ProductsService } from './products.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UserDecorator } from "src/common/decorators/user.decorator";
@@ -6,8 +6,10 @@ import { Document } from "mongoose";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
+import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
 
 @Controller("products")
+@UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
   

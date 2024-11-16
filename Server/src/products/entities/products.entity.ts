@@ -5,7 +5,6 @@ import { Types } from "mongoose";
 export class Product {
   @Prop({
     unique: true,
-    minlength: 4,
     required: true
   })
   name: string;

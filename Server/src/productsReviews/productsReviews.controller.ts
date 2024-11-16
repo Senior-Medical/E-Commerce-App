@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { Document } from "mongoose";
 import { UserDecorator } from "src/common/decorators/user.decorator";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
@@ -7,14 +7,16 @@ import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
+import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
 
 @Controller("products/reviews")
+@UseGuards(JwtAuthGuard)
 export class ProductsReviewsController {
   constructor(private readonly productsReviewsService: ProductsReviewsService) { }
   
-  @Get()
-  find() {
-    return this.productsReviewsService.find();
+  @Get("/all/:productId")
+  find(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+    return this.productsReviewsService.find({product: product._id});
   }
 
   @Get(":reviewId")
@@ -23,8 +25,8 @@ export class ProductsReviewsController {
   }
 
   @Post()
-  create(@Body() reviewData: CreateProductReviewDto, @Body("productId", ProductIdPipe) product: Document, @UserDecorator() user: Document) {
-    return this.productsReviewsService.create(reviewData, product, user);
+  create(@Body() reviewData: CreateProductReviewDto, @UserDecorator() user: Document) {
+    return this.productsReviewsService.create(reviewData, user);
   }
 
   @Patch(":reviewId")

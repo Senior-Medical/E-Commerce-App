@@ -16,13 +16,13 @@ export class ProductsReviews {
     required: true,
     ref: "Product"
   })
-  product: Types.ObjectId
+  product: Types.ObjectId;
 
   @Prop({
     required: true,
     ref: "User"
   })
-  user: Types.ObjectId
+  user: Types.ObjectId;
 }
 
 export const ProductsReviewsSchema = SchemaFactory.createForClass(ProductsReviews);

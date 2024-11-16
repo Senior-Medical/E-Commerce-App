@@ -4,7 +4,6 @@ import { Types } from "mongoose";
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
-  @Min(3)
   name: string;
 
   @IsString()
