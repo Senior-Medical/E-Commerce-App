@@ -1,15 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
-import { CategoriesServices } from "./categories.service";
-import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
 import { Document } from "mongoose";
+import { Roles } from "src/auth/decorators/roles.decorator";
+import { Role } from "src/auth/enums/roles.enum";
+import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { UserDecorator } from "../common/decorators/user.decorator";
+import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
-import { UserDecorator } from "../common/decorators/user.decorator";
-import { JwtAuthGuard } from "src/auth/guards/jwtAuth.guard";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
 
 @Controller("categories")
-@UseGuards(JwtAuthGuard)
+@Roles(Role.admin, Role.staff)
 export class CategoriesController{
   constructor(private readonly categoriesServices: CategoriesServices) { }
   

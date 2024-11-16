@@ -18,8 +18,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    // [1] check if token valid or not
     const user = await this.usersService.findOne(payload.sub);
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException("Invalid token.");
+
+    // [2] check if user change password
+    if (user.changePasswordAt) {
+      let changePasswordDate = user.changePasswordAt.getTime() / 1000;
+      const iat = payload.iat || 0;
+      if (changePasswordDate > iat) throw new UnauthorizedException("Password changed.");
+    }
+
     return user;
   }
 }

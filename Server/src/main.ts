@@ -4,15 +4,10 @@ import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 // import { doubleCsrf } from 'csrf-csrf';
-import { Headers } from '@nestjs/common';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-
-  // for test
-  // app.use((req, res, next) => {
-  //   console.log(req.headers.authorization);
-  // })
 
   const configService = app.get(ConfigService);
 
