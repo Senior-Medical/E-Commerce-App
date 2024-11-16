@@ -19,7 +19,7 @@ export class CategoriesController{
   
   @Get()
   find() {
-    return this.categoriesServices.find({});
+    return this.categoriesServices.find();
   }
 
   @Get(":categoryId")

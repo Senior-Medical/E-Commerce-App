@@ -11,7 +11,7 @@ import { UpdateCategory } from "./types/updateCategoryData.type";
 export class CategoriesServices{
   constructor(@InjectModel(Category.name) private categoriesModel: Model<Category>) { }
 
-  find(conditions: any) {
+  find(conditions: object = {}) {
     return this.categoriesModel.find(conditions);
   }
 
@@ -21,20 +21,20 @@ export class CategoriesServices{
 
   async create(categoryData: CreateCategoryDto, user: Document) {
     const category = (await this.find({ name: categoryData.name }))[0];
-    if (category) throw new HttpException('Name already exist.', HttpStatus.CONFLICT);
+    if (category) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
 
-    const userId = user._id as string;
+    const userId = new Types.ObjectId(user._id as string);
     const inputData: CreateCategory = {
       ...categoryData,
-      createdBy: new Types.ObjectId(userId),
-      updatedBy: new Types.ObjectId(userId),
+      createdBy: userId,
+      updatedBy: userId,
     };
     return this.categoriesModel.create(inputData);
   }
 
   async update(category: Document, categoryData: UpdateCategoryDto, user: Document) {
     let categoryByName = (await this.find({ name: categoryData.name }))[0];
-    if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new HttpException('Name already exist.', HttpStatus.CONFLICT);
+    if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
     
     const inputData: UpdateCategory = {
       ...categoryData,
