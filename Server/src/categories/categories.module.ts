@@ -17,8 +17,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
     ])
   ],
   controllers: [CategoriesController],
-  providers: [
-    CategoriesServices,
-  ]
+  providers: [CategoriesServices],
+  exports: [CategoriesServices]
 })
 export class CategoriesModule{ }
