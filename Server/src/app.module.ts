@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CategoriesModule } from "./categories/categories.module";
 import { ProductsModule } from "./products/products.module";
 import { ProductsReviewsModule } from "./productsReviews/productsReviews.module";
+import { AddressesModule } from "./addresses/addresses.module";
 import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
 
 @Module({
@@ -25,6 +26,7 @@ import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
     CategoriesModule,
     ProductsModule,
     ProductsReviewsModule,
+    AddressesModule,
     PaymentMethodsModule
   ],
 })
