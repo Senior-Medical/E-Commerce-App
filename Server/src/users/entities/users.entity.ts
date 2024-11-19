@@ -75,6 +75,7 @@ export const createUserSchema = (saltNumber: number = 10) => {
         // await this.model("Token").deleteMany({ user: this._id });
         next();
       } catch (err) {
+        console.log(err);
         throw new HttpException("Encryption Password Error.", HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }

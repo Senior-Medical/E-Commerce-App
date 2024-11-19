@@ -33,11 +33,11 @@
 
 ### Payment Method:
 ```
-  GET /api/v1/payments - Get user payment method.
-  GET /api/v1/payments/:paymentId - Get a user payment method.
+  GET /api/v1/payments - Get user payment methods.
+  GET /api/v1/payments/:paymentMethodId - Get a user payment method.
   POST /api/v1/payments - Create a user payment method.
-  PUT /api/v1/payments/:paymentId - Update a user payment method.
-  DELETE /api/v1/payments/:paymentId - Delete a user payment method.
+  PATCH /api/v1/payments/:paymentMethodId - Update a user payment method.
+  DELETE /api/v1/payments/:paymentMethodId - Delete a user payment method.
 ```
 
 ### WishList:
