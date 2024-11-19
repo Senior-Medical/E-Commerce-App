@@ -3,11 +3,14 @@ import { AppModule } from './app.module';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
+import { useContainer } from 'class-validator';
 // import { doubleCsrf } from 'csrf-csrf';
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  
+  app.use(helmet());
 
   const configService = app.get(ConfigService);
 
@@ -16,8 +19,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }));
   
-  app.use(helmet());
-
   // const {
   //   invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.
   //   generateToken, // Use this in your routes to generate and provide a CSRF hash, along with a token cookie and token.
