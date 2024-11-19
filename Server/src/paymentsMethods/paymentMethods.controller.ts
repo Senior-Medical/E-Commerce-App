@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { PaymentMethodsService } from './paymentMethods.service';
 import { UserDecorator } from "src/common/decorators/user.decorator";
 import { Document } from "mongoose";
@@ -6,6 +6,7 @@ import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
+import { CheckPaymentMethodOwnerGuard } from "./guard/checkPaymentMethodOwner.guard";
 
 @Controller("payments")
 export class PaymentMethodsController {
@@ -28,12 +29,14 @@ export class PaymentMethodsController {
 
   @Patch(":paymentMethodId")
   @HttpCode(HttpStatus.ACCEPTED)
+  @UseGuards(CheckPaymentMethodOwnerGuard)
   update(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document, @Body() paymentMethodData: UpdatePaymentMethodsDto, @UserDecorator() user: Document) {
     return this.paymentMethodsService.update(paymentMethod, paymentMethodData, user);
   }
 
   @Delete(":paymentMethodId")
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(CheckPaymentMethodOwnerGuard)
   remove(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document) {
     this.paymentMethodsService.remove(paymentMethod);
   }
