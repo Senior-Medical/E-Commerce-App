@@ -27,7 +27,7 @@
   GET /api/v1/addresses - Get user addresses.
   GET /api/v1/addresses/:addressId - Get a user address by id.
   POST /api/v1/addresses - Create a user address.
-  PUT /api/v1/addresses/:addressId - Update a user address.
+  PATCH /api/v1/addresses/:addressId - Update a user address.
   DELETE /api/v1/addresses/:addressId - Delete a user address.
 ```
 
