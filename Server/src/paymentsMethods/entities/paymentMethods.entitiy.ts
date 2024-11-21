@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { luhnCheck } from "../utils/luhnValidation";
-import { InternalServerErrorException } from "@nestjs/common";
 import { EncryptionService } from "../utils/encryption.service";
 import { ConfigService } from "@nestjs/config";
 

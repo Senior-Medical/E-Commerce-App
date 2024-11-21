@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export type CreateProduct = {
   name: string;
   description?: string;
-  cover?: string;
+  images: string[];
   code: string;
   price: number;
   category: Types.ObjectId;

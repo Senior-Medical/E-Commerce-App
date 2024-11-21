@@ -1,4 +1,5 @@
-import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateProductDto {
@@ -9,13 +10,12 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   description: string;
-
-  // cover: File;
   
   @IsString()
   @IsNotEmpty()
   code: string;
 
+  @Transform(({ value }) => parseFloat(value))
   @IsNumber()
   @IsNotEmpty()
   price: number;

@@ -17,7 +17,12 @@ async function bootstrap() {
   const GLOBAL_PREFIX = configService.get<string>("GLOBAL_PREFIX")
   app.setGlobalPrefix(GLOBAL_PREFIX);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+    errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+  }));
   
   // const {
   //   invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.

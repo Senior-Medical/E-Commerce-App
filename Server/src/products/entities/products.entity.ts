@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 
-@Schema()
+@Schema({timestamps: true})
 export class Product {
   @Prop({
     unique: true,
@@ -12,8 +12,11 @@ export class Product {
   @Prop()
   description: string;
 
-  @Prop()
-  cover: string;
+  @Prop({
+    required: true,
+    type: [String]
+  })
+  images: string[];
 
   @Prop({
     unique: true,
