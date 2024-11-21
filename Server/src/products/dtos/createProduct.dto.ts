@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateProductDto {

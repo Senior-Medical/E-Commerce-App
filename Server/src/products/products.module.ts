@@ -6,6 +6,7 @@ import { ProductsService } from "./products.service";
 import { CategoriesModule } from "src/categories/categories.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { multerOptions } from "./config/multer.config";
+import { FilesModule } from "src/files/files.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { multerOptions } from "./config/multer.config";
       }
     ]),
     MulterModule.register(multerOptions()),
-    CategoriesModule
+    CategoriesModule,
+    FilesModule
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -12,10 +12,14 @@ import { ProductsService } from './products.service';
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
+import { FilesService } from '../files/files.service';
 
 @Controller("products")
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly filesService: FilesService
+  ) { }
   
   @Get()
   @Public()
@@ -27,6 +31,12 @@ export class ProductsController {
   @Public()
   findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
     return product;
+  }
+
+  @Get("images/:imageName")
+  @Public()
+  serveImage(@Param("imageName") imageName: string) {
+    return this.filesService.serveFile(imageName);
   }
 
   @Post()

@@ -72,22 +72,23 @@
 ```
 
 ### Products:
-  **Products:**
-  ```
-    GET /api/v1/products - Get all products.
-    GET /api/v1/products/:productId - Get a single product by ID.
-    POST /api/v1/products - Create a new product (admin only).
-    PATCH /api/v1/products/:productId - Update a product by ID (admin only).
-    DELETE /api/v1/products/:productId - Delete a product by ID (admin only).
-  ```
-  **Reviews:**
-  ```
-    GET /api/v1/products/reviews/:productId - Get all reviews of specific product.
-    GET /api/v1/products/reviews/:reviewId - Get a single review by ID.
-    POST /api/v1/products/reviews - Create a new review on specific product.
-    PATCH /api/v1/products/reviews/:reviewId - Update a review by ID.
-    DELETE /api/v1/products/reviews/:reviewId - Delete a review by ID.
-  ```
+```
+  GET /api/v1/products - Get all products.
+  GET /api/v1/products/:productId - Get a single product by ID.
+  GET /api/v1/products/images/:imageName- Get a image file as file stream.
+  POST /api/v1/products - Create a new product (admin only).
+  PATCH /api/v1/products/:productId - Update a product by ID (admin only).
+  DELETE /api/v1/products/:productId - Delete a product by ID (admin only).
+```
+
+### Products Reviews:
+```
+  GET /api/v1/products/reviews/all/:productId - Get all reviews of specific product.
+  GET /api/v1/products/reviews/:reviewId - Get a single review by ID.
+  POST /api/v1/products/reviews - Create a new review on specific product.
+  PATCH /api/v1/products/reviews/:reviewId - Update a review by ID.
+  DELETE /api/v1/products/reviews/:reviewId - Delete a review by ID.
+```
 
 ### Orders:
   **Order:**

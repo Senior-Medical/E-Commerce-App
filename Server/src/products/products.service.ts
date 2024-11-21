@@ -1,22 +1,20 @@
 import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
+import { InjectModel } from "@nestjs/mongoose";
+import { Document, Model, Types } from "mongoose";
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
-import { Document, Model, Types } from "mongoose";
-import { InjectModel } from "@nestjs/mongoose";
 import { Product } from "./entities/products.entity";
 import { CreateProduct } from "./types/createProductData.type";
 import { UpdateProduct } from "./types/updateProductData.type";
-import { CategoriesServices } from '../categories/categories.service';
-import { ConfigService } from '@nestjs/config';
-import { saveFiles } from "./utils/saveFiles";
-import { removeFiles } from "./utils/removeFiles";
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productsModel: Model<Product>,
-    private readonly categoriesServices: CategoriesServices,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly filesService: FilesService
   ) { }
 
   find(conditions: object = {}) {
@@ -40,9 +38,8 @@ export class ProductsService {
     // Check if images are exist
     if (!images) throw new NotAcceptableException("Images are required.");
     
-    const uploadDir = this.configService.get<string>('MULTER_UPLOADS_FOLDER');
     try {
-      const imagesNames = await saveFiles(images, uploadDir);
+      const imagesNames = await this.filesService.saveFiles(images);
       const userId = new Types.ObjectId(user._id as string);
       const productInput: CreateProduct = {
         ...productData,
@@ -52,7 +49,7 @@ export class ProductsService {
       }
       return this.productsModel.create(productInput);
     } catch (e) {
-      removeFiles(uploadDir, images.map(image => image.filename));
+      this.filesService.removeFiles(images.map(image => image.filename));
       console.error(e);
       throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -70,12 +67,11 @@ export class ProductsService {
 
     // Check if images are exist save it
     let imagesNames: string[] = [];
-    const uploadDir = this.configService.get<string>('MULTER_UPLOADS_FOLDER');
     if (images) {
       try {
-        imagesNames = await saveFiles(images, uploadDir);
+        imagesNames = await this.filesService.saveFiles(images);
       } catch (e) {
-        removeFiles(uploadDir, images.map(image => image.filename));
+        this.filesService.removeFiles(images.map(image => image.filename));
         console.error(e);
         throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
       }
@@ -93,9 +89,9 @@ export class ProductsService {
     const oldImages = product.images;
     try {
       result = await product.set(productInput).save();
-      if(productInput.images) removeFiles(uploadDir, oldImages);
+      if(productInput.images) this.filesService.removeFiles(oldImages);
     } catch (e) {
-      if(productInput.images) removeFiles(uploadDir, productInput.images);
+      if(productInput.images) this.filesService.removeFiles(productInput.images);
       console.error(e);
       throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -109,7 +105,7 @@ export class ProductsService {
     }catch (e) {
       throw e;
     }
-    if(product.images) removeFiles(this.configService.get<string>('MULTER_UPLOADS_FOLDER'), product.images);
+    if(product.images) this.filesService.removeFiles(product.images);
     return result;
   }
 }
