@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -9,6 +9,9 @@ import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductsService } from './products.service';
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
+import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 
 @Controller("products")
 export class ProductsController {
@@ -19,6 +22,7 @@ export class ProductsController {
   find() {
     return this.productsService.find();
   }
+
   @Get(":productId")
   @Public()
   findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
@@ -27,15 +31,26 @@ export class ProductsController {
 
   @Post()
   @Roles(Role.admin, Role.staff)
-  create(@Body() productData: CreateProductDto, @UserDecorator() user: Document) {
-    return this.productsService.create(productData, user);
+  @UseInterceptors(FilesInterceptor("images", 10))
+  create(
+    @Body(CategoryIdPipe) productData: CreateProductDto,
+    @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
+    @UserDecorator() user: Document
+  ) {
+    return this.productsService.create(productData, images, user);
   }
 
   @Patch(":productId")
   @Roles(Role.admin, Role.staff)
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document, @Body() productData: UpdateProductDto, @UserDecorator() user: Document) {
-    return this.productsService.update(product, productData, user);
+  @UseInterceptors(FilesInterceptor("images", 10))
+  update(
+    @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document,
+    @Body(CategoryIdPipe) productData: UpdateProductDto,
+    @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
+    @UserDecorator() user: Document
+  ) {
+    return this.productsService.update(product, productData, images, user);
   }
 
   @Delete(":productId")
