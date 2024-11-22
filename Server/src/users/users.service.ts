@@ -35,8 +35,8 @@ export class UsersService {
 
   async create(createUsersDto: CreateUsersDto) {
     const user = await this.usersModel.create({ ...createUsersDto });
-    await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user._id);
-    if(createUsersDto.phone) await this.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user._id);
+    await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
+    if(createUsersDto.phone) await this.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user);
     return user;
   }
 
@@ -46,31 +46,33 @@ export class UsersService {
     return user.set(updateData).save();
   }
 
-  async findCode(id: string) {
-    return this.codesModel.findById(id);
+  async findCode(condition: object) {
+    return this.codesModel.find(condition);
   }
 
-  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: Types.ObjectId) {
+  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: any) {
     const codeData: CreateCode = {
       code: this.generateCode(),
       value,
       type,
       purpose,
-      user
+      user: user._id
     };
 
-    const existingEmail = await this.codesModel.findOne({ value });
-    if(existingEmail) await this.removeCode({ value });
+    const existingCode = await this.codesModel.findOne({ value });
+    if(existingCode) await existingCode.deleteOne();
 
     const code = await this.codesModel.create({ ...codeData });
-
     if (codeData.type === CodeType.EMAIL) {
       const baseUrl = this.configService.get<string>("BASE_URL");
+      const message = (purpose === CodePurpose.VERIFY_EMAIL) ? `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}` : `The code for reset the password is: ${code.code}.`;
       this.messagingService.sendEmail({
         to: code.value,
         subject: purpose,
-        message: `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}`
+        message: message
       });
+    } else {
+      // send sms
     }
     return code;
   }

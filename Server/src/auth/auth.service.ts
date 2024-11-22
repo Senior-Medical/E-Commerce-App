@@ -6,7 +6,7 @@ import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { Document } from "mongoose";
 import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
-import { CodeType } from "src/users/enums/codePurpose.enum";
+import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
 import { CreateUserType } from "src/users/types/createUser.type";
 
 @Injectable()
@@ -43,7 +43,7 @@ export class AuthService{
       createData['phoneValidated'] = false;
     }
     const user = await this.usersService.create(createData);
-    return {message}
+    return message;
   }
 
   async login(user: any) {
@@ -59,34 +59,24 @@ export class AuthService{
     let message = "";
     const user = await this.usersService.findOne(code.user.toString());
 
-    if (code.type === CodeType.EMAIL) {
-      if (user.phoneValidated === false) {
-        updateData["emailValidated"] = true;
-        message = "Email verified successfully. Please verify your phone number.";
-      } else {
-        updateData["emailValidated"] = true;
-        updateData["verified"] = true;
-        message = "User verified successfully you can now login.";
-      }
-    } else {
-      if (user.emailValidated === false) {
-        updateData["phoneValidated"] = true;
-        message = "Phone verified successfully. Please verify your email.";
-      } else {
-        updateData["phoneValidated"] = true;
-        updateData["verified"] = true;
-        message = "User verified successfully you can now login.";
-      }
-    }
+    if (code.type === CodeType.EMAIL) updateData["emailValidated"] = true;
+    else updateData["phoneValidated"] = true;
+
+    message = "Account verified successfully you can now login.";
+    updateData["verified"] = true;
     await user.set(updateData).save();
+    code.deleteOne();
     return message;
   }
 
-  requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
-    return requestToResetPasswordDto;
+  async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
+    await this.usersService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
+    return `Please check your email for password reset code.`;
   }
 
-  resetPassword(resetPasswordDto: ResetPasswordDto) {
-    return resetPasswordDto;
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save();
+    await resetPasswordDto.codeData.deleteOne();
+    return "Password reset successfully.";
   }
 }

@@ -9,7 +9,8 @@ export class VerificationCodes {
   @Prop({
     required: true,
     unique: true,
-    length: 6
+    minlength: 6,
+    maxlength: 6
   })
   code: string;
 
@@ -57,7 +58,8 @@ export const getVerificationCodesSchema = (configService: ConfigService) => {
     next();
   });
   
-  VerificationCodesSchema.post('findOne', function (docs) {
+  VerificationCodesSchema.post(['find', 'findOne', 'save'], function (docs) {
+    if (Array.isArray(docs)) docs = docs[0];
     if (docs) docs.code = encryptionService.decrypt(docs.code);
   });
 
