@@ -1,11 +1,10 @@
 import { Module } from "@nestjs/common";
-import { PaymentMethodsController } from "./paymentMethods.controller";
-import { PaymentMethodsService } from "./paymentMethods.service";
+import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PaymentMethods, createPaymentMethodsSchema } from "./entities/paymentMethods.entitiy";
+import { PaymentMethodsController } from "./paymentMethods.controller";
+import { PaymentMethodsService } from "./paymentMethods.service";
 import { LuhnValidationConstraint } from "./utils/luhnValidation";
-import { EncryptionService } from "./utils/encryption.service";
-import { ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [

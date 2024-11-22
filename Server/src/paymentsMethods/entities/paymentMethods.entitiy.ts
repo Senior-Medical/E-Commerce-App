@@ -1,8 +1,8 @@
+import { ConfigService } from "@nestjs/config";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
+import { EncryptionService } from "../../common/services/encryption.service";
 import { luhnCheck } from "../utils/luhnValidation";
-import { EncryptionService } from "../utils/encryption.service";
-import { ConfigService } from "@nestjs/config";
 
 @Schema({timestamps: true})
 export class PaymentMethods {
@@ -57,7 +57,7 @@ export const createPaymentMethodsSchema = (configService: ConfigService) => {
 
   PaymentMethodsSchema.pre('save', function (next) {
     if (this.isModified('cardNumber')) this.cardNumber = encryptionService.encrypt(this.cardNumber);
-
+    
     if (this.isModified('cardholderName')) this.cardholderName = encryptionService.encrypt(this.cardholderName);
 
     next();

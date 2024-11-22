@@ -2,6 +2,8 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
 import * as bcrypt from 'bcrypt';
 import { Role } from "src/auth/enums/roles.enum";
+import { EncryptionService } from '../../common/services/encryption.service';
+import { ConfigService } from '@nestjs/config';
 
 @Schema({ timestamps: true })
 export class User {
@@ -63,16 +65,15 @@ export class User {
   cartTotal: number;
 }
 
-export const createUserSchema = (saltNumber: number = 10) => {
+export const createUserSchema = (configService: ConfigService) => {
   const UserSchema = SchemaFactory.createForClass(User);
 
   UserSchema.pre('save', async function(next) {
     if (this.isModified('password')) {
       try {
-        const salt = await bcrypt.genSalt(saltNumber);
-        this.password = await bcrypt.hash(this.password, salt);
+        const encryptionService = new EncryptionService(configService);
+        this.password = await encryptionService.bcryptHash(this.password);
         this.changePasswordAt = new Date();
-        // await this.model("Token").deleteMany({ user: this._id });
         next();
       } catch (err) {
         console.log(err);

@@ -10,7 +10,7 @@ import { ConfigService } from "@nestjs/config";
     MongooseModule.forFeatureAsync([
       {
         name: User.name,
-        useFactory: async (configService: ConfigService) => createUserSchema(configService.get<number>('BCRYPT_SALT_ROUNDS') || 10),
+        useFactory: async (configService: ConfigService) => createUserSchema(configService),
         inject: [ConfigService]
       }
     ]),

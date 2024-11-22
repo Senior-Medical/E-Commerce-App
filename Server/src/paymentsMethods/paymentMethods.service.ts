@@ -6,10 +6,15 @@ import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { CreatePaymentMethods } from "./types/createPaymentMethods.type";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { UpdatePaymentMethods } from "./types/updatePaymentMethods.type";
+import { EncryptionService } from '../common/services/encryption.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PaymentMethodsService {
-  constructor(@InjectModel(PaymentMethods.name) private paymentMethodsModel: Model<PaymentMethods>) { }
+  constructor(
+    @InjectModel(PaymentMethods.name) private paymentMethodsModel: Model<PaymentMethods>,
+    private readonly configService: ConfigService
+  ) { }
   
   find(conditions: object = {}) {
     return this.paymentMethodsModel.find(conditions);
@@ -20,8 +25,9 @@ export class PaymentMethodsService {
   }
 
   async create(paymentMethodData: CreatePaymentMethodsDto, user: Document) {
+    const encryptionService = new EncryptionService(this.configService);
     const paymentMethod = (await this.paymentMethodsModel.find({
-      cardNumber: paymentMethodData.cardNumber
+      cardNumber: encryptionService.encrypt(paymentMethodData.cardNumber)
     }))[0];
     if (paymentMethod) throw new NotAcceptableException("Card Number already exist");
 
