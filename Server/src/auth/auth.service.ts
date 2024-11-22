@@ -7,6 +7,7 @@ import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { Document } from "mongoose";
 import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
 import { CodeType } from "src/users/enums/codePurpose.enum";
+import { CreateUserType } from "src/users/types/createUser.type";
 
 @Injectable()
 export class AuthService{
@@ -35,14 +36,14 @@ export class AuthService{
   }
 
   async register(createUsersDto: CreateUsersDto) {
-    const user = await this.usersService.create(createUsersDto);
+    const createData: CreateUserType = {...createUsersDto, emailValidated: false};
     let message = "User created successfully please check your email for verification.";
-    if(user.phone) message = message.replace("email", "email and phone");
-    return {
-      message,
-      user
+    if (createData.phone) {
+      message = message.replace("email", "email and phone");
+      createData['phoneValidated'] = false;
     }
-    // return this.login(user);
+    const user = await this.usersService.create(createData);
+    return {message}
   }
 
   async login(user: any) {
@@ -59,22 +60,22 @@ export class AuthService{
     const user = await this.usersService.findOne(code.user.toString());
 
     if (code.type === CodeType.EMAIL) {
-      if (user.phoneValidated) {
-        updateData["emailValidated"] = true;
-        updateData["verified"] = true;
-        message = "User verified successfully you can now login.";
-      } else {
+      if (user.phoneValidated === false) {
         updateData["emailValidated"] = true;
         message = "Email verified successfully. Please verify your phone number.";
+      } else {
+        updateData["emailValidated"] = true;
+        updateData["verified"] = true;
+        message = "User verified successfully you can now login.";
       }
     } else {
-      if (user.emailValidated) {
+      if (user.emailValidated === false) {
+        updateData["phoneValidated"] = true;
+        message = "Phone verified successfully. Please verify your email.";
+      } else {
         updateData["phoneValidated"] = true;
         updateData["verified"] = true;
         message = "User verified successfully you can now login.";
-      } else {
-        updateData["phoneValidated"] = true;
-        message = "Phone verified successfully. Please verify your email.";
       }
     }
     await user.set(updateData).save();

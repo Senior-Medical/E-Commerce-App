@@ -1,18 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
 import { EncryptionService } from '../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
-import { Model } from "mongoose";
+import { Document, Model, Types } from "mongoose";
 import { User } from "./entities/users.entity";
 import { CreateUsersDto } from "./dtos/createUser.dto";
 import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
 import { CreateCode } from "./types/createCode.type";
+import { VerificationCodes } from "./entities/verificationCodes.entity";
+import { MessagingService } from '../messaging/messaging.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private usersModel: Model<User>,
+    @InjectModel(VerificationCodes.name) private codesModel: Model<VerificationCodes>,
+    private readonly messagingService: MessagingService,
     private readonly configService: ConfigService
   ) { }
   
@@ -54,6 +58,9 @@ export class UsersService {
       purpose,
       user
     };
+
+    const existingEmail = await this.codesModel.findOne({ value });
+    if(existingEmail) await this.removeCode({ value });
 
     const code = await this.codesModel.create({ ...codeData });
 

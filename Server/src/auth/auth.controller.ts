@@ -28,7 +28,7 @@ export class AuthController {
 
   @Post("login")
   @UseGuards(LocalAuthGuard)
-  login(@UserDecorator() user) {
+  login(@UserDecorator() user: any) {
     return this.authService.login(user);
   }
 

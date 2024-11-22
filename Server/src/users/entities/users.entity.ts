@@ -37,10 +37,10 @@ export class User {
   @Prop({ default: false })
   verified: boolean;
 
-  @Prop({ default: false })
+  @Prop()
   emailValidated: boolean;
   
-  @Prop({ default: false })
+  @Prop()
   phoneValidated: boolean;
   
   @Prop({ default: new Date() })
@@ -48,18 +48,6 @@ export class User {
 
   @Prop({ default: new Date() })
   changePasswordAt: Date;
-  
-  @Prop(raw({
-    code:  String,
-    expireAt: Date
-  }))
-  emailVerificationCode: Record<string, any>;
-  
-  @Prop(raw({
-    code: String,
-    expireAt: Date
-  }))
-  resetPasswordCode: Record<string, any>;
 
   @Prop({ default: 0 })
   cartTotal: number;

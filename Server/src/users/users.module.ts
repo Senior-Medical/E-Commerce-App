@@ -6,12 +6,9 @@ import { createUserSchema, User } from "./entities/users.entity";
 import { VerificationCodes, getVerificationCodesSchema } from "./entities/verificationCodes.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
-import { EncryptionService } from '../paymentsMethods/utils/encryption.service';
-import { PaymentMethodsModule } from "src/paymentsMethods/paymentMethods.module";
 
 @Module({
   imports: [
-  PaymentMethodsModule,
   MongooseModule.forFeatureAsync([
       {
         name: User.name,
@@ -20,8 +17,8 @@ import { PaymentMethodsModule } from "src/paymentsMethods/paymentMethods.module"
       },
       {
         name: VerificationCodes.name,
-        useFactory: async (configService: ConfigService, encryptionService: EncryptionService) => getVerificationCodesSchema(configService, encryptionService),
-        inject: [ConfigService, EncryptionService]
+        useFactory: async (configService: ConfigService) => getVerificationCodesSchema(configService),
+        inject: [ConfigService]
       }
     ]),
     MessagingModule,
