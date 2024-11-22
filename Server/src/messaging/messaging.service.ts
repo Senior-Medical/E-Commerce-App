@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { MailDataRequired } from "@sendgrid/mail";
 import { SendGridClient } from './sendGridClient.service';
+import { MailData } from "./types/mailData.type";
 
 @Injectable()
 export class MessagingService {
@@ -8,9 +9,9 @@ export class MessagingService {
     private readonly sendGridClient: SendGridClient,
   ) { }
 
-  sendEmail(emailData: {email: string, message: string, subject: string}) {
+  sendEmail(emailData: MailData) {
     const mail: MailDataRequired = {
-      to: emailData.email,
+      to: emailData.to,
       from: "",
       subject: emailData.subject,
       text: emailData.message

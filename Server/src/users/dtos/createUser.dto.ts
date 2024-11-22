@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, Length, IsEmail, Matches } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, Matches } from "class-validator";
 
 export class CreateUsersDto {
   @IsString()
@@ -26,8 +26,6 @@ export class CreateUsersDto {
     message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character."
   })
   readonly password: string;
-  
-  // avatar?: File
   
   @IsString()
   readonly bio?: string;

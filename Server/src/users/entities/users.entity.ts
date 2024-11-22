@@ -50,14 +50,14 @@ export class User {
   changePasswordAt: Date;
   
   @Prop(raw({
-    code: { type: String },
-    expireAt: { type: Date }
+    code:  String,
+    expireAt: Date
   }))
   emailVerificationCode: Record<string, any>;
   
   @Prop(raw({
-    code: { type: String },
-    expireAt: { type: Date }
+    code: String,
+    expireAt: Date
   }))
   resetPasswordCode: Record<string, any>;
 

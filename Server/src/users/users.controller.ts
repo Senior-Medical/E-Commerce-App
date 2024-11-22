@@ -15,39 +15,39 @@ export class UsersController{
     return this.usersService.findOne(userId);
   }
 
-  @Patch(":userId")
-  update() {
-    return this.usersService.update();
-  }
+  // @Patch(":userId")
+  // update() {
+  //   return this.usersService.update();
+  // }
 
-  @Patch("password/:userId")
-  updatePassword() {
-    return this.usersService.updatePassword();
-  }
+  // @Patch("password/:userId")
+  // updatePassword() {
+  //   return this.usersService.updatePassword();
+  // }
 
-  @Patch("email/:userId")
-  updateEmail() {
-    return this.usersService.updateEmail();
-  }
+  // @Patch("email/:userId")
+  // updateEmail() {
+  //   return this.usersService.updateEmail();
+  // }
 
-  @Patch("email/verify/:userId")
-  verifyEmail() {
-    return this.usersService.verifyEmail();
-  }
+  // @Patch("email/verify/:userId")
+  // verifyEmail() {
+  //   return this.usersService.verifyEmail();
+  // }
 
-  @Patch("phone/:userId")
-  updatePhone() {
-    return this.usersService.updatePhone();
-  }
+  // @Patch("phone/:userId")
+  // updatePhone() {
+  //   return this.usersService.updatePhone();
+  // }
 
-  @Patch("phone/verify/:userId")
-  verifyPhone() {
-    return this.usersService.verifyPhone();
-  }
+  // @Patch("phone/verify/:userId")
+  // verifyPhone() {
+  //   return this.usersService.verifyPhone();
+  // }
 
-  @Delete(":userId")
-  remove() {
-    return this.usersService.remove();
-  }
+  // @Delete(":userId")
+  // remove() {
+  //   return this.usersService.remove();
+  // }
 
 }

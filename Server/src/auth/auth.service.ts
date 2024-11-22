@@ -1,17 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-// import DeviceDetector from "device-detector-js";
-import { JwtService } from "@nestjs/jwt";
+import { Document } from "mongoose";
+import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
+import { CodeType } from "src/users/enums/codePurpose.enum";
 
 @Injectable()
 export class AuthService{
-  // private detector = new DeviceDetector();
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) { }
   
   async validateUser(email: string, password: string) {
@@ -35,7 +36,13 @@ export class AuthService{
 
   async register(createUsersDto: CreateUsersDto) {
     const user = await this.usersService.create(createUsersDto);
-    return this.login(user);
+    let message = "User created successfully please check your email for verification.";
+    if(user.phone) message = message.replace("email", "email and phone");
+    return {
+      message,
+      user
+    }
+    // return this.login(user);
   }
 
   async login(user: any) {
@@ -46,9 +53,33 @@ export class AuthService{
     };
   }
 
-  // logout(token: string) {
-  //   return token;
-  // }
+  async verify(code: any) {
+    const updateData = {};
+    let message = "";
+    const user = await this.usersService.findOne(code.user.toString());
+
+    if (code.type === CodeType.EMAIL) {
+      if (user.phoneValidated) {
+        updateData["emailValidated"] = true;
+        updateData["verified"] = true;
+        message = "User verified successfully you can now login.";
+      } else {
+        updateData["emailValidated"] = true;
+        message = "Email verified successfully. Please verify your phone number.";
+      }
+    } else {
+      if (user.emailValidated) {
+        updateData["phoneValidated"] = true;
+        updateData["verified"] = true;
+        message = "User verified successfully you can now login.";
+      } else {
+        updateData["phoneValidated"] = true;
+        message = "Phone verified successfully. Please verify your email.";
+      }
+    }
+    await user.set(updateData).save();
+    return message;
+  }
 
   requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
     return requestToResetPasswordDto;
