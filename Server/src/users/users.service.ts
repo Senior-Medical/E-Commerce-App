@@ -10,6 +10,7 @@ import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
 import { CreateCode } from "./types/createCode.type";
 import { VerificationCodes } from "./entities/verificationCodes.entity";
 import { MessagingService } from '../messaging/messaging.service';
+import { SmsData } from "src/messaging/types/smsData.type";
 
 @Injectable()
 export class UsersService {
@@ -63,16 +64,20 @@ export class UsersService {
     if(existingCode) await existingCode.deleteOne();
 
     const code = await this.codesModel.create({ ...codeData });
+    const baseUrl = this.configService.get<string>("BASE_URL");
     if (codeData.type === CodeType.EMAIL) {
-      const baseUrl = this.configService.get<string>("BASE_URL");
       const message = (purpose === CodePurpose.VERIFY_EMAIL) ? `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}` : `The code for reset the password is: ${code.code}.`;
       this.messagingService.sendEmail({
         to: code.value,
         subject: purpose,
-        message: message
+        message
       });
     } else {
-      // send sms
+      const message = `Please visit this link to verify your phone number: ${baseUrl}/auth/verify/${code._id}`;
+      this.messagingService.sendSMS({
+        message,
+        to: code.value 
+      });
     }
     return code;
   }
