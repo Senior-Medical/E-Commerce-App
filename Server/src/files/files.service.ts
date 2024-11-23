@@ -5,7 +5,7 @@ import { extname, join } from "path";
 import { ConfigService } from '@nestjs/config';
 import { lookup } from "mime-types";
 import { memoryStorage } from "multer";
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from 'uuid';
 
 const MAGIC_NUMBERS: Record<string, string> = {
   'FFD8FF': 'image/jpeg',               // JPEG
@@ -43,7 +43,6 @@ export class FilesService {
   constructor(private readonly configService: ConfigService) {
     this.uploadDir = this.configService.get('MULTER_UPLOADS_FOLDER');
     this.maxFileSize = parseInt(this.configService.get('MULTER_MAX_FILE_SIZE'));
-    console.log(this.maxFileSize);
   }
 
   gitMulterOptions(fileSize: number = this.maxFileSize) {
@@ -103,6 +102,12 @@ export class FilesService {
       }
     }
     return undefined;
+  }
+
+  generateFilename(mimeType: string): string {
+    const uuid = uuidv4();
+    const ext = mimeType.split("/").pop();
+    return `${Date.now()}-${uuid}.${ext}`;
   }
 
   private fileFilter(req: Request, file: Express.Multer.File, callback: (error: Error | null, acceptFile: boolean) => void) {

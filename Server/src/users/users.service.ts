@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { EncryptionService } from '../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
 import { Document, Model, Types } from "mongoose";
 import { User } from "./entities/users.entity";
-import { CreateUsersDto } from "./dtos/createUser.dto";
 import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
 import { CreateCode } from "./types/createCode.type";
 import { VerificationCodes } from "./entities/verificationCodes.entity";
 import { MessagingService } from '../messaging/messaging.service';
-import { SmsData } from "src/messaging/types/smsData.type";
+import { CreateUserType } from "./types/createUser.type";
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +18,8 @@ export class UsersService {
     @InjectModel(User.name) private usersModel: Model<User>,
     @InjectModel(VerificationCodes.name) private codesModel: Model<VerificationCodes>,
     private readonly messagingService: MessagingService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly filesService: FilesService
   ) { }
   
   async comparePassword(password: string, hashedPassword: string) {
@@ -34,10 +35,24 @@ export class UsersService {
     return this.usersModel.findById(id);
   }
 
-  async create(createUsersDto: CreateUsersDto) {
-    const user = await this.usersModel.create({ ...createUsersDto });
+  async create(createUsersDto: CreateUserType, avatar: Express.Multer.File) {
+    let user: Document;
+    
+    try {
+      if (avatar) {
+        createUsersDto.avatar = avatar.filename;
+        await this.filesService.saveFiles([avatar]);
+      }
+      user = await this.usersModel.create({ ...createUsersDto });
+    }catch(e) {
+      if (avatar) this.filesService.removeFiles([avatar.filename]);
+      console.error(e);
+      throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
     if(createUsersDto.phone) await this.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user);
+    
     return user;
   }
 

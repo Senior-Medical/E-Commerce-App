@@ -5,7 +5,6 @@ import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { Document } from "mongoose";
-import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
 import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
 import { CreateUserType } from "src/users/types/createUser.type";
 
@@ -35,14 +34,14 @@ export class AuthService{
     return user;
   }
 
-  async register(createUsersDto: CreateUsersDto) {
+  async register(createUsersDto: CreateUsersDto, avatar: Express.Multer.File) {
     const createData: CreateUserType = {...createUsersDto, emailValidated: false};
-    let message = "User created successfully please check your email for verification.";
+    let message = "User created successfully please check your email for verification."
     if (createData.phone) {
       message = message.replace("email", "email and phone");
       createData['phoneValidated'] = false;
     }
-    const user = await this.usersService.create(createData);
+    await this.usersService.create(createData, avatar);
     return message;
   }
 

@@ -10,6 +10,9 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./guards/jwtAuth.guard";
 import { RolesGuard } from "./guards/roles.guard";
+import { FilesModule } from "src/files/files.module";
+import { MulterModule } from "@nestjs/platform-express";
+import { FilesService } from "src/files/files.service";
 
 @Module({
   imports: [
@@ -23,11 +26,15 @@ import { RolesGuard } from "./guards/roles.guard";
         }
       }),
       inject: [ConfigService]
-    })
+    }),
+    FilesModule,
+    MulterModule.registerAsync({
+      imports: [FilesModule],
+      useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
+      inject: [FilesService]
+    }),
   ],
-
   controllers: [AuthController],
-  
   providers: [
     {
       provide: APP_GUARD,

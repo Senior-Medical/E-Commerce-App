@@ -10,9 +10,7 @@ export class ProductImagesValidationPipe implements PipeTransform {
     let newImages = images.map((image: Express.Multer.File) => {
       const mimeType = this.filesService.getMimeType(image.buffer);
       if (!mimeType) throw new NotAcceptableException("Invalid image file.");
-        const uuid = uuidv4();
-        const ext = mimeType ? mimeType.split("/").pop() : image.mimetype.split("/").pop();
-        image.filename = `${Date.now()}-${uuid}.${ext}`;
+      image.filename = this.filesService.generateFilename(mimeType);
       return image;
     })
 
