@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from "class-validator";
+import { Document } from "mongoose";
 
 export class ResetPasswordDto{
   @IsEmail()
@@ -14,4 +15,7 @@ export class ResetPasswordDto{
   @IsString()
   @Length(6, 6)
   readonly code: string;
+
+  codeData: Document;
+  user: Document;
 }

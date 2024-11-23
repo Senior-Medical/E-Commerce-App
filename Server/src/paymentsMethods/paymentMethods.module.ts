@@ -15,6 +15,6 @@ import { LuhnValidationConstraint } from "./utils/luhnValidation";
     }]),
   ],
   controllers: [PaymentMethodsController],
-  providers: [PaymentMethodsService, LuhnValidationConstraint]
+  providers: [PaymentMethodsService, LuhnValidationConstraint],
 })
 export class PaymentMethodsModule {}

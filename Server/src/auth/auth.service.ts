@@ -1,17 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-// import DeviceDetector from "device-detector-js";
-import { JwtService } from "@nestjs/jwt";
+import { Document } from "mongoose";
+import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
+import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
+import { CreateUserType } from "src/users/types/createUser.type";
 
 @Injectable()
 export class AuthService{
-  // private detector = new DeviceDetector();
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) { }
   
   async validateUser(email: string, password: string) {
@@ -34,8 +36,14 @@ export class AuthService{
   }
 
   async register(createUsersDto: CreateUsersDto) {
-    const user = await this.usersService.create(createUsersDto);
-    return this.login(user);
+    const createData: CreateUserType = {...createUsersDto, emailValidated: false};
+    let message = "User created successfully please check your email for verification.";
+    if (createData.phone) {
+      message = message.replace("email", "email and phone");
+      createData['phoneValidated'] = false;
+    }
+    const user = await this.usersService.create(createData);
+    return message;
   }
 
   async login(user: any) {
@@ -46,15 +54,29 @@ export class AuthService{
     };
   }
 
-  // logout(token: string) {
-  //   return token;
-  // }
+  async verify(code: any) {
+    const updateData = {};
+    let message = "";
+    const user = await this.usersService.findOne(code.user.toString());
 
-  requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
-    return requestToResetPasswordDto;
+    if (code.type === CodeType.EMAIL) updateData["emailValidated"] = true;
+    else updateData["phoneValidated"] = true;
+
+    message = "Account verified successfully you can now login.";
+    updateData["verified"] = true;
+    await user.set(updateData).save();
+    code.deleteOne();
+    return message;
   }
 
-  resetPassword(resetPasswordDto: ResetPasswordDto) {
-    return resetPasswordDto;
+  async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
+    await this.usersService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
+    return `Please check your email for password reset code.`;
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save();
+    await resetPasswordDto.codeData.deleteOne();
+    return "Password reset successfully.";
   }
 }

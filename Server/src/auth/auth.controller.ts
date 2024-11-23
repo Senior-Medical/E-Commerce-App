@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { CreateUserValidationPipe } from "src/users/pipes/createUserValidation.pipe";
 import { AuthService } from './auth.service';
@@ -7,6 +7,11 @@ import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 import { LocalAuthGuard } from "./guards/localAuth.guard";
 import { UserDecorator } from "src/common/decorators/user.decorator";
 import { Public } from "./decorators/public.decorator";
+import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
+import { Document } from "mongoose";
+import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
+import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
 
 @Controller("auth")
 @Public()
@@ -20,17 +25,23 @@ export class AuthController {
 
   @Post("login")
   @UseGuards(LocalAuthGuard)
-  login(@UserDecorator() user) {
+  login(@UserDecorator() user: any) {
     return this.authService.login(user);
   }
 
+  @Get("verify/:codeId")
+  verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
+    return this.authService.verify(code);
+  }
+
   @Post("resetPassword")
-  requestToResetPassword(@Body() requestToResetPasswordDto: RequestToResetPasswordDto) {
+  requestToResetPassword(@Body(CheckEmailExistPipe) requestToResetPasswordDto: RequestToResetPasswordDto) {
     return this.authService.requestToResetPassword(requestToResetPasswordDto);
   }
 
   @Patch("resetPassword")
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+  @HttpCode(HttpStatus.ACCEPTED)
+  resetPassword(@Body(ResetPasswordPipe) resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }
 }

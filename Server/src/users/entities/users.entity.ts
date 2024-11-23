@@ -10,10 +10,10 @@ export class User {
   @Prop({ required: true })
   name: string;
   
-  @Prop({ unique: true, index: true })
+  @Prop({ index: true })
   username: string;
   
-  @Prop({ unique: true, index: true })
+  @Prop({ index: true })
   phone: string;
   
   @Prop({ unique: true, required: true, index: true })
@@ -37,10 +37,10 @@ export class User {
   @Prop({ default: false })
   verified: boolean;
 
-  @Prop({ default: false })
+  @Prop()
   emailValidated: boolean;
   
-  @Prop({ default: false })
+  @Prop()
   phoneValidated: boolean;
   
   @Prop({ default: new Date() })
@@ -48,18 +48,6 @@ export class User {
 
   @Prop({ default: new Date() })
   changePasswordAt: Date;
-  
-  @Prop(raw({
-    code: { type: String },
-    expireAt: { type: Date }
-  }))
-  emailVerificationCode: Record<string, any>;
-  
-  @Prop(raw({
-    code: { type: String },
-    expireAt: { type: Date }
-  }))
-  resetPasswordCode: Record<string, any>;
 
   @Prop({ default: 0 })
   cartTotal: number;
