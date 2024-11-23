@@ -46,7 +46,7 @@ export class AuthService{
     return message;
   }
 
-  async login(user: any) {
+  async login(user: Document) {
     const { password, __v, ...userData } = user.toObject();
     return {
       access_token: this.jwtService.sign({ sub: user._id }),

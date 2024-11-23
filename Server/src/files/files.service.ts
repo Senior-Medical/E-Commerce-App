@@ -4,6 +4,8 @@ import { unlink, mkdir, writeFile } from "fs/promises";
 import { extname, join } from "path";
 import { ConfigService } from '@nestjs/config';
 import { lookup } from "mime-types";
+import { memoryStorage } from "multer";
+import { v4 as uuidv4 } from "uuid";
 
 const MAGIC_NUMBERS: Record<string, string> = {
   'FFD8FF': 'image/jpeg',               // JPEG
@@ -37,8 +39,19 @@ const ALLOWED_EXTENSIONS: string[] = [
 @Injectable()
 export class FilesService {
   private uploadDir: string;
+  private maxFileSize: number;
   constructor(private readonly configService: ConfigService) {
-    this.uploadDir = this.configService.get<string>('MULTER_UPLOADS_FOLDER');
+    this.uploadDir = this.configService.get('MULTER_UPLOADS_FOLDER');
+    this.maxFileSize = parseInt(this.configService.get('MULTER_MAX_FILE_SIZE'));
+    console.log(this.maxFileSize);
+  }
+
+  gitMulterOptions(fileSize: number = this.maxFileSize) {
+    return {
+      storage: memoryStorage(),
+      limits: {fileSize},
+      fileFilter: this.fileFilter
+    }
   }
   
   async serveFile(filename: string) {
@@ -51,16 +64,6 @@ export class FilesService {
       type: lookup(filename) || 'application/octet-stream',
     });
     else throw new NotFoundException("file not found.");
-  }
-
-  getMimeType(buffer: Buffer) {
-    const header = buffer.subarray(0, 8).toString('hex').toUpperCase();
-    for (const [magic, mime] of Object.entries(MAGIC_NUMBERS)) {
-      if (header.startsWith(magic)) {
-        return mime;
-      }
-    }
-    return undefined;
   }
 
   async removeFiles(filesNames: string[]) {
@@ -90,6 +93,21 @@ export class FilesService {
       })
     );
     return filenames;
+  }
+
+  getMimeType(buffer: Buffer) {
+    const header = buffer.subarray(0, 8).toString('hex').toUpperCase();
+    for (const [magic, mime] of Object.entries(MAGIC_NUMBERS)) {
+      if (header.startsWith(magic)) {
+        return mime;
+      }
+    }
+    return undefined;
+  }
+
+  private fileFilter(req: Request, file: Express.Multer.File, callback: (error: Error | null, acceptFile: boolean) => void) {
+    if (!file.mimetype.startsWith('image')) callback(new NotAcceptableException("Only image files are allowed."), false);
+    else callback(null, true);
   }
 
   private isValidFileName(filename: string): boolean {

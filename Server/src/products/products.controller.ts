@@ -13,12 +13,14 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { FilesService } from '../files/files.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller("products")
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
-    private readonly filesService: FilesService
+    private readonly filesService: FilesService,
+    private readonly configService: ConfigService
   ) { }
   
   @Get()
