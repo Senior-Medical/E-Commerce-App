@@ -23,9 +23,9 @@ export class AuthService{
         {phone: email}
       ]
     });
-    if (users.length === 0) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
-
+    
     const user = users[0];
+    if (!user) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
     if (!user.verified) throw new HttpException("User not verified.", HttpStatus.FORBIDDEN);
 
     const match = await this.usersService.comparePassword(password, user.password);
@@ -46,7 +46,8 @@ export class AuthService{
   }
 
   async login(user: Document) {
-    const { password, __v, ...userData } = user.toObject();
+    user.set({ lastLogin: new Date() }).save();
+    const { password, __v, changePasswordAt, ...userData } = user.toObject();
     return {
       access_token: this.jwtService.sign({ sub: user._id }),
       user: userData

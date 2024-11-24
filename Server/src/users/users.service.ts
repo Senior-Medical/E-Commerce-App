@@ -28,10 +28,10 @@ export class UsersService {
   }
 
   find(condition: any) {
-    return this.usersModel.find(condition)
+    return this.usersModel.find(condition);
   }
   
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.usersModel.findById(id);
   }
 
@@ -60,6 +60,12 @@ export class UsersService {
   
   update(user: Document, updateData: any) {
     return user.set(updateData).save();
+  }
+
+  async remove(user: any) {
+    await user.deleteOne();
+    if (user.avatar) this.filesService.removeFiles([user.avatar]);
+    return;
   }
 
   async findCode(condition: object) {
