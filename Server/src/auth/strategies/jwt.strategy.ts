@@ -21,6 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // [1] check if token valid or not
     const user = await this.usersService.findOne(payload.sub);
     if (!user) throw new UnauthorizedException("Invalid token.");
+    if(!user.verified) throw new UnauthorizedException("User not verified.");
 
     // [2] check if user change password
     if (user.changePasswordAt) {

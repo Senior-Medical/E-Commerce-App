@@ -6,6 +6,7 @@ import { createUserSchema, User } from "./entities/users.entity";
 import { VerificationCodes, getVerificationCodesSchema } from "./entities/verificationCodes.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
+import { FilesModule } from "src/files/files.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UsersService } from "./users.service";
       }
     ]),
     MessagingModule,
+    FilesModule
   ],
   controllers: [UsersController],
   providers: [UsersService],

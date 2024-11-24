@@ -1,5 +1,6 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
 import { FilesService } from '../../files/files.service';
+import {v4 as uuidv4} from 'uuid';
 @Injectable()
 export class ProductImagesValidationPipe implements PipeTransform {
   constructor(private readonly filesService: FilesService) { }
@@ -9,7 +10,7 @@ export class ProductImagesValidationPipe implements PipeTransform {
     let newImages = images.map((image: Express.Multer.File) => {
       const mimeType = this.filesService.getMimeType(image.buffer);
       if (!mimeType) throw new NotAcceptableException("Invalid image file.");
-      image.filename = `${Date.now()}-${image.originalname}`;
+      image.filename = this.filesService.generateFilename(mimeType);
       return image;
     })
 

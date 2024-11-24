@@ -7,6 +7,7 @@ export type CreateUserType = {
   email: string;
   password: string;
   role?: Role;
+  avatar?: string;
   bio?: string;
   company?: string;
   emailValidated?: boolean;

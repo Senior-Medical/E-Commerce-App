@@ -40,7 +40,7 @@ export class ProductsService {
     
     try {
       const imagesNames = await this.filesService.saveFiles(images);
-      const userId = new Types.ObjectId(user._id as string);
+      const userId = new Types.ObjectId(user._id.toString());
       const productInput: CreateProduct = {
         ...productData,
         images: imagesNames,
@@ -78,7 +78,7 @@ export class ProductsService {
     }
 
     // Update the product
-    const userId = new Types.ObjectId(user._id as string);
+    const userId = new Types.ObjectId(user._id.toString());
     const productInput: UpdateProduct = {
       ...productData,
       updatedBy: userId

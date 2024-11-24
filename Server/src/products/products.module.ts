@@ -5,8 +5,8 @@ import { ProductsController } from "./products.controller";
 import { ProductsService } from "./products.service";
 import { CategoriesModule } from "src/categories/categories.module";
 import { MulterModule } from "@nestjs/platform-express";
-import { multerOptions } from "./config/multer.config";
 import { FilesModule } from "src/files/files.module";
+import { FilesService } from "src/files/files.service";
 
 @Module({
   imports: [
@@ -16,9 +16,13 @@ import { FilesModule } from "src/files/files.module";
         schema: ProductSchema
       }
     ]),
-    MulterModule.register(multerOptions()),
-    CategoriesModule,
-    FilesModule
+    FilesModule,
+    MulterModule.registerAsync({
+      imports: [FilesModule],
+      useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
+      inject: [FilesService]
+    }),
+    CategoriesModule
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

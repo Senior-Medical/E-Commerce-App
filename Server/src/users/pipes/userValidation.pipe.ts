@@ -1,12 +1,11 @@
-import { ArgumentMetadata, HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common';
-import { CreateUsersDto } from '../dtos/createUser.dto';
+import { ArgumentMetadata, ConflictException, HttpException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common';
 import { UsersService } from '../users.service';
 
 @Injectable()
-export class CreateUserValidationPipe implements PipeTransform {
+export class UserValidationPipe implements PipeTransform {
   constructor(private readonly usersService: UsersService) { }
   
-  async transform(body: CreateUsersDto, metadata: ArgumentMetadata) {
+  async transform(body: any, metadata: ArgumentMetadata) {
     let { email, phone, username } = body;
     const conditions = []
     if (email) conditions.push({ email });
@@ -17,7 +16,7 @@ export class CreateUserValidationPipe implements PipeTransform {
         ...conditions
       ]
     }))[0];
-    if (user) throw new HttpException('Email, phone or username are already exist.', HttpStatus.CONFLICT);
+    if (user) throw new ConflictException('Email, phone or username are already exist.');
     else return body;
   }
 }

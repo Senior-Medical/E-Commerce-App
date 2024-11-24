@@ -1,6 +1,6 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { CreateUserValidationPipe } from "src/users/pipes/createUserValidation.pipe";
+import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
 import { AuthService } from './auth.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
@@ -12,6 +12,8 @@ import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
 import { Document } from "mongoose";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 
 @Controller("auth")
 @Public()
@@ -19,13 +21,17 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
   
   @Post("register")
-  register(@Body(CreateUserValidationPipe) registerDto: CreateUsersDto) {
-    return this.authService.register(registerDto);
+  @UseInterceptors(FileInterceptor("avatar"))
+  register(
+    @Body(UserValidationPipe) registerDto: CreateUsersDto,
+    @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
+  ) {
+    return this.authService.register(registerDto, avatar);
   }
 
   @Post("login")
   @UseGuards(LocalAuthGuard)
-  login(@UserDecorator() user: any) {
+  login(@UserDecorator() user: Document) {
     return this.authService.login(user);
   }
 

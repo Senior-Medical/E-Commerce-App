@@ -4,7 +4,7 @@
 ```
   POST /api/v1/auth/register - Register a new user.
   POST /api/v1/auth/login - User login.
-  GET /api/v1/auth/logout - User logout.
+  GET /api/v1/auth/verify/:codeId - For verify emails and phone numbers.
   POST /api/v1/auth/resetPassword - Request to Reset the password.
   PATCH /api/v1/auth/resetPassword - set new password.
 ```
@@ -14,11 +14,7 @@
   GET /api/v1/users - Get all users (admin only).
   GET /api/v1/users/:userId - Get a single user by ID (admin or owner only).
   PATCH /api/v1/users/:userId - Update a user by ID (admin or owner only).
-  PATCH /api/v1/users/password - Update a user password (owner only).
-  PATCH /api/v1/users/email - Update a user email (owner only).
-  PATCH /api/v1/users/email/verify - Verify user email (owner only).
-  PATCH /api/v1/users/phone - Update a user phone (owner only).
-  PATCH /api/v1/users/phone/verify - Verify user phone (owner only).
+  PATCH /api/v1/users/password/:userId - Update a user password (owner only).
   DELETE /api/v1/users/:userId - Delete a user by ID (admin or owner only).
 ```
 

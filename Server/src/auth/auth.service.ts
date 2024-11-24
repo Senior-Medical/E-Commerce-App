@@ -5,9 +5,9 @@ import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { Document } from "mongoose";
-import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
 import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
 import { CreateUserType } from "src/users/types/createUser.type";
+import { UpdateUserType } from "src/users/types/updateUser.type";
 
 @Injectable()
 export class AuthService{
@@ -24,9 +24,9 @@ export class AuthService{
         {phone: email}
       ]
     });
-    if (users.length === 0) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
-
+    
     const user = users[0];
+    if (!user) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
     if (!user.verified) throw new HttpException("User not verified.", HttpStatus.FORBIDDEN);
 
     const match = await this.usersService.comparePassword(password, user.password);
@@ -35,35 +35,47 @@ export class AuthService{
     return user;
   }
 
-  async register(createUsersDto: CreateUsersDto) {
+  async register(createUsersDto: CreateUsersDto, avatar: Express.Multer.File) {
     const createData: CreateUserType = {...createUsersDto, emailValidated: false};
-    let message = "User created successfully please check your email for verification.";
+    let message = "User created successfully please check your email for verification."
     if (createData.phone) {
       message = message.replace("email", "email and phone");
       createData['phoneValidated'] = false;
     }
-    const user = await this.usersService.create(createData);
+    await this.usersService.create(createData, avatar);
     return message;
   }
 
-  async login(user: any) {
-    const { password, __v, ...userData } = user.toObject();
+  async login(user: Document) {
+    user.set({ lastLogin: new Date() }).save();
     return {
       access_token: this.jwtService.sign({ sub: user._id }),
-      user: userData
+      user: this.usersService.getUserObject(user)
     };
   }
 
   async verify(code: any) {
-    const updateData = {};
-    let message = "";
+    const updateData: UpdateUserType = {};
     const user = await this.usersService.findOne(code.user.toString());
+    
+    let message = "Account verified successfully you can now login.";
 
-    if (code.type === CodeType.EMAIL) updateData["emailValidated"] = true;
-    else updateData["phoneValidated"] = true;
+    if (code.type === CodeType.EMAIL) {
+      if (code.purpose === CodePurpose.UPDATE_EMAIL) {
+        updateData.email = code.value;
+        message = "Email updated successfully.";
+      }
+      updateData.emailValidated = true;
+    }
+    else {
+      if (code.purpose === CodePurpose.UPDATE_PHONE) {
+        updateData.phone = code.value;
+        message = "Phone updated successfully.";
+      }
+      updateData.phoneValidated = true;
+    }
 
-    message = "Account verified successfully you can now login.";
-    updateData["verified"] = true;
+    updateData.verified = true;
     await user.set(updateData).save();
     code.deleteOne();
     return message;

@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { MailDataRequired } from "@sendgrid/mail";
-import { SendGridClient } from './sendGridClient.service';
 import { MailData } from "./types/mailData.type";
 import { ConfigService } from '@nestjs/config';
 import * as sendGrid from '@sendgrid/mail';
@@ -52,6 +51,4 @@ export class MessagingService {
       this.logger.error("SMS send error: " + error);
     }
   }
-
-
 }
