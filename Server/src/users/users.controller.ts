@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Patch, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
@@ -6,6 +6,10 @@ import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { Document } from "mongoose";
 import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
 import { UserPermissionGuard } from "./guards/userPermisstion.guard";
+import { UpdateUsersDto } from "./dtos/updateUser.dto";
+import { UserValidationPipe } from "./pipes/userValidation.pipe";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
 
 @Controller("users")
 export class UsersController{
@@ -20,37 +24,23 @@ export class UsersController{
   @Get(":userId")
   @UseGuards(UserPermissionGuard)
   findOne(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
-    return user;
+    return this.usersService.getUserObject(user);
   }
 
-  // @Patch(":userId")
-  // update() {
-  //   return this.usersService.update();
-  // }
+  @Patch(":userId")
+  @UseGuards(UserPermissionGuard)
+  @UseInterceptors(FileInterceptor("avatar"))
+  update(
+    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document,
+    @Body(UserValidationPipe) updateData: UpdateUsersDto,
+    @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
+  ) {
+    return this.usersService.update(user, updateData, avatar);
+  }
 
   // @Patch("password/:userId")
   // updatePassword() {
   //   return this.usersService.updatePassword();
-  // }
-
-  // @Patch("email/:userId")
-  // updateEmail() {
-  //   return this.usersService.updateEmail();
-  // }
-
-  // @Patch("email/verify/:userId")
-  // verifyEmail() {
-  //   return this.usersService.verifyEmail();
-  // }
-
-  // @Patch("phone/:userId")
-  // updatePhone() {
-  //   return this.usersService.updatePhone();
-  // }
-
-  // @Patch("phone/verify/:userId")
-  // verifyPhone() {
-  //   return this.usersService.verifyPhone();
   // }
 
   @Delete(":userId")

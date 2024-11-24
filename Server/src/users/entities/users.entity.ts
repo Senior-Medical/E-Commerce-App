@@ -80,13 +80,5 @@ export const createUserSchema = (configService: ConfigService) => {
     await this.model(PaymentMethods.name).deleteMany({ user: user._id });
     next();
   });
-
-  UserSchema.post(['findOne', 'save'], async function (doc) {
-    if (doc) {
-      doc.password = undefined;
-      doc.__v = undefined;
-    }
-  });
-  
   return UserSchema;
 }

@@ -11,6 +11,8 @@ import { VerificationCodes } from "./entities/verificationCodes.entity";
 import { MessagingService } from '../messaging/messaging.service';
 import { CreateUserType } from "./types/createUser.type";
 import { FilesService } from 'src/files/files.service';
+import { UpdateUsersDto } from "./dtos/updateUser.dto";
+import { UpdateUserType } from "./types/updateUser.type";
 
 @Injectable()
 export class UsersService {
@@ -37,7 +39,6 @@ export class UsersService {
 
   async create(createUsersDto: CreateUserType, avatar: Express.Multer.File) {
     let user: Document;
-    
     try {
       if (avatar) {
         createUsersDto.avatar = avatar.filename;
@@ -53,19 +54,59 @@ export class UsersService {
     await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
     if(createUsersDto.phone) await this.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user);
     
-    return user;
+    return this.getUserObject(user);
   }
-
-
   
-  update(user: Document, updateData: any) {
-    return user.set(updateData).save();
+  async update(user: any, updateData: UpdateUsersDto, avatar: Express.Multer.File) {
+    const inputData: UpdateUserType = { ...updateData };
+    let message: string = "";
+    
+    if (inputData.email) {
+      await this.createCode(CodePurpose.UPDATE_EMAIL, inputData.email, CodeType.EMAIL, user);
+      inputData.emailValidated = false;
+      message = "Please check your new email for verification.";
+    }
+
+    if (inputData.phone) {
+      await this.createCode(CodePurpose.UPDATE_PHONE, inputData.phone, CodeType.PHONE, user);
+      inputData.phoneValidated = false;
+      message = "Please check your new phone for verification.";
+    }
+
+    if (inputData.phone && inputData.email) {
+      message = "Please check your new email and new phone for verification.";
+    }
+    
+    try {
+      let oldImage = user.avatar;
+      if (avatar) {
+        inputData.avatar = avatar.filename;
+        await this.filesService.saveFiles([avatar]);
+      }
+      await user.set(inputData).save();
+      if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
+    }catch(e) {
+      if (avatar) this.filesService.removeFiles([avatar.filename]);
+      throw new HttpException("Error in saving data: " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    message = "User updated successfully. " + message;
+
+    return {
+      message,
+      user: this.getUserObject(user)
+    };
   }
 
   async remove(user: any) {
     await user.deleteOne();
     if (user.avatar) this.filesService.removeFiles([user.avatar]);
     return;
+  }
+
+  getUserObject(user: Document) { 
+    const { password, __v, changePasswordAt, ...userObject } = user.toObject();
+    return userObject;
   }
 
   async findCode(condition: object) {
@@ -87,7 +128,7 @@ export class UsersService {
     const code = await this.codesModel.create({ ...codeData });
     const baseUrl = this.configService.get<string>("BASE_URL");
     if (codeData.type === CodeType.EMAIL) {
-      const message = (purpose === CodePurpose.VERIFY_EMAIL) ? `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}` : `The code for reset the password is: ${code.code}.`;
+      const message = (purpose === CodePurpose.VERIFY_EMAIL || purpose === CodePurpose.UPDATE_EMAIL) ? `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}` : `The code for reset the password is: ${code.code}.`;
       this.messagingService.sendEmail({
         to: code.value,
         subject: purpose,
@@ -101,10 +142,6 @@ export class UsersService {
       });
     }
     return code;
-  }
-
-  async removeCode(condition: any) {
-    return this.codesModel.deleteOne(condition);
   }
 
   private generateCode(length: number = 6) {

@@ -9,8 +9,6 @@ export class VerificationCodes {
   @Prop({
     required: true,
     unique: true,
-    minlength: 6,
-    maxlength: 6
   })
   code: string;
 

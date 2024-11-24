@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { CreateUserValidationPipe } from "src/users/pipes/createUserValidation.pipe";
+import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
 import { AuthService } from './auth.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
@@ -23,7 +23,7 @@ export class AuthController {
   @Post("register")
   @UseInterceptors(FileInterceptor("avatar"))
   register(
-    @Body(CreateUserValidationPipe) registerDto: CreateUsersDto,
+    @Body(UserValidationPipe) registerDto: CreateUsersDto,
     @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
   ) {
     return this.authService.register(registerDto, avatar);
