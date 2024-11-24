@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { EncryptionService } from '../common/services/encryption.service';
@@ -13,6 +13,7 @@ import { CreateUserType } from "./types/createUser.type";
 import { FilesService } from 'src/files/files.service';
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { UpdateUserType } from "./types/updateUser.type";
+import { UpdatePasswordDto } from './dtos/updatePassword.dto';
 
 @Injectable()
 export class UsersService {
@@ -96,6 +97,15 @@ export class UsersService {
       message,
       user: this.getUserObject(user)
     };
+  }
+
+  async updatePassword(user: any, body: UpdatePasswordDto) {
+    const { oldPassword, newPassword } = body;
+    const isPasswordMatch = await this.comparePassword(oldPassword, user.password);
+    if (!isPasswordMatch) throw new NotAcceptableException("Incorrect old password.");
+    user.password = newPassword;
+    await user.save();
+    return "Password updated successfully.";
   }
 
   async remove(user: any) {

@@ -10,6 +10,7 @@ import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { UserValidationPipe } from "./pipes/userValidation.pipe";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
+import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
 
 @Controller("users")
 export class UsersController{
@@ -38,10 +39,11 @@ export class UsersController{
     return this.usersService.update(user, updateData, avatar);
   }
 
-  // @Patch("password/:userId")
-  // updatePassword() {
-  //   return this.usersService.updatePassword();
-  // }
+  @Patch("password/:userId")
+  @UseGuards(UserPermissionGuard)
+  updatePassword(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document, @Body() body: UpdatePasswordDto) {
+    return this.usersService.updatePassword(user, body);
+  }
 
   @Delete(":userId")
   @UseGuards(UserPermissionGuard)
