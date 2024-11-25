@@ -1,19 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { UserDecorator } from "src/common/decorators/user.decorator";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { UserDecorator } from "src/users/decorators/user.decorator";
+import { FilesService } from '../files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
-import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
-import { ProductsService } from './products.service';
-import { FilesInterceptor } from "@nestjs/platform-express";
-import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
-import { FilesService } from '../files/files.service';
-import { ConfigService } from '@nestjs/config';
+import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
+import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
+import { ProductsService } from './products.service';
 
 @Controller("products")
 export class ProductsController {

@@ -17,10 +17,12 @@ import { CustomLogger } from "./common/services/customLogger.service";
 import { LoggerInterceptor } from "./common/interceptors/logger.interceptor";
 import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
 import { LoggerExceptionFilter } from "./common/filters/loggerException.filter";
+import { envVariablesValidationSchema } from "./common/config/envValidation.schema";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      validationSchema: envVariablesValidationSchema,
       isGlobal: true,
     }),
     ThrottlerModule.forRootAsync({
@@ -80,9 +82,7 @@ import { LoggerExceptionFilter } from "./common/filters/loggerException.filter";
     }
   ],
 })
-export class AppModule {
-  constructor(private readonly customLogger: CustomLogger) { }
-  
+export class AppModule { 
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestTimingMiddleware).forRoutes('*');
   }

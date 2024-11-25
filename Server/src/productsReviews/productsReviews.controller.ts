@@ -3,14 +3,14 @@ import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { UserDecorator } from "src/common/decorators/user.decorator";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
+import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
+import { CheckReviewOwnerGuard } from "./guards/checkReviewOwner.guard";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
-import { CheckReviewOwnerGuard } from "./guards/checkReviewOwner.guard";
 
 @Controller("products/reviews")
 export class ProductsReviewsController {

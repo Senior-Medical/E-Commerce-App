@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
-import { AddressesService } from './addresses.service';
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
-import { UserDecorator } from "src/common/decorators/user.decorator";
-import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { Document } from "mongoose";
+import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { UserDecorator } from "src/users/decorators/user.decorator";
+import { AddressesService } from './addresses.service';
+import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
 import { CheckAddressOwnerGuard } from "./guards/checkAddressOwner.guard";
+import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
 
 @Controller("addresses")
 export class AddressesController {
