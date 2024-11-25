@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { HttpStatus, MiddlewareConsumer, Module, OnModuleInit, ValidationPipe } from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersModule } from "./users/users.module";
@@ -10,9 +10,13 @@ import { AddressesModule } from "./addresses/addresses.module";
 import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
 import { MessagingModule } from "./messaging/messaging.module";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/guards/jwtAuth.guard";
 import { RolesGuard } from "./auth/guards/roles.guard";
+import { CustomLogger } from "./common/services/customLogger.service";
+import { LoggerInterceptor } from "./common/interceptors/logger.interceptor";
+import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
+import { LoggerExceptionFilter } from "./common/filters/loggerException.filter";
 
 @Module({
   imports: [
@@ -44,6 +48,11 @@ import { RolesGuard } from "./auth/guards/roles.guard";
     MessagingModule
   ],
   providers: [
+    CustomLogger,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
@@ -56,6 +65,25 @@ import { RolesGuard } from "./auth/guards/roles.guard";
       provide: APP_GUARD,
       useClass: RolesGuard
     },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      })
+    },
+    {
+      provide: APP_FILTER,
+      useClass: LoggerExceptionFilter
+    }
   ],
 })
-export class AppModule{}
+export class AppModule {
+  constructor(private readonly customLogger: CustomLogger) { }
+  
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestTimingMiddleware).forRoutes('*');
+  }
+}
