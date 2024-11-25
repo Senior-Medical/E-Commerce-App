@@ -5,11 +5,8 @@ import { UsersModule } from "src/users/users.module";
 import { PassportModule } from "@nestjs/passport";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { JwtModule } from "@nestjs/jwt";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigService } from "@nestjs/config";
 import { JwtStrategy } from "./strategies/jwt.strategy";
-import { APP_GUARD } from "@nestjs/core";
-import { JwtAuthGuard } from "./guards/jwtAuth.guard";
-import { RolesGuard } from "./guards/roles.guard";
 import { FilesModule } from "src/files/files.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
@@ -36,14 +33,6 @@ import { FilesService } from "src/files/files.service";
   ],
   controllers: [AuthController],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard
-    },
     AuthService,
     LocalStrategy,
     JwtStrategy

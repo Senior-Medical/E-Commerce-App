@@ -9,11 +9,23 @@ import { ProductsReviewsModule } from "./productsReviews/productsReviews.module"
 import { AddressesModule } from "./addresses/addresses.module";
 import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
 import { MessagingModule } from "./messaging/messaging.module";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { APP_GUARD } from "@nestjs/core";
+import { JwtAuthGuard } from "./auth/guards/jwtAuth.guard";
+import { RolesGuard } from "./auth/guards/roles.guard";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => [{
+        ttl: configService.get<number>("THROTTLE_TTL"),
+        limit: configService.get<number>("THROTTLE_LIMIT")
+      }],
+      inject: [ConfigService]
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -30,6 +42,20 @@ import { MessagingModule } from "./messaging/messaging.module";
     AddressesModule,
     PaymentMethodsModule,
     MessagingModule
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    },
   ],
 })
 export class AppModule{}
