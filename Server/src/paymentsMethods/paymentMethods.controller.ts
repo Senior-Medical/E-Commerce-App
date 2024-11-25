@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
-import { PaymentMethodsService } from './paymentMethods.service';
-import { UserDecorator } from "src/common/decorators/user.decorator";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
+import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { CheckPaymentMethodOwnerGuard } from "./guard/checkPaymentMethodOwner.guard";
+import { PaymentMethodsService } from './paymentMethods.service';
+import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
 
 @Controller("payments")
 export class PaymentMethodsController {

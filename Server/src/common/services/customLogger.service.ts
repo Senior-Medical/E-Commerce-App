@@ -13,6 +13,11 @@ export class CustomLogger extends ConsoleLogger implements LoggerService {
     }
   }
 
+  clearLogFile() {
+    this.ensureLogFileExists();
+    fs.writeFileSync(this.logFile, '');
+  }
+
   log(message: string, context?: string) {
     const formattedMessage = context
     ? `[${context}] ${message}`

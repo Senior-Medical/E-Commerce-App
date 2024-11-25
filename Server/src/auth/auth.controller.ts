@@ -1,19 +1,19 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Document } from "mongoose";
+import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
+import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
 import { AuthService } from './auth.service';
+import { Public } from "./decorators/public.decorator";
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 import { LocalAuthGuard } from "./guards/localAuth.guard";
-import { UserDecorator } from "src/common/decorators/user.decorator";
-import { Public } from "./decorators/public.decorator";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
-import { Document } from "mongoose";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
+import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 
 @Controller("auth")
 @Public()

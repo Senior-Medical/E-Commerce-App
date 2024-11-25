@@ -3,7 +3,7 @@ import { Document } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { UserDecorator } from "../common/decorators/user.decorator";
+import { UserDecorator } from "../users/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
