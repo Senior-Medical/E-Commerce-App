@@ -1,11 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HttpStatus, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import { CustomLogger } from './common/services/customLogger.service';
-import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
-// import { doubleCsrf } from 'csrf-csrf';
+// import { DoubleCsrfConfigOptions, doubleCsrf } from 'csrf-csrf';
 
 
 async function bootstrap() {
@@ -23,6 +22,9 @@ async function bootstrap() {
     defaultVersion: defaultVersion,
   });
 
+  // const doubleCsrfOptions: DoubleCsrfConfigOptions = {
+  //   getSecret: () => configService.get<string>("CSRF_SECRET"),
+  // };
   // const {
   //   invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.
   //   generateToken, // Use this in your routes to generate and provide a CSRF hash, along with a token cookie and token.
