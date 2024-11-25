@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 // import { doubleCsrf } from 'csrf-csrf';
@@ -31,9 +31,17 @@ async function bootstrap() {
   // } = doubleCsrf(doubleCsrfOptions);
   // app.use(doubleCsrfProtection);
 
+  const defaultVersion = configService.get<string>("DEFAULT_VERSION") || "1";
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: defaultVersion,
+  });
+
   const PORT = configService.get<number>("PORT") || 3000;
   await app.listen(PORT, () => {
-    console.log(`Server listen on link: http://localhost:${PORT}/${GLOBAL_PREFIX}`);
+    const baseUrl = configService.get<string>("BASE_URL") || `http://localhost:${PORT}`;
+    // console.log(`Server listen on link: ${baseUrl}/${GLOBAL_PREFIX}/v${defaultVersion}`);
+    Logger.log(`Server listen on link: ${baseUrl}/${GLOBAL_PREFIX}/v${defaultVersion}`, 'Bootstrap');
   });
 }
 bootstrap();
