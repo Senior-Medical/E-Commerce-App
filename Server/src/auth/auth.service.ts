@@ -42,8 +42,12 @@ export class AuthService{
       message = message.replace("email", "email and phone");
       createData['phoneValidated'] = false;
     }
-    await this.usersService.create(createData, avatar);
-    return message;
+    const user = await this.usersService.create(createData, avatar);
+
+    return {
+      message,
+      userId: user._id
+    };
   }
 
   async login(user: Document) {
@@ -78,17 +82,39 @@ export class AuthService{
     updateData.verified = true;
     await user.set(updateData).save();
     code.deleteOne();
-    return message;
+    return {message};
   }
 
   async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
     await this.usersService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
-    return `Please check your email for password reset code.`;
+    return {message: `Please check your email for password reset code.`};
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save();
     await resetPasswordDto.codeData.deleteOne();
-    return "Password reset successfully.";
+    return {message: "Password reset successfully."};
+  }
+
+  async resendVerification(user: any) {
+    const { emailValidated, phoneValidated, verified } = user;
+    let message = "";
+    let email = false;
+    let phone = false;
+    if (user.email && !emailValidated) {
+      await this.usersService.createCode(CodePurpose.VERIFY_EMAIL, user.email, CodeType.EMAIL, user);
+      email = true;
+    }
+    if (user.phone && !phoneValidated) {
+      await this.usersService.createCode(CodePurpose.VERIFY_PHONE, user.phone, CodeType.PHONE, user);
+      phone = true;
+    }
+
+    if (email && phone) message = "Please check your email and phone for verification.";
+    else if (email) message = "Please check your email for verification.";
+    else if (phone) message = "Please check your phone for verification.";
+    else message = "User already verified.";
+    
+    return {message};
   }
 }

@@ -6,13 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { VerificationCodes } from "./verificationCodes.entity";
 import { Address } from "src/addresses/entities/addresses.entity";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
-import { Category } from "src/categories/entities/categories.entity";
-import { Product } from "src/products/entities/products.entity";
-import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "src/app.module";
-import { AddressesService } from "src/addresses/addresses.service";
-import { CategoriesServices } from "src/categories/categories.service";
 
 @Schema({ timestamps: true })
 export class User {

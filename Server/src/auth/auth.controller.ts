@@ -14,12 +14,24 @@ import { LocalAuthGuard } from "./guards/localAuth.guard";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
+import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 
 @Controller("auth")
 @Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
   
+
+  @Get("verify/:codeId")
+  verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
+    return this.authService.verify(code);
+  }
+
+  @Get("resendVerification/:userId")
+  resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+    return this.authService.resendVerification(user);
+  }
+
   @Post("register")
   @UseInterceptors(FileInterceptor("avatar"))
   register(
@@ -33,11 +45,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@UserDecorator() user: Document) {
     return this.authService.login(user);
-  }
-
-  @Get("verify/:codeId")
-  verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
-    return this.authService.verify(code);
   }
 
   @Post("resetPassword")
