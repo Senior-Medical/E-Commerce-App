@@ -22,7 +22,6 @@ export class LoggerInterceptor implements NestInterceptor {
     const controllerName = context.getClass().name;
     const handlerName = context.getHandler().name;
     const contextName = `${controllerName}.${handlerName}`;
-    console.log(contextName)
 
     return next.handle().pipe(
       tap(() => {

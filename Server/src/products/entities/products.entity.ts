@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
+import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
 
 @Schema({timestamps: true})
 export class Product {
@@ -53,4 +54,11 @@ export class Product {
   updatedBy: Types.ObjectId;
 }
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
+const ProductSchema = SchemaFactory.createForClass(Product);
+
+ProductSchema.post("findOneAndDelete", async function (doc, next) {
+  if (doc) await doc.model(ProductsReviews.name).deleteMany({ product: doc._id });
+  next();
+})
+
+export { ProductSchema };

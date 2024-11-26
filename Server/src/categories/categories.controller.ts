@@ -8,20 +8,23 @@ import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
+import { UsersService } from 'src/users/users.service';
 
 @Controller("categories")
 @Roles(Role.admin, Role.staff)
 export class CategoriesController{
-  constructor(private readonly categoriesServices: CategoriesServices) { }
+  constructor(
+    private readonly categoriesServices: CategoriesServices
+  ) { }
   
   @Get()
   find() {
-    return this.categoriesServices.find();
+    return this.categoriesServices.find().populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
   @Get(":categoryId")
-  findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: string) {
-    return category;
+  async findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document) {
+    return (await category.populate("createdBy", "name username")).populate("updatedBy", "name username");
   }
 
   @Post()

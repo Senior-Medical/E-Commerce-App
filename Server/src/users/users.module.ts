@@ -7,6 +7,8 @@ import { VerificationCodes, getVerificationCodesSchema } from "./entities/verifi
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 import { FilesModule } from "src/files/files.module";
+import { MulterModule } from "@nestjs/platform-express";
+import { FilesService } from "src/files/files.service";
 
 @Module({
   imports: [
@@ -23,7 +25,12 @@ import { FilesModule } from "src/files/files.module";
       }
     ]),
     MessagingModule,
-    FilesModule
+    FilesModule,
+    MulterModule.registerAsync({
+      imports: [FilesModule],
+      useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
+      inject: [FilesService]
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService],

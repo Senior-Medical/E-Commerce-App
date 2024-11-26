@@ -19,13 +19,13 @@ export class ProductsReviewsController {
   @Get("/all/:productId")
   @Public()
   find(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
-    return this.productsReviewsService.find({product: product._id});
+    return this.productsReviewsService.find({product: product._id}).populate("user", "name username");
   }
 
   @Get(":reviewId")
   @Public()
-  findOne(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
-    return review;
+  async findOne(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
+    return (await review.populate("user", "name username")).populate("product", "name");
   }
 
   @Post()

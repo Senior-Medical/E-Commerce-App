@@ -3,10 +3,16 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { EncryptionService } from '../../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
-import { model } from 'mongoose';
 import { VerificationCodes } from "./verificationCodes.entity";
 import { Address } from "src/addresses/entities/addresses.entity";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
+import { Category } from "src/categories/entities/categories.entity";
+import { Product } from "src/products/entities/products.entity";
+import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "src/app.module";
+import { AddressesService } from "src/addresses/addresses.service";
+import { CategoriesServices } from "src/categories/categories.service";
 
 @Schema({ timestamps: true })
 export class User {
@@ -73,11 +79,12 @@ export const createUserSchema = (configService: ConfigService) => {
     }
   })
 
-  UserSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const user = this as any;
-    await this.model(VerificationCodes.name).deleteMany({ user: user._id });
-    await this.model(Address.name).deleteMany({ user: user._id });
-    await this.model(PaymentMethods.name).deleteMany({ user: user._id });
+  UserSchema.post('findOneAndDelete', async function (doc, next) {
+    if (doc) {
+      await doc.model(Address.name).deleteMany({ user: doc._id });
+      await doc.model(PaymentMethods.name).deleteMany({ user: doc._id });
+      await doc.model(VerificationCodes.name).deleteMany({ user: doc._id });
+    }
     next();
   });
   return UserSchema;

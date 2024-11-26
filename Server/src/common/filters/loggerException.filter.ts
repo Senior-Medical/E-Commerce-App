@@ -6,35 +6,25 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { CustomLogger } from '../services/customLogger.service';
+import { BaseExceptionFilter } from '@nestjs/core';
 
 @Injectable()
 @Catch()
-export class LoggerExceptionFilter implements ExceptionFilter {
-  constructor(private readonly customLogger: CustomLogger) {}
+export class LoggerExceptionFilter extends BaseExceptionFilter implements ExceptionFilter {
+  constructor(private readonly customLogger: CustomLogger) {
+    super();
+  }
 
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const request = ctx.getRequest();
-    const response = ctx.getResponse();  
+  catch(exception: any, host: ArgumentsHost) {
+    const request = host.switchToHttp().getRequest();
 
-    const statusCode = 
-    exception instanceof HttpException
-    ? exception.getStatus()
-    : 500;
-    
-    const exceptionResponse: any = exception instanceof HttpException
-    ? exception.getResponse()
-    : exception instanceof Error
-    ? exception.message
-    : {message: 'Unknown error'};
-    
-    
-    if (!request.log) { 
+    if (!request.log) {
       const { method, url } = request;
-      const errorMessage = exception instanceof HttpException
-        ? (exception.getResponse()as object)['message']
-        : exception instanceof Error
-          ? exception.message : 'Unknown error';
+      const statusCode = 
+      exception instanceof HttpException
+      ? exception.getStatus()
+      : 500;
+      const errorMessage = exception.message;
       
       const duration = Date.now() - (request.startTime || Date.now());
       const contextName = "Exception Filter";
@@ -44,6 +34,6 @@ export class LoggerExceptionFilter implements ExceptionFilter {
       );
     }
     
-    response.status(statusCode).json(exceptionResponse);
+    super.catch(exception, host);
   }
 }

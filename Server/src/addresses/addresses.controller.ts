@@ -7,19 +7,22 @@ import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
 import { CheckAddressOwnerGuard } from "./guards/checkAddressOwner.guard";
 import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
+import { UsersService } from 'src/users/users.service';
 
 @Controller("addresses")
 export class AddressesController {
-  constructor(private readonly addressesService: AddressesService) { }
+  constructor(
+    private readonly addressesService: AddressesService
+  ) { }
 
   @Get()
   find(@UserDecorator() user: Document) {
-    return this.addressesService.find({ user: user._id });
+    return this.addressesService.find({ user: user._id }).populate("user", "name username");
   }
 
   @Get(":addressId")
   findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
-    return address;
+    return address.populate("user", "name username");
   }
 
   @Post()

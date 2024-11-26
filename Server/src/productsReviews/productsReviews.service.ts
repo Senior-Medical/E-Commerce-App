@@ -16,15 +16,14 @@ export class ProductsReviewsService {
   ) { }
 
   find(conditions: object = {}) {
-    return this.productsReviewsModel.find(conditions);
+    return this.productsReviewsModel.find(conditions).select("-__v");
   }
 
   findOne(id: string) {
-    return this.productsReviewsModel.findById(id);
+    return this.productsReviewsModel.findById(id).select("-__v");
   }
 
   async create(reviewData: CreateProductReviewDto, user: Document) {
-    // check if product id is valid
     const product = await this.productsService.findOne(reviewData.product.toString());
     if (!product) throw new NotFoundException("Product not found.");
 
