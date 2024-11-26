@@ -15,7 +15,7 @@ export class LoggerExceptionFilter extends BaseExceptionFilter implements Except
     super();
   }
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const request = host.switchToHttp().getRequest();
 
     if (!request.log) {
@@ -24,11 +24,7 @@ export class LoggerExceptionFilter extends BaseExceptionFilter implements Except
       exception instanceof HttpException
       ? exception.getStatus()
       : 500;
-      const errorMessage = exception instanceof HttpException
-        ? exception.getResponse()
-        : exception instanceof Error
-          ? exception.message
-          : 'Unknown error';
+      const errorMessage = exception.message;
       
       const duration = Date.now() - (request.startTime || Date.now());
       const contextName = "Exception Filter";

@@ -9,6 +9,10 @@ import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.enti
 import { Category } from "src/categories/entities/categories.entity";
 import { Product } from "src/products/entities/products.entity";
 import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "src/app.module";
+import { AddressesService } from "src/addresses/addresses.service";
+import { CategoriesServices } from "src/categories/categories.service";
 
 @Schema({ timestamps: true })
 export class User {
@@ -75,16 +79,12 @@ export const createUserSchema = (configService: ConfigService) => {
     }
   })
 
-  UserSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const user = this as any;
-    await this.model(VerificationCodes.name).deleteMany({ user: user._id });
-    await this.model(Address.name).deleteMany({ user: user._id });
-    await this.model(PaymentMethods.name).deleteMany({ user: user._id });
-    await this.model(Category.name).updateMany({ createdBy: user._id }, { createdBy: undefined });
-    await this.model(Category.name).updateMany({ updatedBy: user._id }, { updatedBy: undefined });
-    await this.model(Product.name).updateMany({ createdBy: user._id }, { createdBy: undefined });
-    await this.model(Product.name).updateMany({ updatedBy: user._id }, { updatedBy: undefined });
-    await this.model(ProductsReviews.name).updateMany({ user: user._id }, { user: undefined });
+  UserSchema.post('findOneAndDelete', async function (doc, next) {
+    if (doc) {
+      await doc.model(Address.name).deleteMany({ user: doc._id });
+      await doc.model(PaymentMethods.name).deleteMany({ user: doc._id });
+      await doc.model(VerificationCodes.name).deleteMany({ user: doc._id });
+    }
     next();
   });
   return UserSchema;

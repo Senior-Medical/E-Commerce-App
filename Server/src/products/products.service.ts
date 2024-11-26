@@ -97,7 +97,7 @@ export class ProductsService {
   }
 
   async remove(product: any) {
-    await product.deleteOne();
+    await this.productsModel.findByIdAndDelete(product._id);
     if (product.images) this.filesService.removeFiles(product.images);
     return;
   }

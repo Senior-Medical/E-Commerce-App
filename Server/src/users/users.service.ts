@@ -109,7 +109,7 @@ export class UsersService {
   }
 
   async remove(user: any) {
-    await user.deleteOne();
+    await this.usersModel.findByIdAndDelete(user._id);
     if (user.avatar) this.filesService.removeFiles([user.avatar]);
     return;
   }
