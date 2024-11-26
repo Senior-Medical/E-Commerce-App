@@ -28,6 +28,12 @@ export class UsersController{
     return this.usersService.getUserObject(user);
   }
 
+  @Get("role/:userId")
+  @Roles(Role.admin)
+  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+    return this.usersService.updateRole(user);
+  }
+
   @Patch(":userId")
   @UseGuards(UserPermissionGuard)
   @UseInterceptors(FileInterceptor("avatar"))

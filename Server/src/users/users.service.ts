@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { EncryptionService } from '../common/services/encryption.service';
@@ -14,6 +14,7 @@ import { FilesService } from 'src/files/files.service';
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { UpdateUserType } from "./types/updateUser.type";
 import { UpdatePasswordDto } from './dtos/updatePassword.dto';
+import { Role } from "src/auth/enums/roles.enum";
 
 @Injectable()
 export class UsersService {
@@ -36,6 +37,14 @@ export class UsersService {
   
   async findOne(id: string) {
     return this.usersModel.findById(id);
+  }
+
+
+  updateRole(user: any) {
+    if (user.role === Role.admin) throw new UnauthorizedException("Permission Denied.");
+    else if (user.role === Role.staff) user.role = Role.customer;
+    else user.role = Role.staff;
+    return user.save();
   }
 
   async create(createUsersDto: CreateUserType, avatar: Express.Multer.File) {
