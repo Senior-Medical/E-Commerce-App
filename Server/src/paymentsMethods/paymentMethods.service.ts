@@ -17,11 +17,11 @@ export class PaymentMethodsService {
   ) { }
   
   find(conditions: object = {}) {
-    return this.paymentMethodsModel.find(conditions);
+    return this.paymentMethodsModel.find(conditions).select("-__v");
   }
 
   findOne(id: string) {
-    return this.paymentMethodsModel.findById(id);
+    return this.paymentMethodsModel.findById(id).select("-__v");
   }
 
   async create(paymentMethodData: CreatePaymentMethodsDto, user: Document) {

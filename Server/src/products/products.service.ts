@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { CreateProductDto } from "./dtos/createProduct.dto";
@@ -13,16 +12,15 @@ import { FilesService } from '../files/files.service';
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productsModel: Model<Product>,
-    private readonly configService: ConfigService,
     private readonly filesService: FilesService
   ) { }
 
   find(conditions: object = {}) {
-    return this.productsModel.find(conditions);
+    return this.productsModel.find(conditions).select("-__v");
   }
 
   findOne(id: string) {
-    return this.productsModel.findById(id);
+    return this.productsModel.findById(id).select("-__v");
   }
 
   async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: Document) {

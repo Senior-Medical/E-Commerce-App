@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
-import { ConfigService } from '@nestjs/config';
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
@@ -20,19 +19,18 @@ export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly filesService: FilesService,
-    private readonly configService: ConfigService
   ) { }
   
   @Get()
   @Public()
   find() {
-    return this.productsService.find();
+    return this.productsService.find().populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
   @Get(":productId")
   @Public()
-  findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
-    return product;
+  async findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+    return (await (await product.populate("category", "name")).populate("createdBy", "name username")).populate("updatedBy", "name username");
   }
 
   @Get("images/:imageName")

@@ -12,11 +12,11 @@ export class CategoriesServices{
   constructor(@InjectModel(Category.name) private categoriesModel: Model<Category>) { }
 
   find(conditions: object = {}) {
-    return this.categoriesModel.find(conditions);
+    return this.categoriesModel.find(conditions).select("-__v");
   }
 
   findOne(id: string) {
-    return this.categoriesModel.findById(id);
+    return this.categoriesModel.findById(id).select("-__v");
   }
 
   async create(categoryData: CreateCategoryDto, user: Document) {

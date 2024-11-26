@@ -14,12 +14,12 @@ export class PaymentMethodsController {
   
   @Get()
   find(@UserDecorator() user: Document) {
-    return this.paymentMethodsService.find({user: user._id});
+    return this.paymentMethodsService.find({user: user._id}).populate("user", "name username");
   }
 
   @Get(":paymentMethodId")
   findOne(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document) {
-    return paymentMethod;
+    return paymentMethod.populate("user", "name username");
   }
 
   @Post()

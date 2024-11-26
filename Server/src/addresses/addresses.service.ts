@@ -12,11 +12,11 @@ export class AddressesService {
   constructor(@InjectModel(Address.name) private addressesModel: Model<Address>) { }
   
   find(conditions: object = {}) {
-    return this.addressesModel.find(conditions);
+    return this.addressesModel.find(conditions).select("-__v");
   }
 
   findOne(id: string) {
-    return this.addressesModel.findById(id);
+    return this.addressesModel.findById(id).select("-__v");
   }
 
   create(addressData: CreateAddressDto, user: Document) {
