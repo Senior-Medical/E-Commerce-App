@@ -97,13 +97,8 @@ export class ProductsService {
   }
 
   async remove(product: any) {
-    let result;
-    try {
-      result = await product.deleteOne();
-    }catch (e) {
-      throw e;
-    }
-    if(product.images) this.filesService.removeFiles(product.images);
-    return result;
+    await product.deleteOne();
+    if (product.images) this.filesService.removeFiles(product.images);
+    return;
   }
 }

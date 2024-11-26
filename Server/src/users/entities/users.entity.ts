@@ -3,10 +3,12 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { EncryptionService } from '../../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
-import { model } from 'mongoose';
 import { VerificationCodes } from "./verificationCodes.entity";
 import { Address } from "src/addresses/entities/addresses.entity";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
+import { Category } from "src/categories/entities/categories.entity";
+import { Product } from "src/products/entities/products.entity";
+import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
 
 @Schema({ timestamps: true })
 export class User {
@@ -78,6 +80,11 @@ export const createUserSchema = (configService: ConfigService) => {
     await this.model(VerificationCodes.name).deleteMany({ user: user._id });
     await this.model(Address.name).deleteMany({ user: user._id });
     await this.model(PaymentMethods.name).deleteMany({ user: user._id });
+    await this.model(Category.name).updateMany({ createdBy: user._id }, { createdBy: undefined });
+    await this.model(Category.name).updateMany({ updatedBy: user._id }, { updatedBy: undefined });
+    await this.model(Product.name).updateMany({ createdBy: user._id }, { createdBy: undefined });
+    await this.model(Product.name).updateMany({ updatedBy: user._id }, { updatedBy: undefined });
+    await this.model(ProductsReviews.name).updateMany({ user: user._id }, { user: undefined });
     next();
   });
   return UserSchema;

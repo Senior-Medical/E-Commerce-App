@@ -9,7 +9,9 @@ import { UpdateCategory } from "./types/updateCategoryData.type";
 
 @Injectable()
 export class CategoriesServices{
-  constructor(@InjectModel(Category.name) private categoriesModel: Model<Category>) { }
+  constructor(
+    @InjectModel(Category.name) private categoriesModel: Model<Category>
+  ) { }
 
   find(conditions: object = {}) {
     return this.categoriesModel.find(conditions).select("-__v");
