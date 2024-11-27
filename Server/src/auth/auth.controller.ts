@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Headers } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
@@ -31,6 +31,11 @@ export class AuthController {
     return this.authService.resendVerification(user);
   }
 
+  @Get("refreshToken")
+  refreshToken(@Headers("Authorization") refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
+  }
+
   @Post("register")
   @UseInterceptors(FileInterceptor("avatar"))
   register(
@@ -41,12 +46,14 @@ export class AuthController {
   }
 
   @Post("login")
+  @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   login(@UserDecorator() user: Document) {
     return this.authService.login(user);
   }
 
   @Post("resetPassword")
+  @HttpCode(HttpStatus.ACCEPTED)
   requestToResetPassword(@Body(CheckEmailExistPipe) requestToResetPasswordDto: RequestToResetPasswordDto) {
     return this.authService.requestToResetPassword(requestToResetPasswordDto);
   }

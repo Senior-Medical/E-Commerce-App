@@ -1,16 +1,19 @@
 ## EndPoints:
 
 ### Auth:
+
 ```
   POST /api/v1/auth/register - Register a new user.
   POST /api/v1/auth/login - User login.
   GET /api/v1/auth/verify/:codeId - For verify emails and phone numbers.
   GET /api/v1/auth/resendVerification/:userId - For resend verification links to emails and phone numbers.
+  GET /api/v1/auth/refreshToken - For get access token by using refresh token.
   POST /api/v1/auth/resetPassword - Request to Reset the password.
   PATCH /api/v1/auth/resetPassword - set new password.
 ```
 
 ### Users:
+
 ```
   GET /api/v1/users - Get all users.
   GET /api/v1/users/:userId - Get a single user by ID.
@@ -21,6 +24,7 @@
 ```
 
 ### Addresses:
+
 ```
   GET /api/v1/addresses - Get user addresses.
   GET /api/v1/addresses/:addressId - Get a user address by id.
@@ -31,6 +35,7 @@
 ```
 
 ### Payment Method:
+
 ```
   GET /api/v1/payments - Get user payment methods.
   GET /api/v1/payments/:paymentMethodId - Get a user payment method.
@@ -41,6 +46,7 @@
 ```
 
 ### WishList:
+
 ```
   GET /api/v1/wishList - Get all products that is in wish list.
   POST /api/v1/wishList - Add product to wish list.
@@ -48,6 +54,7 @@
 ```
 
 ### Tokens:
+
 ```
   GET /api/v1/token - Get all tokens data of the user.
   GET /api/v1/token/:tokenId - Get token data.
@@ -55,6 +62,7 @@
 ```
 
 ### Carts:
+
 ```
   GET /api/v1/cart - Get all products that is in cart with its quantity.
   POST /api/v1/cart - Add product to cart.
@@ -63,6 +71,7 @@
 ```
 
 ### Categories:
+
 ```
   GET /api/v1/categories - Get all categories.
   GET /api/v1/categories/:categoryId - Get a single category by ID.
@@ -72,6 +81,7 @@
 ```
 
 ### Products:
+
 ```
   GET /api/v1/products - Get all products.
   GET /api/v1/products/:productId - Get a single product by ID.
@@ -82,6 +92,7 @@
 ```
 
 ### Products Reviews:
+
 ```
   GET /api/v1/products/reviews/product/:productId - Get all reviews of specific product.
   GET /api/v1/products/reviews/:reviewId - Get a single review by ID.
@@ -91,32 +102,38 @@
 ```
 
 ### Orders:
-  **Order:**
-  ```
-    GET /api/v1/orders - Get all orders.
-    GET /api/v1/orders/:userId - Get orders of specific user.
-    GET /api/v1/orders/:orderId - Get a single order by ID.
-    POST /api/v1/orders - Create a new order.
-    PUT /api/v1/orders/address/:orderId - update address of order.
-    PUT /api/v1/orders/status/:orderId - update status of order
-    DELETE /api/v1/orders/:orderId - Delete an order by ID.
-  ```
 
-  **OrderItem:**
-  ```
-    POST /api/v1/orders/orderItems/:orderId/:productId - Add product to a specific order.
-    PUT /api/v1/orders/orderItems/:orderId/:productId - Update quantity of product in a specific order.
-    DELETE /api/v1/orders/orderItems/:orderId/:productId - Delete product from an order.
-  ```
-  **Reviews:**
-  ```
-    GET /api/v1/orders/reviews/:orderId - Get the review of specific order.
-    POST /api/v1/orders/reviews - Create a new review on specific order.
-    PUT /api/v1/orders/reviews/:reviewId - Update a review by ID.
-    DELETE /api/v1/orders/reviews/:reviewId - Delete a review by ID.
-  ```
-  **Checkout:**
-  ```
-    POST /api/v1/orders/checkout - checkout the order
-  ```
+**Order:**
 
+```
+  GET /api/v1/orders - Get all orders.
+  GET /api/v1/orders/:userId - Get orders of specific user.
+  GET /api/v1/orders/:orderId - Get a single order by ID.
+  POST /api/v1/orders - Create a new order.
+  PUT /api/v1/orders/address/:orderId - update address of order.
+  PUT /api/v1/orders/status/:orderId - update status of order
+  DELETE /api/v1/orders/:orderId - Delete an order by ID.
+```
+
+**OrderItem:**
+
+```
+  POST /api/v1/orders/orderItems/:orderId/:productId - Add product to a specific order.
+  PUT /api/v1/orders/orderItems/:orderId/:productId - Update quantity of product in a specific order.
+  DELETE /api/v1/orders/orderItems/:orderId/:productId - Delete product from an order.
+```
+
+**Reviews:**
+
+```
+  GET /api/v1/orders/reviews/:orderId - Get the review of specific order.
+  POST /api/v1/orders/reviews - Create a new review on specific order.
+  PUT /api/v1/orders/reviews/:reviewId - Update a review by ID.
+  DELETE /api/v1/orders/reviews/:reviewId - Delete a review by ID.
+```
+
+**Checkout:**
+
+```
+  POST /api/v1/orders/checkout - checkout the order
+```
