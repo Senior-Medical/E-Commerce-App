@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
-export class CustomLogger extends ConsoleLogger implements LoggerService {
-  private logFile = path.join(__dirname, '..', '..', '..', 'logs', 'app.log');
+export class CustomLoggerService extends ConsoleLogger implements LoggerService {
+  private logFile = path.join(__dirname, '..', '..', 'logs', 'app.log');
 
   private ensureLogFileExists() {
     if (!fs.existsSync(this.logFile)) {

@@ -1,22 +1,20 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger, VersioningType } from '@nestjs/common';
-import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
-import { CustomLogger } from './common/services/customLogger.service';
+import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
+import { AppModule } from './app.module';
+import { CustomLoggerService } from './logger/logger.service';
 // import { DoubleCsrfConfigOptions, doubleCsrf } from 'csrf-csrf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  const customLogger = app.get(CustomLogger);
-  customLogger.clearLogFile();
   const configService = app.get(ConfigService);
   const globalPrefix = configService.get<string>("GLOBAL_PREFIX")
   const defaultVersion = configService.get<string>("DEFAULT_VERSION") || "1";
   const port = configService.get<number>("PORT") || 3000;
 
 
-  app.useLogger(app.get(CustomLogger));
+  app.useLogger(app.get(CustomLoggerService));
   app.use(helmet());
   app.setGlobalPrefix(globalPrefix);
   app.enableVersioning({

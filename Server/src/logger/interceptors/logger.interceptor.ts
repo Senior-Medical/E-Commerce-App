@@ -4,13 +4,13 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { CustomLogger } from '../services/customLogger.service';
+import { Observable } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { CustomLoggerService } from '../logger.service';
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
-  constructor(private readonly customLogger: CustomLogger) {}
+  constructor(private readonly customLoggerService: CustomLoggerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
@@ -26,14 +26,14 @@ export class LoggerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const duration = Date.now() - startTime;
-        this.customLogger.log(
+        this.customLoggerService.log(
           `${method} ${url} [${statusCode}] Duration: ${duration}ms`,
           contextName
         );
       }),
       catchError((error) => {
         const duration = Date.now() - startTime;
-        this.customLogger.error(
+        this.customLoggerService.error(
           `${method} ${url} [${statusCode}] Duration: ${duration}ms Error: ${error.message}`,
           contextName
         );

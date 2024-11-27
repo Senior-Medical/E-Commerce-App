@@ -1,23 +1,24 @@
-import { HttpStatus, MiddlewareConsumer, Module, OnModuleInit, ValidationPipe } from "@nestjs/common";
-import { AuthModule } from "./auth/auth.module";
-import { MongooseModule } from "@nestjs/mongoose";
-import { UsersModule } from "./users/users.module";
+import { HttpStatus, Logger, MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { CategoriesModule } from "./categories/categories.module";
-import { ProductsModule } from "./products/products.module";
-import { ProductsReviewsModule } from "./productsReviews/productsReviews.module";
-import { AddressesModule } from "./addresses/addresses.module";
-import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
-import { MessagingModule } from "./messaging/messaging.module";
-import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { MongooseModule } from "@nestjs/mongoose";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { AddressesModule } from "./addresses/addresses.module";
+import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/guards/jwtAuth.guard";
 import { RolesGuard } from "./auth/guards/roles.guard";
-import { CustomLogger } from "./common/services/customLogger.service";
-import { LoggerInterceptor } from "./common/interceptors/logger.interceptor";
-import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
-import { LoggerExceptionFilter } from "./common/filters/loggerException.filter";
+import { CategoriesModule } from "./categories/categories.module";
 import { envVariablesValidationSchema } from "./common/config/envValidation.schema";
+import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
+import { LoggerExceptionFilter } from "./logger/filters/loggerException.filter";
+import { LoggerInterceptor } from "./logger/interceptors/logger.interceptor";
+import { MessagingModule } from "./messaging/messaging.module";
+import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
+import { ProductsModule } from "./products/products.module";
+import { ProductsReviewsModule } from "./productsReviews/productsReviews.module";
+import { UsersModule } from "./users/users.module";
+import { LoggerModule } from "./logger/logger.module";
+import { CustomLoggerService } from "./logger/logger.service";
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { envVariablesValidationSchema } from "./common/config/envValidation.sche
       }),
       inject: [ConfigService]
     }),
+    LoggerModule,
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -50,11 +52,6 @@ import { envVariablesValidationSchema } from "./common/config/envValidation.sche
     MessagingModule
   ],
   providers: [
-    CustomLogger,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggerInterceptor
-    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

@@ -5,13 +5,13 @@ import {
   HttpException,
   Injectable,
 } from '@nestjs/common';
-import { CustomLogger } from '../services/customLogger.service';
 import { BaseExceptionFilter } from '@nestjs/core';
+import { CustomLoggerService } from '../logger.service';
 
 @Injectable()
 @Catch()
 export class LoggerExceptionFilter extends BaseExceptionFilter implements ExceptionFilter {
-  constructor(private readonly customLogger: CustomLogger) {
+  constructor(private readonly customLoggerService: CustomLoggerService) {
     super();
   }
 
@@ -28,7 +28,7 @@ export class LoggerExceptionFilter extends BaseExceptionFilter implements Except
       
       const duration = Date.now() - (request.startTime || Date.now());
       const contextName = "Exception Filter";
-      this.customLogger.error(
+      this.customLoggerService.error(
         `${method} ${url} [${statusCode}] Duration: ${duration}ms Error: ${errorMessage}`,
         contextName
       );
