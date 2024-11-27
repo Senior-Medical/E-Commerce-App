@@ -1,17 +1,23 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { Document } from "mongoose";
+import { Document, Model, Types } from "mongoose";
 import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
 import { CreateUserType } from "src/users/types/createUser.type";
 import { UpdateUserType } from "src/users/types/updateUser.type";
+import { InjectModel } from "@nestjs/mongoose";
+import { RefreshToken } from "./entities/refreshTokens.entity";
+import { CreateRefreshToken } from "./types/createToken.type";
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService{
   constructor(
+    @InjectModel(RefreshToken.name) private readonly refreshTokenModel: Model<RefreshToken>,
+    private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) { }
@@ -51,9 +57,20 @@ export class AuthService{
   }
 
   async login(user: Document) {
-    user.set({ lastLogin: new Date() }).save();
+    await user.set({ lastLogin: new Date() }).save();
+    const accessToken = this.jwtService.sign({ sub: user._id });
+    const expiresIn = this.configService.get("JWT_REFRESH_EXPIRATION");
+    const refreshToken = this.jwtService.sign({ sub: user._id }, { expiresIn });
+
+    const inputData: CreateRefreshToken = {
+      token: refreshToken,
+      user: new Types.ObjectId(user._id.toString())
+    };
+    await this.refreshTokenModel.create(inputData);
+
     return {
-      access_token: this.jwtService.sign({ sub: user._id }),
+      accessToken,
+      refreshToken,
       user: this.usersService.getUserObject(user)
     };
   }
@@ -83,6 +100,26 @@ export class AuthService{
     await user.set(updateData).save();
     code.deleteOne();
     return {message};
+  }
+
+  async refreshToken(refreshToken: any) {
+    const refreshTokenData = await this.refreshTokenModel.findOne({ token: refreshToken });
+    const payload = this.jwtService.verify(refreshToken);
+    if (!refreshTokenData || !payload) throw new ForbiddenException("Invalid refresh token.");
+
+    const user = await this.usersService.findOne(payload.sub);
+    if (!user) throw new UnauthorizedException("Invalid refresh token.");
+    if (!user.verified) throw new UnauthorizedException("User not verified.");
+    if (user.changePasswordAt) {
+      let changePasswordDate = user.changePasswordAt.getTime() / 1000;
+      const iat = payload.iat || 0;
+      if (changePasswordDate > iat) throw new UnauthorizedException("Password changed.");
+    }
+
+    const accessToken = this.jwtService.sign({ sub: user._id });
+    return {
+      access_token: accessToken,
+    };
   }
 
   async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {

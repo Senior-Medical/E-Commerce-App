@@ -11,8 +11,8 @@ export const envVariablesValidationSchema = Joi.object({
   
   // JWT
   JWT_SECRET: Joi.string().min(32).required(),
-  JWT_EXPIRATION: Joi.string().regex(/^\d+[smhd]$/).required(), // e.g., "10m", "1h", "7d"
-  
+  JWT_ACCESS_EXPIRATION: Joi.string().regex(/^\d+[smhd]$/).required(), // e.g., "10m", "1h", "7d"
+  JWT_REFRESH_EXPIRATION: Joi.string().regex(/^\d+[smhd]$/).required(), // e.g., "10m", "1h", "7d"
   // Encryption
   BCRYPT_GENERATION_SALT_NUMBER: Joi.number().integer().min(1).required(),
   ENCRYPTION_KEY: Joi.string().length(32).required(),

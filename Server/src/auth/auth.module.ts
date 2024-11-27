@@ -10,6 +10,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { FilesModule } from "src/files/files.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
+import { MongooseModule } from "@nestjs/mongoose";
+import { getRefreshTokenSchema } from "./entities/refreshTokens.entity";
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { FilesService } from "src/files/files.service";
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>("JWT_SECRET"),
         signOptions: {
-          expiresIn: configService.get<string>("JWT_EXPIRATION")
+          expiresIn: configService.get<string>("JWT_ACCESS_EXPIRATION")
         }
       }),
       inject: [ConfigService]
@@ -30,6 +32,13 @@ import { FilesService } from "src/files/files.service";
       useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
       inject: [FilesService]
     }),
+    MongooseModule.forFeatureAsync([
+      {
+        name: "RefreshToken",
+        useFactory: (configService: ConfigService) => getRefreshTokenSchema(configService),
+        inject: [ConfigService]
+      }
+    ])
   ],
   controllers: [AuthController],
   providers: [
