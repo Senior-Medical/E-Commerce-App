@@ -8,7 +8,6 @@ import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
-import { UsersService } from 'src/users/users.service';
 
 @Controller("categories")
 @Roles(Role.admin, Role.staff)

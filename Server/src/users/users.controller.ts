@@ -56,5 +56,4 @@ export class UsersController{
   remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
     return this.usersService.remove(user);
   }
-
 }

@@ -8,19 +8,13 @@ import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
-import { CheckReviewOwnerGuard } from "./guards/checkReviewOwner.guard";
+import { ProductReviewPermissionGuard } from "./guards/productReviewPermission.guard";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
 
 @Controller("products/reviews")
 export class ProductsReviewsController {
   constructor(private readonly productsReviewsService: ProductsReviewsService) { }
-  
-  @Get("/all/:productId")
-  @Public()
-  find(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
-    return this.productsReviewsService.find({product: product._id}).populate("user", "name username");
-  }
 
   @Get(":reviewId")
   @Public()
@@ -28,24 +22,27 @@ export class ProductsReviewsController {
     return (await review.populate("user", "name username")).populate("product", "name");
   }
 
+  @Get("/product/:productId")
+  @Public()
+  find(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+    return this.productsReviewsService.find({product: product._id}).populate("user", "name username");
+  }
+
   @Post()
-  @Roles(Role.customer)
   create(@Body() reviewData: CreateProductReviewDto, @UserDecorator() user: Document) {
     return this.productsReviewsService.create(reviewData, user);
   }
 
   @Patch(":reviewId")
   @HttpCode(HttpStatus.ACCEPTED)
-  @Roles(Role.customer)
-  @UseGuards(CheckReviewOwnerGuard)
+  @UseGuards(ProductReviewPermissionGuard)
   update(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document, @Body() reviewData: UpdateProductReviewDto) {
     return this.productsReviewsService.update(review, reviewData);
   }
 
   @Delete(":reviewId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(Role.customer)
-  @UseGuards(CheckReviewOwnerGuard)
+  @UseGuards(ProductReviewPermissionGuard)
   async remove(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
     await this.productsReviewsService.remove(review);
   }

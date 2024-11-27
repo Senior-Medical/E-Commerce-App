@@ -21,7 +21,6 @@ import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
   
-
   @Get("verify/:codeId")
   verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
     return this.authService.verify(code);

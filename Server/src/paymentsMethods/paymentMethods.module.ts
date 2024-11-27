@@ -5,14 +5,16 @@ import { PaymentMethods, createPaymentMethodsSchema } from "./entities/paymentMe
 import { PaymentMethodsController } from "./paymentMethods.controller";
 import { PaymentMethodsService } from "./paymentMethods.service";
 import { LuhnValidationConstraint } from "./utils/luhnValidation";
+import { UsersModule } from "src/users/users.module";
 
 @Module({
   imports: [
-  MongooseModule.forFeatureAsync([{
+    MongooseModule.forFeatureAsync([{
       name: PaymentMethods.name,
       useFactory: (configService: ConfigService) => createPaymentMethodsSchema(configService),
       inject: [ConfigService]
     }]),
+    UsersModule
   ],
   controllers: [PaymentMethodsController],
   providers: [PaymentMethodsService, LuhnValidationConstraint],
