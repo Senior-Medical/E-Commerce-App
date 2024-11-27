@@ -20,6 +20,7 @@ import { UsersModule } from "./users/users.module";
 import { LoggerModule } from "./logger/logger.module";
 import { CustomLoggerService } from "./logger/logger.service";
 import { WishListModule } from "./wishList/wishList.module";
+import { CartItemModule } from "./cartItem/cartItem.module";
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { WishListModule } from "./wishList/wishList.module";
     AddressesModule,
     PaymentMethodsModule,
     MessagingModule,
-    WishListModule
+    WishListModule,
+    CartItemModule
   ],
   providers: [
     {
