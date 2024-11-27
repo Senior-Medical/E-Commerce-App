@@ -32,12 +32,7 @@ export class LoggerInterceptor implements NestInterceptor {
         );
       }),
       catchError((error) => {
-        const duration = Date.now() - startTime;
-        this.customLoggerService.error(
-          `${method} ${url} [${statusCode}] Duration: ${duration}ms Error: ${error.message}`,
-          contextName
-        );
-        request.log = true
+        error.contextName = contextName;
         throw error;
       }),
     );
