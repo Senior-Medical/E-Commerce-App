@@ -15,29 +15,40 @@ import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { CodeIdVerificationPipe } from "./pipes/codeIdVerification.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
+import { RefreshTokenGuard } from "./guards/refreshToken.guard";
 
 @Controller("auth")
-@Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
   
   @Get("verify/:codeId")
+  @Public()
   verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
     return this.authService.verify(code);
   }
 
   @Get("resendVerification/:userId")
+  @Public()
   resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
     return this.authService.resendVerification(user);
   }
 
   @Get("refreshToken")
+  @Public()
+  @UseGuards(RefreshTokenGuard)
   refreshToken(@Headers("Authorization") refreshToken: string) {
     return this.authService.refreshToken(refreshToken);
   }
 
+  @Get("logout")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Headers("Authorization") accessToken: string) {
+    await this.authService.logout(accessToken);
+  }
+
   @Post("register")
   @UseInterceptors(FileInterceptor("avatar"))
+  @Public()
   register(
     @Body(UserValidationPipe) registerDto: CreateUsersDto,
     @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
@@ -48,18 +59,21 @@ export class AuthController {
   @Post("login")
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
+  @Public()
   login(@UserDecorator() user: Document) {
     return this.authService.login(user);
   }
 
   @Post("resetPassword")
   @HttpCode(HttpStatus.ACCEPTED)
+  @Public()
   requestToResetPassword(@Body(CheckEmailExistPipe) requestToResetPasswordDto: RequestToResetPasswordDto) {
     return this.authService.requestToResetPassword(requestToResetPasswordDto);
   }
 
   @Patch("resetPassword")
   @HttpCode(HttpStatus.ACCEPTED)
+  @Public()
   resetPassword(@Body(ResetPasswordPipe) resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }

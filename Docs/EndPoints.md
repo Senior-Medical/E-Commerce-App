@@ -8,6 +8,7 @@
   GET /api/v1/auth/verify/:codeId - For verify emails and phone numbers.
   GET /api/v1/auth/resendVerification/:userId - For resend verification links to emails and phone numbers.
   GET /api/v1/auth/refreshToken - For get access token by using refresh token.
+  GET /api/v1/auth/logout - For logout.
   POST /api/v1/auth/resetPassword - Request to Reset the password.
   PATCH /api/v1/auth/resetPassword - set new password.
 ```

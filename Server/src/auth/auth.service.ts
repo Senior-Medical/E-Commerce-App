@@ -57,16 +57,18 @@ export class AuthService{
   }
 
   async login(user: Document) {
-    await user.set({ lastLogin: new Date() }).save();
-    const accessToken = this.jwtService.sign({ sub: user._id });
     const expiresIn = this.configService.get("JWT_REFRESH_EXPIRATION");
     const refreshToken = this.jwtService.sign({ sub: user._id }, { expiresIn });
-
+    
     const inputData: CreateRefreshToken = {
       token: refreshToken,
       user: new Types.ObjectId(user._id.toString())
     };
-    await this.refreshTokenModel.create(inputData);
+    const refreshTokenData = await this.refreshTokenModel.create(inputData);
+    
+    const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
+    
+    await user.set({ lastLogin: new Date() }).save();
 
     return {
       accessToken,
@@ -102,24 +104,21 @@ export class AuthService{
     return {message};
   }
 
-  async refreshToken(refreshToken: any) {
-    const refreshTokenData = await this.refreshTokenModel.findOne({ token: refreshToken });
-    const payload = this.jwtService.verify(refreshToken);
-    if (!refreshTokenData || !payload) throw new ForbiddenException("Invalid refresh token.");
+  async refreshToken(refreshToken: string) {
+    refreshToken = refreshToken.split(" ")[1];
+    const refreshTokenData = await this.findRefreshToken({ token: refreshToken });
+    const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
+    return { accessToken };
+  }
 
-    const user = await this.usersService.findOne(payload.sub);
-    if (!user) throw new UnauthorizedException("Invalid refresh token.");
-    if (!user.verified) throw new UnauthorizedException("User not verified.");
-    if (user.changePasswordAt) {
-      let changePasswordDate = user.changePasswordAt.getTime() / 1000;
-      const iat = payload.iat || 0;
-      if (changePasswordDate > iat) throw new UnauthorizedException("Password changed.");
-    }
+  async logout(accessToken: string) {
+    accessToken = accessToken.split(" ")[1]
+    const { refreshTokenId } = this.jwtService.verify(accessToken);
+    await this.refreshTokenModel.deleteOne({ _id: refreshTokenId });
+  }
 
-    const accessToken = this.jwtService.sign({ sub: user._id });
-    return {
-      access_token: accessToken,
-    };
+  findRefreshToken(conditions: object = {}) {
+    return this.refreshTokenModel.findOne(conditions);
   }
 
   async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {

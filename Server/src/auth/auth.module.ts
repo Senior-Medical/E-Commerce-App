@@ -11,7 +11,7 @@ import { FilesModule } from "src/files/files.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
 import { MongooseModule } from "@nestjs/mongoose";
-import { getRefreshTokenSchema } from "./entities/refreshTokens.entity";
+import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.entity";
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { getRefreshTokenSchema } from "./entities/refreshTokens.entity";
     }),
     MongooseModule.forFeatureAsync([
       {
-        name: "RefreshToken",
+        name: RefreshToken.name,
         useFactory: (configService: ConfigService) => getRefreshTokenSchema(configService),
         inject: [ConfigService]
       }
