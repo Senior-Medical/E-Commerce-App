@@ -19,6 +19,7 @@ import { ProductsReviewsModule } from "./productsReviews/productsReviews.module"
 import { UsersModule } from "./users/users.module";
 import { LoggerModule } from "./logger/logger.module";
 import { CustomLoggerService } from "./logger/logger.service";
+import { CartItemModule } from "./cartItem/cartItem.module";
 
 @Module({
   imports: [
@@ -49,7 +50,8 @@ import { CustomLoggerService } from "./logger/logger.service";
     ProductsReviewsModule,
     AddressesModule,
     PaymentMethodsModule,
-    MessagingModule
+    MessagingModule,
+    CartItemModule
   ],
   providers: [
     {
