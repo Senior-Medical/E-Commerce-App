@@ -64,14 +64,16 @@ export const createPaymentMethodsSchema = (configService: ConfigService) => {
   })
 
   PaymentMethodsSchema.post(['find', 'findOne', 'save'], function (docs) {
-    if (Array.isArray(docs)) {
-      docs.forEach(doc => {
-        doc.cardNumber = encryptionService.decrypt(doc.cardNumber);
-        doc.cardholderName = encryptionService.decrypt(doc.cardholderName);
-      })
-    } else {
-      docs.cardNumber = encryptionService.decrypt(docs.cardNumber);
-      docs.cardholderName = encryptionService.decrypt(docs.cardholderName);
+    if (docs) {
+      if (Array.isArray(docs)) {
+        docs.forEach(doc => {
+          doc.cardNumber = encryptionService.decrypt(doc.cardNumber);
+          doc.cardholderName = encryptionService.decrypt(doc.cardholderName);
+        })
+      } else {
+        docs.cardNumber = encryptionService.decrypt(docs.cardNumber);
+        docs.cardholderName = encryptionService.decrypt(docs.cardholderName);
+      }
     }
   })
 

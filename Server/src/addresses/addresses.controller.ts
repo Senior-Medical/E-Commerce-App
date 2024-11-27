@@ -5,9 +5,11 @@ import { UserDecorator } from "src/users/decorators/user.decorator";
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
-import { CheckAddressOwnerGuard } from "./guards/checkAddressOwner.guard";
+import { AddressPermissionGuard } from "./guards/addressPermission.guard";
 import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
-import { UsersService } from 'src/users/users.service';
+import { Role } from "src/auth/enums/roles.enum";
+import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
+import { Roles } from "src/auth/decorators/roles.decorator";
 
 @Controller("addresses")
 export class AddressesController {
@@ -16,13 +18,22 @@ export class AddressesController {
   ) { }
 
   @Get()
-  find(@UserDecorator() user: Document) {
-    return this.addressesService.find({ user: user._id }).populate("user", "name username");
+  find(@UserDecorator() user: any) {
+    let condition = {};
+    if(user.role === Role.customer) condition = { user: user._id };
+    return this.addressesService.find(condition).populate("user", "name username");
   }
 
   @Get(":addressId")
+  @UseGuards(AddressPermissionGuard)
   findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
     return address.populate("user", "name username");
+  }
+
+  @Get("user/:userId")
+  @Roles(Role.admin, Role.staff)
+  findByUser(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+    return this.addressesService.find({ user: user._id }).populate("user", "name username");
   }
 
   @Post()
@@ -32,15 +43,15 @@ export class AddressesController {
 
   @Patch(":addressId")
   @HttpCode(HttpStatus.ACCEPTED)
-  @UseGuards(CheckAddressOwnerGuard)
+  @UseGuards(AddressPermissionGuard)
   update(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document, @Body() addressData: UpdateAddressDto) {
     return this.addressesService.update(address, addressData);
   }
 
   @Delete(":addressId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(CheckAddressOwnerGuard)
-  remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
-    return this.addressesService.remove(address);
+  @UseGuards(AddressPermissionGuard)
+  async remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
+    await this.addressesService.remove(address);
   }
 }
