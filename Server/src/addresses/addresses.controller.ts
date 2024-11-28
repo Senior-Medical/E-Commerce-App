@@ -24,40 +24,84 @@ export class AddressesController {
     private readonly addressesService: AddressesService
   ) { }
 
+  /**
+   * Retrieves all addresses.
+   * 
+   * - Customers see only their own addresses.
+   * - Admins and staff can access all addresses.
+   * 
+   * @param user - The authenticated user object.
+   * @returns List of addresses.
+   */
   @Get()
   find(@UserDecorator() user: any) {
     let condition = {};
-    if(user.role === Role.customer) condition = { user: user._id }; // Customers can only access their own addresses
+    if(user.role === Role.customer) condition = { user: user._id };
     return this.addressesService.find(condition).populate("user", "name username");
   }
 
+  /**
+   * Retrieves a single address by its ID.
+   * - Ensures access permissions using `AddressPermissionGuard`.
+   * - Populates associated user details.
+   * @param address - The validated and authorized address document.
+   * @returns Address details.
+   */
   @Get(":addressId")
-  @UseGuards(AddressPermissionGuard) // Checks if the user has permission to access the address
+  @UseGuards(AddressPermissionGuard)
   findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
     return address.populate("user", "name username");
   }
 
+  /**
+   * Retrieves addresses for a specific user.
+   * - Restricted to admin and staff roles using `Roles` decorator.
+   * @param user - The validated user document.
+   * @returns Addresses belonging to the specified user.
+   */
   @Get("user/:userId")
-  @Roles(Role.admin, Role.staff) // Restricts access to admins and staff only
+  @Roles(Role.admin, Role.staff)
   findByUser(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
     return this.addressesService.find({ user: user._id }).populate("user", "name username");
   }
 
+  /**
+   * Creates a new address for the authenticated user.
+   * - Validates the input DTO.
+   * - Associates the address with the current user.
+   * @param addressData - DTO containing address details.
+   * @param user - The authenticated user document.
+   * @returns The created address.
+   */
   @Post()
   create(@Body() addressData: CreateAddressDto, @UserDecorator() user: Document) {
     return this.addressesService.create(addressData, user);
   }
 
+  /**
+   * Updates an existing address.
+   * - Ensures access permissions using `AddressPermissionGuard`.
+   * - Validates the input DTO and updates the address.
+   * @param address - The validated address document.
+   * @param addressData - DTO containing updated address details.
+   * @returns The updated address.
+   */
   @Patch(":addressId")
   @HttpCode(HttpStatus.ACCEPTED)
-  @UseGuards(AddressPermissionGuard) // Checks if the user has permission to update the address
+  @UseGuards(AddressPermissionGuard)
   update(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document, @Body() addressData: UpdateAddressDto) {
     return this.addressesService.update(address, addressData);
   }
 
+  /**
+   * Deletes a address by its ID.
+   * - Ensures access permissions using `AddressPermissionGuard`.
+   * - Removes the address from the database.
+   * @param address - The validated address document.
+   */
   @Delete(":addressId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(AddressPermissionGuard) // Checks if the user has permission to update the address
+  @UseGuards(AddressPermissionGuard)
   async remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
     await this.addressesService.remove(address);
   }

@@ -1,6 +1,11 @@
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, Validate } from "class-validator";
 import { LuhnValidationConstraint } from "../utils/luhnValidation";
 
+/**
+ * DTO for creating payment methods.
+ * - Validates card details, including type, number, name, and expiry date.
+ * - Optional field to set the payment method as default.
+ */
 export class CreatePaymentMethodsDto {
   @IsString()
   @IsNotEmpty()
