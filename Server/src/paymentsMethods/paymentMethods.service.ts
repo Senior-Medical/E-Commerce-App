@@ -60,10 +60,10 @@ export class PaymentMethodsService {
     if (paymentMethod) throw new ConflictException("Card Number already exist");
 
     if (paymentMethodData.isDefault) {
-      const defaultMethod = (await this.paymentMethodsModel.find({
+      const defaultMethod = await this.paymentMethodsModel.findOne({
         user: user._id,
         isDefault: true
-      }))[0];
+      });
       if (defaultMethod) await defaultMethod.set({ isDefault: false }).save();
     }
 
@@ -89,17 +89,17 @@ export class PaymentMethodsService {
    */
   async update(paymentMethod: Document, paymentMethodData: UpdatePaymentMethodsDto, user: Document) {
     if (paymentMethodData.cardNumber) {
-      const paymentMethodExist = (await this.paymentMethodsModel.find({
+      const paymentMethodExist = await this.paymentMethodsModel.findOne({
         cardNumber: paymentMethodData.cardNumber
-      }))[0];
+      });
       if (paymentMethodExist && paymentMethodExist._id.toString() !== paymentMethod._id.toString()) throw new ConflictException("Card Number already exist");
     }
 
     if (paymentMethodData.isDefault) {
-      const defaultMethod = (await this.paymentMethodsModel.find({
+      const defaultMethod = await this.paymentMethodsModel.findOne({
         user: user._id,
         isDefault: true
-      }))[0];
+      });
       if (defaultMethod && defaultMethod._id.toString() !== paymentMethod._id.toString()) await defaultMethod.set({ isDefault: false }).save();
     }
 

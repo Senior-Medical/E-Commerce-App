@@ -5,6 +5,20 @@ import { CartItemController } from "./cartItem.controller";
 import { CartItemService } from "./cartItem.service";
 import { ProductsModule } from "src/products/products.module";
 
+/**
+ * CartItem Module
+ * 
+ * Provides functionality for managing cart items in the system.
+ * Features:
+ * - CRUD operations for cart items
+ * - Calculates cart totals for users
+ * - Validates product and user inputs
+ * 
+ * Dependencies:
+ * - CartItem entity
+ * - CartItem service and controller
+ * - Product and user validation pipes
+ */
 @Module({
   imports: [
     MongooseModule.forFeature([
