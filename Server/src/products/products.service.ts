@@ -80,8 +80,7 @@ export class ProductsService {
       return this.productsModel.create(productInput);
     } catch (e) {
       this.filesService.removeFiles(images.map(image => image.filename));
-      console.error(e);
-      throw new InternalServerErrorException("Error in saving data");
+      throw e;
     }
   }
 
@@ -113,8 +112,7 @@ export class ProductsService {
         imagesNames = await this.filesService.saveFiles(images);
       } catch (e) {
         this.filesService.removeFiles(images.map(image => image.filename));
-        console.error(e);
-        throw new InternalServerErrorException("Error in saving data");
+        throw e;
       }
     }
 
@@ -132,8 +130,7 @@ export class ProductsService {
       if(productInput.images) this.filesService.removeFiles(oldImages);
     } catch (e) {
       if(productInput.images) this.filesService.removeFiles(productInput.images);
-      console.error(e);
-      throw new InternalServerErrorException("Error in saving data");
+      throw e;
     }
     return result;
   }

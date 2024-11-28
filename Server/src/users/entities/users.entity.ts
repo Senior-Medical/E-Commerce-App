@@ -1,11 +1,10 @@
-import { InternalServerErrorException } from "@nestjs/common";
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Role } from "src/auth/enums/roles.enum";
-import { EncryptionService } from '../../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
-import { VerificationCodes } from "./verificationCodes.entity";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Address } from "src/addresses/entities/addresses.entity";
+import { Role } from "src/auth/enums/roles.enum";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
+import { EncryptionService } from '../../encryption/encryption.service';
+import { VerificationCodes } from "./verificationCodes.entity";
 
 @Schema({ timestamps: true })
 export class User {
@@ -55,20 +54,14 @@ export class User {
   cartTotal?: number;
 }
 
-export const createUserSchema = (configService: ConfigService) => {
+export const createUserSchema = (configService: ConfigService, encryptionService: EncryptionService) => {
   const UserSchema = SchemaFactory.createForClass(User);
 
   UserSchema.pre('save', async function(next) {
     if (this.isModified('password')) {
-      try {
-        const encryptionService = new EncryptionService(configService);
-        this.password = await encryptionService.bcryptHash(this.password);
-        this.changePasswordAt = new Date();
-        next();
-      } catch (err) {
-        console.error(err);
-        throw new InternalServerErrorException("Encryption Password Error.");
-      }
+      this.password = await encryptionService.bcryptHash(this.password);
+      this.changePasswordAt = new Date();
+      next();
     }
   })
 

@@ -6,6 +6,14 @@ import * as sendGrid from '@sendgrid/mail';
 import * as twilio from "twilio";
 import { SmsData } from "./types/smsData.type";
 
+/**
+ * - Handles sending emails via SendGrid and SMS via Twilio.
+ * - Uses environment variables for Twilio and SendGrid API keys, and other configurations.
+ * 
+ * Methods:
+ * - sendEmail: Sends an email using SendGrid.
+ * - sendSMS: Sends an SMS using Twilio.
+ */
 @Injectable()
 export class MessagingService {
   private logger: Logger;
@@ -23,6 +31,10 @@ export class MessagingService {
     sendGrid.setApiKey(configService.get<string>("SENDGRID_API_KEY"));
   }
 
+  /**
+   * sendEmail - Sends an email using SendGrid.
+   * @param emailData - The data required to send the email.
+   */
   async sendEmail(emailData: MailData) {
     const mail: MailDataRequired = {
       to: emailData.to,
@@ -39,6 +51,10 @@ export class MessagingService {
     }
   }
 
+  /**
+   * sendSMS - Sends an SMS using Twilio.
+   * @param smsData - The data required to send the SMS.
+   */
   async sendSMS(smsData: SmsData) {
     try {
       await this.twilioClient.messages.create({

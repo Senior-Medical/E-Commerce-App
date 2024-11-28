@@ -9,19 +9,23 @@ import { UsersService } from "./users.service";
 import { FilesModule } from "src/files/files.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
+import { EncryptionModule } from "src/encryption/encryption.module";
+import { EncryptionService } from "src/encryption/encryption.service";
 
 @Module({
   imports: [
   MongooseModule.forFeatureAsync([
-      {
+    {
+        imports: [EncryptionModule],
         name: User.name,
-        useFactory: async (configService: ConfigService) => createUserSchema(configService),
-        inject: [ConfigService]
+        useFactory: async (configService: ConfigService, encryptionService: EncryptionService) => createUserSchema(configService, encryptionService),
+        inject: [ConfigService, EncryptionService]
       },
       {
+        imports: [EncryptionModule],
         name: VerificationCodes.name,
-        useFactory: async (configService: ConfigService) => getVerificationCodesSchema(configService),
-        inject: [ConfigService]
+        useFactory: async (configService: ConfigService, encryptionService: EncryptionService) => getVerificationCodesSchema(configService, encryptionService),
+        inject: [ConfigService, EncryptionService]
       }
     ]),
     MessagingModule,
@@ -31,6 +35,7 @@ import { FilesService } from "src/files/files.service";
       useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
       inject: [FilesService]
     }),
+    EncryptionModule
   ],
   controllers: [UsersController],
   providers: [UsersService],
