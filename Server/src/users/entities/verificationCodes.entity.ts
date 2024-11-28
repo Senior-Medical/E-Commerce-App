@@ -13,7 +13,7 @@ export class VerificationCodes {
   code: string;
 
   @Prop()
-  expireAt: Date;
+  expireAt?: Date;
 
   @Prop({
     required: true,

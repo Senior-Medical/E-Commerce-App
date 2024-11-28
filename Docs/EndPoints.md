@@ -49,25 +49,17 @@
 ### WishList:
 
 ```
-  GET /api/v1/wishList - Get all products that is in wish list.
-  POST /api/v1/wishList - Add product to wish list.
+  GET /api/v1/wishList - Get all products that is in the wish list.
+  POST /api/v1/wishList/:productId - Add product to wish list.
   DELETE /api/v1/wishList/:productId - Delete product from wish list.
-```
-
-### Tokens:
-
-```
-  GET /api/v1/token - Get all tokens data of the user.
-  GET /api/v1/token/:tokenId - Get token data.
-  DELETE /api/v1/token/:tokenId - Logout from specific device.
 ```
 
 ### Carts:
 
 ```
   GET /api/v1/cart - Get all products that is in cart with its quantity.
-  POST /api/v1/cart - Add product to cart.
-  PUT /api/v1/cart/:productId - Update quantity of product in cart.
+  POST /api/v1/cart/:productId - Add product to cart.
+  PATCH /api/v1/cart/:productId - Update quantity of product in cart.
   DELETE /api/v1/cart/:productId - Delete product from the cart.
 ```
 

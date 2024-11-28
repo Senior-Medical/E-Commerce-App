@@ -20,7 +20,7 @@ export class RefreshToken {
   token: string;
 
   @Prop()
-  expireAt: Date;
+  expireAt?: Date;
 
   @Prop({
     ref: "User",
