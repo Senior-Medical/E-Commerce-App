@@ -8,6 +8,21 @@ import { MulterModule } from "@nestjs/platform-express";
 import { FilesModule } from "src/files/files.module";
 import { FilesService } from "src/files/files.service";
 
+/**
+ * ProductsModule
+ * 
+ * Module for managing product-related features and data.
+ * 
+ * Features:
+ * - Defines the Product entity schema for MongoDB.
+ * - Provides CRUD operations for products.
+ * - Integrates with CategoriesModule for category management.
+ * - Utilizes FilesModule for handling product image uploads.
+ * - Configures Multer for image upload processing.
+ * 
+ * Exports:
+ * - ProductsService for use in other modules.
+ */
 @Module({
   imports: [
     MongooseModule.forFeature([

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UsersService } from '../users/users.service';
@@ -30,11 +30,11 @@ export class AuthService{
     });
     
     const user = users[0];
-    if (!user) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
-    if (!user.verified) throw new HttpException("User not verified.", HttpStatus.FORBIDDEN);
+    if (!user) throw new ForbiddenException("Incorrect email or password.");
+    if (!user.verified) throw new ForbiddenException("User not verified.");
 
     const match = await this.usersService.comparePassword(password, user.password);
-    if (!match) throw new HttpException("Incorrect email or password.", HttpStatus.FORBIDDEN);
+    if (!match) throw new ForbiddenException("Incorrect email or password.");
 
     return user;
   }

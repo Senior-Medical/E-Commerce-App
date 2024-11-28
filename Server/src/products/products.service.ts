@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { CreateProductDto } from "./dtos/createProduct.dto";
@@ -6,6 +6,15 @@ import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
 import { FilesService } from '../files/files.service';
 
+/**
+ * Service responsible for managing product-related operations.
+ * Handles product creation, updating, retrieval, and deletion, 
+ * including file handling for product images.
+ * 
+ * Dependencies:
+ * - Mongoose Model for Product: Handles database operations.
+ * - FilesService: Manages file upload and removal.
+ */
 @Injectable()
 export class ProductsService {
   constructor(
@@ -13,25 +22,50 @@ export class ProductsService {
     private readonly filesService: FilesService
   ) { }
 
+  /**
+   * Retrieves all products matching the specified conditions.
+   * Excludes version keys from the result.
+   * 
+   * @param conditions - Filtering criteria for retrieving products.
+   * @returns List of products matching the criteria.
+   */
   find(conditions: object = {}) {
     return this.productsModel.find(conditions).select("-__v");
   }
 
+  /**
+   * Retrieves a single product by its unique ID.
+   * Excludes version keys from the result.
+   * 
+   * @param id - The unique identifier of the product.
+   * @returns The product if found.
+   */
   findOne(id: string) {
     return this.productsModel.findById(id).select("-__v");
   }
 
+  /**
+   * Creates a new product with the provided details and images.
+   * - Ensures the product name and code are unique.
+   * - Saves product images to storage and associates them with the product.
+   * - Handles cleanup of uploaded files if an error occurs.
+   * 
+   * @param productData - Data for the new product.
+   * @param images - Array of product images.
+   * @param user - The user creating the product.
+   * @returns The created product.
+   * @throws NotAcceptableException if validation fails.
+   * @throws InternalServerErrorException for file handling or database errors.
+   */
   async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: Document) {
-    // Check if name or code are taken
-    const existProduct = (await this.productsModel.find({
+    const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
         { code: productData.code }
       ]
-    }))[0];
+    });
     if (existProduct) throw new NotAcceptableException("Product name or code is already exist");
     
-    // Check if images are exist
     if (!images) throw new NotAcceptableException("Images are required.");
     
     try {
@@ -47,21 +81,32 @@ export class ProductsService {
     } catch (e) {
       this.filesService.removeFiles(images.map(image => image.filename));
       console.error(e);
-      throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException("Error in saving data");
     }
   }
 
+  /**
+   * Updates an existing product with the provided details and images.
+   * - Validates uniqueness of product name and code.
+   * - Optionally updates product images and cleans up old or failed uploads.
+   * - Updates product metadata, including the updater's details.
+   * 
+   * @param product - The product to update.
+   * @param productData - Updated data for the product.
+   * @param images - Optional array of updated product images.
+   * @param user - The user making the update.
+   * @returns The updated product.
+   * @throws HttpException if validation or file handling fails.
+   */
   async update(product: any, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document) {
-    // Check if name or code are taken
     const existProduct = (await this.productsModel.find({
       $or: [
         { name: productData.name },
         { code: productData.code }
       ]
     }))[0];
-    if (existProduct && existProduct._id.toString() !== product._id.toString()) throw new HttpException("Product name or code is already exist", HttpStatus.CONFLICT);
+    if (existProduct && existProduct._id.toString() !== product._id.toString()) throw new ConflictException("Product name or code is already exist");
 
-    // Check if images are exist save it
     let imagesNames: string[] = [];
     if (images) {
       try {
@@ -69,11 +114,10 @@ export class ProductsService {
       } catch (e) {
         this.filesService.removeFiles(images.map(image => image.filename));
         console.error(e);
-        throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new InternalServerErrorException("Error in saving data");
       }
     }
 
-    // Update the product
     const userId = new Types.ObjectId(user._id.toString());
     const productInput: Partial<Product> = {
       ...productData,
@@ -81,7 +125,7 @@ export class ProductsService {
     }
     if (imagesNames.length) productInput.images = imagesNames;
 
-    let result;
+    let result: Document;
     const oldImages = product.images;
     try {
       result = await product.set(productInput).save();
@@ -89,11 +133,17 @@ export class ProductsService {
     } catch (e) {
       if(productInput.images) this.filesService.removeFiles(productInput.images);
       console.error(e);
-      throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException("Error in saving data");
     }
     return result;
   }
 
+  /**
+   * Deletes a product from the database and its associated images from storage.
+   * 
+   * @param product - The product to delete.
+   * @returns void
+   */
   async remove(product: any) {
     await this.productsModel.findByIdAndDelete(product._id);
     if (product.images) this.filesService.removeFiles(product.images);

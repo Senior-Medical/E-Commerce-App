@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { Category } from "./entities/categories.entity";
@@ -21,7 +21,7 @@ export class CategoriesServices{
 
   async create(categoryData: CreateCategoryDto, user: Document) {
     const category = (await this.find({ name: categoryData.name }))[0];
-    if (category) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
+    if (category) throw new ConflictException('Category already exist.');
 
     const userId = new Types.ObjectId(user._id as string);
     const inputData: Category = {
@@ -34,7 +34,7 @@ export class CategoriesServices{
 
   async update(category: Document, categoryData: UpdateCategoryDto, user: Document) {
     let categoryByName = (await this.find({ name: categoryData.name }))[0];
-    if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
+    if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new ConflictException('Category already exist.');
     
     const inputData: Partial<Category> = {
       ...categoryData,

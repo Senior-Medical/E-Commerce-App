@@ -1,11 +1,13 @@
 import { Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
 import { CategoriesServices } from "src/categories/categories.service";
 
+/**
+ * Validates the `category` field in a request body.
+ * Ensures the category exists and replaces the field with the category's ID.
+ */
 @Injectable()
 export class CategoryIdPipe implements PipeTransform {
-  constructor(
-    private readonly categoriesServices: CategoriesServices,
-  ) { }
+  constructor(private readonly categoriesServices: CategoriesServices) { }
 
   async transform(body: any) {
     if (body.category) {

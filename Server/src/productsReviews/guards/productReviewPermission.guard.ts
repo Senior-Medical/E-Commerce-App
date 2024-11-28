@@ -2,6 +2,12 @@ import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { ProductsReviewsService } from '../productsReviews.service';
 import { Role } from "src/auth/enums/roles.enum";
 
+/**
+ * A guard to check if the user has permission to access or modify a product review.
+ * 
+ * Dependencies:
+ * - ProductsReviewsService: Fetches the review by its ID.
+ */
 @Injectable()
 export class ProductReviewPermissionGuard implements CanActivate{
   constructor(private readonly productsReviewsService: ProductsReviewsService) { }

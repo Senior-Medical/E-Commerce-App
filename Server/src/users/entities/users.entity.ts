@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { InternalServerErrorException } from "@nestjs/common";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { EncryptionService } from '../../common/services/encryption.service';
@@ -66,8 +66,8 @@ export const createUserSchema = (configService: ConfigService) => {
         this.changePasswordAt = new Date();
         next();
       } catch (err) {
-        console.log(err);
-        throw new HttpException("Encryption Password Error.", HttpStatus.INTERNAL_SERVER_ERROR);
+        console.error(err);
+        throw new InternalServerErrorException("Encryption Password Error.");
       }
     }
   })

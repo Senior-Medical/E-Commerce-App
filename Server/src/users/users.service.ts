@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
 import { EncryptionService } from '../common/services/encryption.service';
@@ -55,7 +55,7 @@ export class UsersService {
     }catch(e) {
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       console.error(e);
-      throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException("Error in saving data");
     }
 
     await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
@@ -94,7 +94,8 @@ export class UsersService {
       if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
     }catch(e) {
       if (avatar) this.filesService.removeFiles([avatar.filename]);
-      throw new HttpException("Error in saving data: " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error(e);
+      throw new InternalServerErrorException("Error in saving data.");
     }
 
     message = "User updated successfully. " + message;
