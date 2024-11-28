@@ -8,10 +8,20 @@ import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { CustomLoggerService } from '../logger.service';
 
+/**
+ * - Intercepts HTTP requests and logs the method, URL, status code, and duration.
+ * - Uses the CustomLoggerService to log this information.
+ */
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
   constructor(private readonly customLoggerService: CustomLoggerService) {}
 
+  /**
+   * intercept - Intercepts the request and logs its details.
+   * @param context - The execution context of the request.
+   * @param next - The next handler in the request pipeline.
+   * @returns The response or error.
+   */
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();

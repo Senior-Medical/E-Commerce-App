@@ -12,6 +12,7 @@ import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.entity";
+import { EncryptionModule } from "src/encryption/encryption.module";
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.en
         useFactory: (configService: ConfigService) => getRefreshTokenSchema(configService),
         inject: [ConfigService]
       }
-    ])
+    ]),
+    EncryptionModule
   ],
   controllers: [AuthController],
   providers: [

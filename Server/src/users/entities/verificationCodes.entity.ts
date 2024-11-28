@@ -1,8 +1,8 @@
+import { ConfigService } from '@nestjs/config';
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
-import { ConfigService } from '@nestjs/config';
+import { EncryptionService } from '../../encryption/encryption.service';
 import { CodePurpose, CodeType } from "../enums/codePurpose.enum";
-import { EncryptionService } from '../../common/services/encryption.service';
 
 @Schema({ timestamps: true })
 export class VerificationCodes {  
@@ -42,9 +42,8 @@ export class VerificationCodes {
   user: Types.ObjectId;
 }
 
-export const getVerificationCodesSchema = (configService: ConfigService) => {
+export const getVerificationCodesSchema = (configService: ConfigService, encryptionService: EncryptionService) => {
   const VerificationCodesSchema = SchemaFactory.createForClass(VerificationCodes);
-  const encryptionService = new EncryptionService(configService);
 
   const EXPIRATION_TIME = parseInt(configService.get<string>("EXPIRE_TIME_FOR_CODES") || "900000", 10);
   VerificationCodesSchema.path('expireAt').default(() => new Date(Date.now() + EXPIRATION_TIME));

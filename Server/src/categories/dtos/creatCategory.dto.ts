@@ -1,5 +1,10 @@
 import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator"
 
+/**
+ * Data transfer object used for creating a new category. It ensures that 
+ * the category name follows a specific pattern and validates the optional 
+ * description field.
+ */
 export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()

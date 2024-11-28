@@ -6,6 +6,8 @@ import { PaymentMethodsController } from "./paymentMethods.controller";
 import { PaymentMethodsService } from "./paymentMethods.service";
 import { LuhnValidationConstraint } from "./utils/luhnValidation";
 import { UsersModule } from "src/users/users.module";
+import { EncryptionModule } from "src/encryption/encryption.module";
+import { EncryptionService } from "src/encryption/encryption.service";
 
 /**
  * PaymentMethodsModule
@@ -31,7 +33,6 @@ import { UsersModule } from "src/users/users.module";
  * -------------
  * - UsersModule: For user-related operations and user ID validation.
  * - AuthModule: For role-based access control (`Roles` decorator).
- * - CommonModule: For reusable utilities, including `ObjectIdValidationPipe` and `EncryptionService`.
  * 
  * Security and Validation:
  * ------------------------
@@ -47,11 +48,13 @@ import { UsersModule } from "src/users/users.module";
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([{
+      imports: [EncryptionModule],
       name: PaymentMethods.name,
-      useFactory: (configService: ConfigService) => createPaymentMethodsSchema(configService),
-      inject: [ConfigService]
+      useFactory: (configService: ConfigService, encryptionService: EncryptionService) => createPaymentMethodsSchema(configService, encryptionService),
+      inject: [ConfigService, EncryptionService]
     }]),
-    UsersModule
+    UsersModule,
+    EncryptionModule
   ],
   controllers: [PaymentMethodsController],
   providers: [PaymentMethodsService, LuhnValidationConstraint],

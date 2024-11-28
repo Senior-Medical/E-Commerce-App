@@ -1,11 +1,11 @@
-import { ConflictException, Injectable, NotAcceptableException } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from "@nestjs/mongoose";
-import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 import { Document, Model, Types } from "mongoose";
+import { EncryptionService } from '../encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
-import { EncryptionService } from '../common/services/encryption.service';
-import { ConfigService } from '@nestjs/config';
+import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 
 /**
  * PaymentMethodsService
@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 export class PaymentMethodsService {
   constructor(
     @InjectModel(PaymentMethods.name) private paymentMethodsModel: Model<PaymentMethods>,
-    private readonly configService: ConfigService
+    private readonly encryptionService: EncryptionService
   ) { }
 
   /**
@@ -53,9 +53,8 @@ export class PaymentMethodsService {
    * @throws ConflictException if the card number already exists.
    */
   async create(paymentMethodData: CreatePaymentMethodsDto, user: Document) {
-    const encryptionService = new EncryptionService(this.configService);
     const paymentMethod = await this.paymentMethodsModel.findOne({
-      cardNumber: encryptionService.encrypt(paymentMethodData.cardNumber)
+      cardNumber: this.encryptionService.encrypt(paymentMethodData.cardNumber)
     });
     if (paymentMethod) throw new ConflictException("Card Number already exist");
 

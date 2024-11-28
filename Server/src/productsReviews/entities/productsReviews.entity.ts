@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 
+/**
+ * Schema definition for the product reviews collection. It includes the
+ * review comment, rating, and references to the associated product and user.
+ */
 @Schema({timestamps: true})
 export class ProductsReviews {
   @Prop()

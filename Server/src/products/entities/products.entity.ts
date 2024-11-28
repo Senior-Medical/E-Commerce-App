@@ -2,6 +2,9 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
 
+/**
+ * Product Entity Definition
+ */
 @Schema({timestamps: true})
 export class Product {
   @Prop({
@@ -54,6 +57,11 @@ export class Product {
   updatedBy: Types.ObjectId;
 }
 
+/**
+ * Mongoose Schema for the Product entity.
+ * Represents the schema for storing product information in the database.
+ * Includes hooks and relations for managing associated data and dependencies.
+ */
 const ProductSchema = SchemaFactory.createForClass(Product);
 
 ProductSchema.post("findOneAndDelete", async function (doc, next) {

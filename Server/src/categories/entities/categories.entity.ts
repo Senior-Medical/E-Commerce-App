@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 
+/**
+ * Mongoose schema definition for the Category model. This schema defines 
+ * the structure of a category document in MongoDB, including the name, 
+ * description, and references to the user who created and updated the category.
+ */
 @Schema({timestamps: true})
 export class Category {
   @Prop({

@@ -1,6 +1,14 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
 import { FilesService } from '../../files/files.service';
-import {v4 as uuidv4} from 'uuid';
+
+/**
+ * Validates uploaded product images.
+ * Ensures images are valid files with appropriate MIME types.
+ * Assigns unique filenames to each image.
+ * 
+ * @returns Array of processed images.
+ * @throws NotAcceptableException if validation fails.
+ */
 @Injectable()
 export class ProductImagesValidationPipe implements PipeTransform {
   constructor(private readonly filesService: FilesService) { }

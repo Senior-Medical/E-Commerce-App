@@ -1,17 +1,17 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
-import { EncryptionService } from '../common/services/encryption.service';
-import { ConfigService } from '@nestjs/config';
-import { Document, Model, Types } from "mongoose";
-import { User } from "./entities/users.entity";
-import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
-import { VerificationCodes } from "./entities/verificationCodes.entity";
-import { MessagingService } from '../messaging/messaging.service';
-import { FilesService } from 'src/files/files.service';
-import { UpdateUsersDto } from "./dtos/updateUser.dto";
-import { UpdatePasswordDto } from './dtos/updatePassword.dto';
+import { Document, Model } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
+import { FilesService } from 'src/files/files.service';
+import { EncryptionService } from '../encryption/encryption.service';
+import { MessagingService } from '../messaging/messaging.service';
+import { UpdatePasswordDto } from './dtos/updatePassword.dto';
+import { UpdateUsersDto } from "./dtos/updateUser.dto";
+import { User } from "./entities/users.entity";
+import { VerificationCodes } from "./entities/verificationCodes.entity";
+import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
 
 @Injectable()
 export class UsersService {
@@ -20,12 +20,12 @@ export class UsersService {
     @InjectModel(VerificationCodes.name) private codesModel: Model<VerificationCodes>,
     private readonly messagingService: MessagingService,
     private readonly configService: ConfigService,
-    private readonly filesService: FilesService
+    private readonly filesService: FilesService,
+    private readonly encryptionService: EncryptionService
   ) { }
   
   async comparePassword(password: string, hashedPassword: string) {
-    const encryptionService = new EncryptionService(this.configService);
-    return encryptionService.bcryptCompare(password, hashedPassword);
+    return this.encryptionService.bcryptCompare(password, hashedPassword);
   }
 
   find(condition: any) {
@@ -54,8 +54,7 @@ export class UsersService {
       user = await this.usersModel.create({ ...createUsersDto });
     }catch(e) {
       if (avatar) this.filesService.removeFiles([avatar.filename]);
-      console.error(e);
-      throw new HttpException("Error in saving data", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw e;
     }
 
     await this.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
@@ -94,7 +93,7 @@ export class UsersService {
       if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
     }catch(e) {
       if (avatar) this.filesService.removeFiles([avatar.filename]);
-      throw new HttpException("Error in saving data: " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw e;
     }
 
     message = "User updated successfully. " + message;
