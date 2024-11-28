@@ -1,5 +1,9 @@
 import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
+/**
+ * DTO for creating a new address.
+ * Enforces validation rules to ensure consistent and secure data entry.
+ */
 export class CreateAddressDto {
   @IsString()
   @IsNotEmpty()

@@ -4,6 +4,18 @@ import { Types } from "mongoose";
 import { EncryptionService } from "../../common/services/encryption.service";
 import { luhnCheck } from "../utils/luhnValidation";
 
+/**
+ * Mongoose schema for payment methods.
+ * - Validates card type, number, holder name, and expiry date.
+ * - Encrypts sensitive data (card number and cardholder name) before saving to the database.
+ * - Decrypts sensitive data after retrieval.
+ * 
+ * Key Features:
+ * - Uses custom validators, including Luhn algorithm for card number validation.
+ * - Ensures expiry dates are valid and in the future.
+ * - Associates payment methods with a specific user.
+ * - Implements hooks for encryption and decryption using `EncryptionService`.
+ */
 @Schema({timestamps: true})
 export class PaymentMethods {
   @Prop({

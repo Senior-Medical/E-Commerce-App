@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 
+/**
+ * Schema for the WishList collection.
+ * Links a user to a product with unique user-product pairs.
+ */
 @Schema({timestamps: true})
 export class WishList {
   @Prop({
