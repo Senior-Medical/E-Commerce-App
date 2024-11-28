@@ -4,8 +4,6 @@ import { Document, Model, Types } from "mongoose";
 import { Category } from "./entities/categories.entity";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
-import { CreateCategory } from "./types/createCategoryData.type";
-import { UpdateCategory } from "./types/updateCategoryData.type";
 
 @Injectable()
 export class CategoriesServices{
@@ -26,7 +24,7 @@ export class CategoriesServices{
     if (category) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
 
     const userId = new Types.ObjectId(user._id as string);
-    const inputData: CreateCategory = {
+    const inputData: Category = {
       ...categoryData,
       createdBy: userId,
       updatedBy: userId,
@@ -38,7 +36,7 @@ export class CategoriesServices{
     let categoryByName = (await this.find({ name: categoryData.name }))[0];
     if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new HttpException('Category already exist.', HttpStatus.CONFLICT);
     
-    const inputData: UpdateCategory = {
+    const inputData: Partial<Category> = {
       ...categoryData,
       updatedBy: new Types.ObjectId(user._id as string)
     };

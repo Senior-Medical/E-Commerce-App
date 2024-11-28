@@ -9,7 +9,7 @@ export class WishListService {
   constructor(@InjectModel(WishList.name) private wishListModel: Model<WishList>) { }
   
   find(user: Document) {
-    return this.wishListModel.find({user: user._id}).select("-__v").populate("user", "name username").populate("product", "name price images description code salesTimes");
+    return this.wishListModel.find({user: user._id}).select("-__v").populate("product", "name price images description code salesTimes");
   }
 
   async create(product: Document, user: Document) {

@@ -4,8 +4,6 @@ import { Document, Model, Types } from "mongoose";
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
-import { CreateProduct } from "./types/createProductData.type";
-import { UpdateProduct } from "./types/updateProductData.type";
 import { FilesService } from '../files/files.service';
 
 @Injectable()
@@ -39,7 +37,7 @@ export class ProductsService {
     try {
       const imagesNames = await this.filesService.saveFiles(images);
       const userId = new Types.ObjectId(user._id.toString());
-      const productInput: CreateProduct = {
+      const productInput: Product = {
         ...productData,
         images: imagesNames,
         createdBy: userId,
@@ -77,7 +75,7 @@ export class ProductsService {
 
     // Update the product
     const userId = new Types.ObjectId(user._id.toString());
-    const productInput: UpdateProduct = {
+    const productInput: Partial<Product> = {
       ...productData,
       updatedBy: userId
     }

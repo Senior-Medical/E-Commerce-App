@@ -6,13 +6,10 @@ import { ConfigService } from '@nestjs/config';
 import { Document, Model, Types } from "mongoose";
 import { User } from "./entities/users.entity";
 import { CodePurpose, CodeType } from "./enums/codePurpose.enum";
-import { CreateCode } from "./types/createCode.type";
 import { VerificationCodes } from "./entities/verificationCodes.entity";
 import { MessagingService } from '../messaging/messaging.service';
-import { CreateUserType } from "./types/createUser.type";
 import { FilesService } from 'src/files/files.service';
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
-import { UpdateUserType } from "./types/updateUser.type";
 import { UpdatePasswordDto } from './dtos/updatePassword.dto';
 import { Role } from "src/auth/enums/roles.enum";
 
@@ -47,7 +44,7 @@ export class UsersService {
     return user.save();
   }
 
-  async create(createUsersDto: CreateUserType, avatar: Express.Multer.File) {
+  async create(createUsersDto: User, avatar: Express.Multer.File) {
     let user: Document;
     try {
       if (avatar) {
@@ -68,7 +65,7 @@ export class UsersService {
   }
   
   async update(user: any, updateData: UpdateUsersDto, avatar: Express.Multer.File) {
-    const inputData: UpdateUserType = { ...updateData };
+    const inputData: Partial<User> = { ...updateData };
     let message: string = "";
     
     if (inputData.email) {
@@ -133,7 +130,7 @@ export class UsersService {
   }
 
   async createCode(purpose: CodePurpose, value: string, type: CodeType, user: any) {
-    const codeData: CreateCode = {
+    const codeData: VerificationCodes = {
       code: this.generateCode(),
       value,
       type,

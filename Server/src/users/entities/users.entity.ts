@@ -13,10 +13,10 @@ export class User {
   name: string;
   
   @Prop({ index: true })
-  username: string;
+  username?: string;
   
   @Prop({ index: true })
-  phone: string;
+  phone?: string;
   
   @Prop({ unique: true, required: true, index: true })
   email: string;
@@ -25,34 +25,34 @@ export class User {
   password: string;
 
   @Prop({ enum: Role, default: "customer" })
-  role: string;
+  role?: string;
 
   @Prop()
-  avatar: string;
+  avatar?: string;
 
   @Prop()
-  bio: string;
+  bio?: string;
 
   @Prop()
-  company: string;
+  company?: string;
 
   @Prop({ default: false })
-  verified: boolean;
+  verified?: boolean;
 
   @Prop()
-  emailValidated: boolean;
+  emailValidated?: boolean;
   
   @Prop()
-  phoneValidated: boolean;
+  phoneValidated?: boolean;
   
   @Prop({ default: new Date() })
-  lastLogin: Date;
+  lastLogin?: Date;
 
   @Prop({ default: new Date() })
-  changePasswordAt: Date;
+  changePasswordAt?: Date;
 
   @Prop({ default: 0 })
-  cartTotal: number;
+  cartTotal?: number;
 }
 
 export const createUserSchema = (configService: ConfigService) => {

@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UsersService } from '../users/users.service';
@@ -6,12 +6,10 @@ import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { Document, Model, Types } from "mongoose";
 import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
-import { CreateUserType } from "src/users/types/createUser.type";
-import { UpdateUserType } from "src/users/types/updateUser.type";
 import { InjectModel } from "@nestjs/mongoose";
 import { RefreshToken } from "./entities/refreshTokens.entity";
-import { CreateRefreshToken } from "./types/createToken.type";
 import { ConfigService } from '@nestjs/config';
+import { User } from "src/users/entities/users.entity";
 
 @Injectable()
 export class AuthService{
@@ -42,7 +40,7 @@ export class AuthService{
   }
 
   async register(createUsersDto: CreateUsersDto, avatar: Express.Multer.File) {
-    const createData: CreateUserType = {...createUsersDto, emailValidated: false};
+    const createData: User = {...createUsersDto, emailValidated: false};
     let message = "User created successfully please check your email for verification."
     if (createData.phone) {
       message = message.replace("email", "email and phone");
@@ -60,7 +58,7 @@ export class AuthService{
     const expiresIn = this.configService.get("JWT_REFRESH_EXPIRATION");
     const refreshToken = this.jwtService.sign({ sub: user._id }, { expiresIn });
     
-    const inputData: CreateRefreshToken = {
+    const inputData: RefreshToken = {
       token: refreshToken,
       user: new Types.ObjectId(user._id.toString())
     };
@@ -78,7 +76,7 @@ export class AuthService{
   }
 
   async verify(code: any) {
-    const updateData: UpdateUserType = {};
+    const updateData: Partial<User> = {};
     const user = await this.usersService.findOne(code.user.toString());
     
     let message = "Account verified successfully you can now login.";

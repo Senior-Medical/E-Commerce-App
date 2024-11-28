@@ -4,8 +4,6 @@ import { Document, Model, Types } from "mongoose";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductsReviews } from "./entities/productsReviews.entity";
-import { CreateProductReview } from "./types/createProductReview.type";
-import { UpdateProductReview } from "./types/updateProductReview.type";
 import { ProductsService } from "src/products/products.service";
 
 @Injectable()
@@ -28,7 +26,7 @@ export class ProductsReviewsService {
     if (!product) throw new NotFoundException("Product not found.");
 
     reviewData.product = product._id;
-    const reviewInput: CreateProductReview = {
+    const reviewInput: ProductsReviews = {
       ...reviewData,
       user: new Types.ObjectId(user._id as string)
     };
@@ -36,7 +34,7 @@ export class ProductsReviewsService {
   }
 
   update(review: Document, reviewData: UpdateProductReviewDto) {
-    const reviewInput: UpdateProductReview = {
+    const reviewInput: Partial<ProductsReviews> = {
       ...reviewData
     };
     return review.set(reviewInput).save();

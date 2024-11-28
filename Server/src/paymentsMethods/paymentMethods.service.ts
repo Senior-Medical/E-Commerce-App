@@ -3,9 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 import { Document, Model, Types } from "mongoose";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
-import { CreatePaymentMethods } from "./types/createPaymentMethods.type";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
-import { UpdatePaymentMethods } from "./types/updatePaymentMethods.type";
 import { EncryptionService } from '../common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -40,7 +38,7 @@ export class PaymentMethodsService {
     }
 
     const userId = new Types.ObjectId(user._id as string);
-    const inputData: CreatePaymentMethods = {
+    const inputData: PaymentMethods = {
       ...paymentMethodData,
       user: userId
     };
@@ -63,7 +61,7 @@ export class PaymentMethodsService {
       if (defaultMethod && defaultMethod._id.toString() !== paymentMethod._id.toString()) await defaultMethod.set({ isDefault: false }).save();
     }
 
-    const inputData: UpdatePaymentMethods = {
+    const inputData: Partial<PaymentMethods> = {
       ...paymentMethodData,
     };
     return paymentMethod.set(inputData).save();

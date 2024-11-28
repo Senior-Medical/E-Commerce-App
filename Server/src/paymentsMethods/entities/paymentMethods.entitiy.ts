@@ -42,7 +42,7 @@ export class PaymentMethods {
   expiryDate: string;
 
   @Prop({default: false})
-  isDefault: boolean;
+  isDefault?: boolean;
 
   @Prop({
     required: true,
