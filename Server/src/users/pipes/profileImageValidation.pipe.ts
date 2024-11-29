@@ -1,6 +1,11 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
 import { FilesService } from '../../files/files.service';
 
+/**
+ * Validates uploaded profile images.
+ * - Checks the MIME type to ensure it is a valid image.
+ * - Generates a filename for the image based on its MIME type.
+ */
 @Injectable()
 export class ProfileImagesValidationPipe implements PipeTransform {
   constructor(private readonly filesService: FilesService) { }

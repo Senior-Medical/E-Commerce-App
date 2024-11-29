@@ -10,6 +10,9 @@ const codes = {
   "w": 604800000,
 };
 
+/**
+ * Entity schema for storing refresh tokens with expiration logic.
+ */
 @Schema({timestamps: true})
 export class RefreshToken {
   @Prop({
@@ -29,6 +32,12 @@ export class RefreshToken {
   user: Types.ObjectId;
 }
 
+/**
+ * Factory function to configure the expiration time for refresh tokens.
+ *
+ * @param configService - Accesses JWT refresh expiration configuration from the environment.
+ * @returns A Mongoose schema for the RefreshToken with the correct expiration time.
+ */
 export const getRefreshTokenSchema = (configService: ConfigService) => {
   const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
 

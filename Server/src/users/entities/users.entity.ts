@@ -6,6 +6,11 @@ import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.enti
 import { EncryptionService } from '../../encryption/encryption.service';
 import { VerificationCodes } from "./verificationCodes.entity";
 
+/**
+ * - Represents a user in the system.
+ * - Stores user information such as name, email, role, and authentication details.
+ * - Tracks additional user metadata like verification status, last login, and cart total.
+ */
 @Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
@@ -54,6 +59,14 @@ export class User {
   cartTotal?: number;
 }
 
+/**
+ * Creates the Mongoose schema for the User entity.
+ * - Includes pre-save middleware for hashing passwords.
+ * - Includes post-delete middleware for cleaning related data.
+ * @param configService - NestJS ConfigService for environment configuration.
+ * @param encryptionService - EncryptionService for password hashing.
+ * @returns UserSchema - Mongoose schema for the User entity.
+ */
 export const createUserSchema = (configService: ConfigService, encryptionService: EncryptionService) => {
   const UserSchema = SchemaFactory.createForClass(User);
 

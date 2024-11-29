@@ -61,7 +61,7 @@ export class EncryptionService {
    * @param hashedPassword - The hashed password.
    * @returns A boolean indicating whether the passwords match.
    */
-  async bcryptCompare(password: string, hashedPassword: string) {
+  bcryptCompare(password: string, hashedPassword: string) {
     return bcrypt.compare(password, hashedPassword);
   }
 }

@@ -1,6 +1,9 @@
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from "class-validator";
 import { Document } from "mongoose";
 
+/**
+ * DTO for resetting password with validation for email, password, and reset code.
+ */
 export class ResetPasswordDto{
   @IsEmail()
   readonly email: string;

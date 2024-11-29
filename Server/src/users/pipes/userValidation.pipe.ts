@@ -1,6 +1,9 @@
 import { ArgumentMetadata, ConflictException, Injectable, PipeTransform } from '@nestjs/common';
 import { UsersService } from '../users.service';
 
+/**
+ * Validates user data to ensure uniqueness for email, phone, or username.
+ */
 @Injectable()
 export class UserValidationPipe implements PipeTransform {
   constructor(private readonly usersService: UsersService) { }

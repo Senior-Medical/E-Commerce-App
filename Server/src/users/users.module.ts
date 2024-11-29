@@ -11,7 +11,33 @@ import { MulterModule } from "@nestjs/platform-express";
 import { FilesService } from "src/files/files.service";
 import { EncryptionModule } from "src/encryption/encryption.module";
 import { EncryptionService } from "src/encryption/encryption.service";
+import { CodesService } from "./services/codes.service";
 
+/**
+ * Manages user-related functionalities like account creation, updates, role management, and email/phone verification. 
+ * It integrates MongoDB, encryption, file handling, and messaging for secure and efficient operations.
+ * 
+ * **Key Features:**
+ * - User management (create, update, delete).
+ * - Email/phone verification via verify link.
+ * - Role management (admin, staff, customer).
+ * - Avatar upload and password encryption.
+ * 
+ * **Imports:**
+ * - **MongooseModule**: For `User` and `VerificationCodes` schemas.
+ * - **MessagingModule**: Sends verification codes.
+ * - **FilesModule**, **MulterModule**: Handles avatar uploads.
+ * - **EncryptionModule**: For password encryption.
+ * 
+ * **Providers:**
+ * - **UsersService**, **CodesService**, **EncryptionService**.
+ * 
+ * **Controller:**
+ * - **UsersController**: Manages user data routes.
+ * 
+ * **Exports:**
+ * - **UsersService**, **CodesService**.
+ */
 @Module({
   imports: [
   MongooseModule.forFeatureAsync([
@@ -38,7 +64,7 @@ import { EncryptionService } from "src/encryption/encryption.service";
     EncryptionModule
   ],
   controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService]
+  providers: [UsersService, CodesService],
+  exports: [UsersService, CodesService]
 })
 export class UsersModule{}
