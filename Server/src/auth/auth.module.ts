@@ -13,7 +13,20 @@ import { FilesService } from "src/files/files.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.entity";
 import { EncryptionModule } from "src/encryption/encryption.module";
-
+/**
+ * AuthModule encapsulates authentication-related functionalities.
+ * It provides services, controllers, and dependencies for user authentication,
+ * including token management, password reset, and verification mechanisms.
+ * 
+ * Key Features:
+ * - Service Providers: AuthService, LocalStrategy, JwtStrategy.
+ * - Imported Modules: UsersModule, ConfigModule, EncryptionModule, CodesModule.
+ * - Mongoose Integration: Registering the RefreshToken schema.
+ * 
+ * Dependencies:
+ * - MongooseModule: Manages MongoDB collections.
+ * - ConfigModule: Retrieves configuration values.
+ */
 @Module({
   imports: [
     UsersModule,

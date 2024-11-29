@@ -5,6 +5,9 @@ import { UsersService } from "src/users/users.service";
 import { ResetPasswordDto } from "../dtos/resetPassword.dto";
 import { CodesService } from "src/users/services/codes.service";
 
+/**
+ * Validates the user's reset password code and checks if it's expired.
+ */
 @Injectable()
 export class ResetPasswordPipe implements PipeTransform {
   constructor(
@@ -13,6 +16,16 @@ export class ResetPasswordPipe implements PipeTransform {
     private readonly codesService: CodesService
   ) { }
 
+  /**
+   * - Checks if the user's email is valid.
+   * - Verifies if the reset code is correct and has not expired.
+   * - Throws `NotFoundException` if email or code is invalid.
+   * - Returns the `ResetPasswordDto` object if all checks pass.
+   * 
+   * @param body - body of the request
+   * @param metadata - metadata of the request
+   * @returns `ResetPasswordDto` object
+   */
   async transform(body: ResetPasswordDto, metadata: ArgumentMetadata) {
     const user = (await this.usersService.find({ email: body.email }))[0];
     if (!user) throw new NotFoundException("Email not correct.");

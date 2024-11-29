@@ -5,6 +5,12 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { UsersService } from '../../users/users.service';
 import { AuthService } from '../auth.service';
 
+/**
+ * JWT Strategy for Passport.
+ * 
+ * Validates JWT tokens in incoming requests by checking the token's payload and ensuring 
+ * the user exists, is verified, and hasn't changed their password after the token was issued.
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -19,12 +25,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
+  /**
+   * - Verifies the refresh token, user existence, user verification, and password change status.
+   * - Throws `UnauthorizedException` if any check fails.
+   * @param payload - JWT payload
+   * @returns user document if all checks pass
+   */
   async validate(payload: any) {
     const refreshToken = await this.authService.findRefreshToken({_id: payload.refreshTokenId});
     const user = await this.usersService.findOne(payload.sub);
 
     if(!refreshToken || !user) throw new UnauthorizedException("Invalid token.");
-    if(!user.verified) throw new UnauthorizedException("User not verified.");
+    
+    if (!user.verified) throw new UnauthorizedException("User not verified.");
     if (user.changePasswordAt) {
       let changePasswordDate = user.changePasswordAt.getTime() / 1000;
       const iat = payload.iat || 0;
