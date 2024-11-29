@@ -1,15 +1,17 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
+import { InjectModel } from "@nestjs/mongoose";
+import { Document, Model, Types } from "mongoose";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
+import { User } from "src/users/entities/users.entity";
+import { CodePurpose, CodeType } from "src/users/enums/code.enum";
 import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { Document, Model, Types } from "mongoose";
-import { CodePurpose, CodeType } from "src/users/enums/codePurpose.enum";
-import { InjectModel } from "@nestjs/mongoose";
 import { RefreshToken } from "./entities/refreshTokens.entity";
-import { ConfigService } from '@nestjs/config';
-import { User } from "src/users/entities/users.entity";
+import { EncryptionService } from "src/encryption/encryption.service";
+import { CodesService } from '../users/services/codes.service';
 
 @Injectable()
 export class AuthService{
@@ -18,6 +20,8 @@ export class AuthService{
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly encryptionService: EncryptionService,
+    private readonly codesService: CodesService
   ) { }
   
   async validateUser(email: string, password: string) {
@@ -33,7 +37,8 @@ export class AuthService{
     if (!user) throw new ForbiddenException("Incorrect email or password.");
     if (!user.verified) throw new ForbiddenException("User not verified.");
 
-    const match = await this.usersService.comparePassword(password, user.password);
+    const match = await this.encryptionService.bcryptCompare(password, user.password);
+
     if (!match) throw new ForbiddenException("Incorrect email or password.");
 
     return user;
@@ -120,7 +125,7 @@ export class AuthService{
   }
 
   async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
-    await this.usersService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
+    await this.codesService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
     return {message: `Please check your email for password reset code.`};
   }
 
@@ -136,11 +141,11 @@ export class AuthService{
     let email = false;
     let phone = false;
     if (user.email && !emailValidated) {
-      await this.usersService.createCode(CodePurpose.VERIFY_EMAIL, user.email, CodeType.EMAIL, user);
+      await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, user.email, CodeType.EMAIL, user);
       email = true;
     }
     if (user.phone && !phoneValidated) {
-      await this.usersService.createCode(CodePurpose.VERIFY_PHONE, user.phone, CodeType.PHONE, user);
+      await this.codesService.createCode(CodePurpose.VERIFY_PHONE, user.phone, CodeType.PHONE, user);
       phone = true;
     }
 
