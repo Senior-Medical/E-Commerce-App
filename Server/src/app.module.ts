@@ -1,6 +1,6 @@
-import { HttpStatus, Logger, MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
+import { HttpStatus, MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AddressesModule } from "./addresses/addresses.module";
@@ -11,14 +11,12 @@ import { CategoriesModule } from "./categories/categories.module";
 import { envVariablesValidationSchema } from "./common/config/envValidation.schema";
 import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
 import { LoggerExceptionFilter } from "./logger/filters/loggerException.filter";
-import { LoggerInterceptor } from "./logger/interceptors/logger.interceptor";
 import { MessagingModule } from "./messaging/messaging.module";
 import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
 import { ProductsModule } from "./products/products.module";
 import { ProductsReviewsModule } from "./productsReviews/productsReviews.module";
 import { UsersModule } from "./users/users.module";
 import { LoggerModule } from "./logger/logger.module";
-import { CustomLoggerService } from "./logger/logger.service";
 import { WishListModule } from "./wishList/wishList.module";
 import { CartItemModule } from "./cartItem/cartItem.module";
 

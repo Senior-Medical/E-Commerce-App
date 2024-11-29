@@ -1,12 +1,13 @@
 import { Injectable, NotAcceptableException, NotFoundException, StreamableFile } from "@nestjs/common";
 import { createReadStream, existsSync } from "fs";
 import { unlink, mkdir, writeFile } from "fs/promises";
-import { extname, join } from "path";
+import path, { extname, join } from "path";
 import { ConfigService } from '@nestjs/config';
 import { lookup } from "mime-types";
 import { memoryStorage } from "multer";
 import {v4 as uuidv4} from 'uuid';
 import { CustomLoggerService } from "src/logger/logger.service";
+import { UploadDirs } from "./enums/uploadDirs.enum";
 
 const MAGIC_NUMBERS: Record<string, string> = {
   'FFD8FF': 'image/jpeg',               // JPEG
@@ -50,7 +51,7 @@ export class FilesService {
     private readonly configService: ConfigService,
     private readonly loggerService: CustomLoggerService
   ) {
-    this.uploadDir = this.configService.get('MULTER_UPLOADS_FOLDER');
+    this.uploadDir = this.configService.get('MULTER_UPLOADS_FOLDER')
     this.maxFileSize = parseInt(this.configService.get('MULTER_MAX_FILE_SIZE'));
   }
 
@@ -85,7 +86,7 @@ export class FilesService {
    * @throws NotAcceptableException - If the filename is invalid.
    * @throws NotFoundException - If the file is not found.
    */
-  async serveFile(filename: string) {
+  async serveFile(filename: string): Promise<StreamableFile> {
     filename = this.sanitizeFilename(filename);
     if (!this.isValidFileName(filename)) throw new NotAcceptableException("Invalid file name.");
     const filePath = join(this.uploadDir, filename);
@@ -171,10 +172,10 @@ export class FilesService {
    * @param mimeType - The MIME type of the file.
    * @returns A unique filename with the appropriate extension.
    */
-  generateFilename(mimeType: string): string {
+  generateFilename(mimeType: string, dir: UploadDirs): string {
     const uuid = uuidv4();
     const ext = mimeType.split("/").pop();
-    return `${Date.now()}-${uuid}.${ext}`;
+    return path.join(dir, `${uuid}.${ext}`);
   }
 
   /**

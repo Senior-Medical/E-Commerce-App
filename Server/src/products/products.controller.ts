@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
@@ -13,6 +13,7 @@ import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
+import { UploadDirs } from "src/files/enums/uploadDirs.enum";
 
 /**
  * Controller for managing product-related operations.
@@ -58,6 +59,7 @@ export class ProductsController {
   @Get("images/:imageName")
   @Public()
   serveImage(@Param("imageName") imageName: string) {
+    if (!imageName.startsWith(UploadDirs.PRODUCTS)) throw new NotAcceptableException("Invalid image name");
     return this.filesService.serveFile(imageName);
   }
 

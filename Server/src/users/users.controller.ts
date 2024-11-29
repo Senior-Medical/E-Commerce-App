@@ -11,6 +11,9 @@ import { UserValidationPipe } from "./pipes/userValidation.pipe";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
 import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
+import { UserDecorator } from "./decorators/user.decorator";
+import { User } from "./entities/users.entity";
+import { FilesService } from "src/files/files.service";
 
 /**
  * Handles user-related operations, including CRUD and role management.
@@ -20,7 +23,10 @@ import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
  */
 @Controller("users")
 export class UsersController{
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly filesService: FilesService
+  ) { }
 
   /**
    * Retrieves a list of all users.
@@ -36,7 +42,17 @@ export class UsersController{
   }
 
   /**
-   * GET /users/:userId
+   * Serves a user avatar.
+   * 
+   * @param user - The user document.
+   * @returns The requested image file.
+   */
+  @Get("avatar")
+  serveImage(@UserDecorator() user: User) {
+    return this.filesService.serveFile(user.avatar);
+  }
+
+  /**
    * Retrieves a single user's details.
    * 
    * @param user - The user object retrieved after validation.

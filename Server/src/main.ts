@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { CustomLoggerService } from './logger/logger.service';
-// import { DoubleCsrfConfigOptions, doubleCsrf } from 'csrf-csrf';
+import { DoubleCsrfConfigOptions, doubleCsrf } from 'csrf-csrf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -22,16 +22,16 @@ async function bootstrap() {
     defaultVersion: defaultVersion,
   });
 
-  // const doubleCsrfOptions: DoubleCsrfConfigOptions = {
-  //   getSecret: () => configService.get<string>("CSRF_SECRET"),
-  // };
-  // const {
-  //   invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.
-  //   generateToken, // Use this in your routes to generate and provide a CSRF hash, along with a token cookie and token.
-  //   validateRequest, // Also a convenience if you plan on making your own middleware.
-  //   doubleCsrfProtection, // This is the default CSRF protection middleware.
-  // } = doubleCsrf(doubleCsrfOptions);
-  // app.use(doubleCsrfProtection);
+  const doubleCsrfOptions: DoubleCsrfConfigOptions = {
+    getSecret: () => configService.get<string>("CSRF_SECRET"),
+  };
+  const {
+    invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.
+    generateToken, // Use this in your routes to generate and provide a CSRF hash, along with a token cookie and token.
+    validateRequest, // Also a convenience if you plan on making your own middleware.
+    doubleCsrfProtection, // This is the default CSRF protection middleware.
+  } = doubleCsrf(doubleCsrfOptions);
+  app.use(doubleCsrfProtection);
 
 
 

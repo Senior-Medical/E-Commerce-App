@@ -1,5 +1,6 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
 import { FilesService } from '../../files/files.service';
+import { UploadDirs } from "src/files/enums/uploadDirs.enum";
 
 /**
  * Validates uploaded product images.
@@ -18,7 +19,7 @@ export class ProductImagesValidationPipe implements PipeTransform {
     let newImages = images.map((image: Express.Multer.File) => {
       const mimeType = this.filesService.getMimeType(image.buffer);
       if (!mimeType) throw new NotAcceptableException("Invalid image file.");
-      image.filename = this.filesService.generateFilename(mimeType);
+      image.filename = this.filesService.generateFilename(mimeType, UploadDirs.PRODUCTS);
       return image;
     })
 

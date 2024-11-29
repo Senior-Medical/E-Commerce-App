@@ -18,6 +18,7 @@
 ```
   GET /api/v1/users - Get all users.
   GET /api/v1/users/:userId - Get a single user by ID.
+  GET /api/v1/users/avatar - Get a user profile image.
   PATCH /api/v1/users/:userId - Update a user by ID.
   PATCH /api/v1/users/password/:userId - Update a user password.
   PATCH /api/v1/users/role/:userId - Update a user role.
