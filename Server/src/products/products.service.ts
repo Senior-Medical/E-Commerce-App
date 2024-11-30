@@ -5,6 +5,7 @@ import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
 import { FilesService } from '../files/files.service';
+import { Request } from "express";
 
 /**
  * Service responsible for managing product-related operations.
@@ -52,8 +53,10 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(conditions: object = {}) {
-    return this.productsModel.find(conditions).select("-__v");
+  find(req: any, conditions: object = {}) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) return this.productsModel.find(conditions).select("-__v");
+    else return queryBuilder.select("-__v");
   }
 
   /**

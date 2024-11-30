@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
@@ -15,6 +15,7 @@ import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pip
 import { ProductsService } from './products.service';
 import { UploadDirs } from "src/files/enums/uploadDirs.enum";
 import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { Request } from "express";
 
 /**
  * Controller for managing product-related operations.
@@ -36,8 +37,8 @@ export class ProductsController {
   @Get()
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find() {
-    return this.productsService.find().populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
+  find(@Req() req: Request) {
+    return this.productsService.find(req).populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
   /**

@@ -46,11 +46,8 @@ import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
   providers: [ProductsService],
   exports: [ProductsService]
 })
-export class ProductsModule {
+export class ProductsModule { 
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetModelMiddleware).forRoutes({
-      path: "products",
-      method: RequestMethod.GET
-    })
+    consumer.apply(SetModelMiddleware).forRoutes(ProductsController);
   }
 }
