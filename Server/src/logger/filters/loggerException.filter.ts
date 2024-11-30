@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  HttpException,
   Injectable,
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
@@ -24,7 +25,8 @@ export class LoggerExceptionFilter extends BaseExceptionFilter implements Except
    * @param host - The context of the exception.
    */
   catch(exception: any, host: ArgumentsHost) {
-    const statusCode = exception.getStatus() || 500;
+    console.log(exception);
+    const statusCode = exception instanceof HttpException ? exception.getStatus() : 500;
     const errorMessage = exception.message || "Internal server error";
     const contextName = exception.contextName || 'Unknown';
     

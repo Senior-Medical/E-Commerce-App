@@ -14,6 +14,7 @@ import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
 import { UploadDirs } from "src/files/enums/uploadDirs.enum";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 
 /**
  * Controller for managing product-related operations.
@@ -34,6 +35,7 @@ export class ProductsController {
    */
   @Get()
   @Public()
+  @UseInterceptors(ApiFeatureInterceptor)
   find() {
     return this.productsService.find().populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
