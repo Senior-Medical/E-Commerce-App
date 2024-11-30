@@ -19,6 +19,7 @@ import { UsersModule } from "./users/users.module";
 import { LoggerModule } from "./logger/logger.module";
 import { WishListModule } from "./wishList/wishList.module";
 import { CartItemModule } from "./cartItem/cartItem.module";
+import { CsrfModule } from "./csrf/csrf.module";
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { CartItemModule } from "./cartItem/cartItem.module";
     PaymentMethodsModule,
     MessagingModule,
     WishListModule,
-    CartItemModule
+    CartItemModule,
+    CsrfModule
   ],
   providers: [
     {

@@ -23,6 +23,29 @@ export class ProductsService {
   ) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The product model
+   */
+  getModel() {
+    return this.productsModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "name",
+      "description",
+      "code",
+      "category",
+      "createdBy",
+      "updatedBy",
+    ]
+  }
+
+  /**
    * Retrieves all products matching the specified conditions.
    * Excludes version keys from the result.
    * 

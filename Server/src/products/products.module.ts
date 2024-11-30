@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Product, ProductSchema } from "./entities/products.entity";
 import { ProductsController } from "./products.controller";
@@ -7,6 +7,8 @@ import { CategoriesModule } from "src/categories/categories.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesModule } from "src/files/files.module";
 import { FilesService } from "src/files/files.service";
+import { SetModelMiddleware } from "./middlewares/setModel.middleware";
+import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
 
 /**
  * ProductsModule
@@ -37,10 +39,18 @@ import { FilesService } from "src/files/files.service";
       useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
       inject: [FilesService]
     }),
-    CategoriesModule
+    CategoriesModule,
+    ApiFeatureModule
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService]
 })
-export class ProductsModule { }
+export class ProductsModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetModelMiddleware).forRoutes({
+      path: "products",
+      method: RequestMethod.GET
+    })
+  }
+}
