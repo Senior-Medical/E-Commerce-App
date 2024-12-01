@@ -83,6 +83,24 @@ export class Address {
   landmark?: string;
 
   /**
+   * An optional latitude for geolocation.
+   */
+  @Prop({
+    min: -90,
+    max: 90
+  })
+  latitude?: number;
+
+  /**
+   * An optional longitude for geolocation.
+   */
+  @Prop({
+    min: -180,
+    max: 180
+  })
+  longitude?: number;
+
+  /**
    * The ID of the user who owns the address.
    * References the `User` collection in the database.
    */

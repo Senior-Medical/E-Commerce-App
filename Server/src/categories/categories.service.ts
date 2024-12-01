@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { Category } from "./entities/categories.entity";
@@ -17,13 +17,35 @@ export class CategoriesServices{
   ) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The categories model
+   */
+  getModel() {
+    return this.categoriesModel;
+  }
+  
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "name",
+      "description"
+    ];
+  }
+
+  /**
    * Finds categories based on specified conditions.
    * 
    * @param conditions - The search conditions.
    * @returns List of categories that match the conditions.
    */
-  find(conditions: object = {}) {
-    return this.categoriesModel.find(conditions).select("-__v");
+  find(req: any) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    return queryBuilder.select("-__v");
   }
 
   /**
@@ -45,7 +67,7 @@ export class CategoriesServices{
    * @returns The created category.
    */
   async create(categoryData: CreateCategoryDto, user: Document) {
-    const category = (await this.find({ name: categoryData.name }))[0];
+    const category = await this.categoriesModel.findOne({ name: categoryData.name });
     if (category) throw new ConflictException('Category already exist.');
 
     const userId = new Types.ObjectId(user._id as string);
@@ -67,7 +89,7 @@ export class CategoriesServices{
    * @returns The updated category document.
    */
   async update(category: Document, categoryData: UpdateCategoryDto, user: Document) {
-    let categoryByName = (await this.find({ name: categoryData.name }))[0];
+    let categoryByName = await this.categoriesModel.findOne({ name: categoryData.name });
     if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new ConflictException('Category already exist.');
     
     const inputData: Partial<Category> = {

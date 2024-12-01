@@ -1,9 +1,11 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ProductsReviews, ProductsReviewsSchema } from "./entities/productsReviews.entity";
 import { ProductsReviewsController } from "./productsReviews.controller";
 import { ProductsReviewsService } from './productsReviews.service';
 import { ProductsModule } from "src/products/products.module";
+import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
+import { SetApiFeatureVariableForProductsReviews } from "./middlewares/setApiFeatureVariablesForProductsReviews.middleware";
 
 /**
  * - The module responsible for managing product reviews.
@@ -24,9 +26,14 @@ import { ProductsModule } from "src/products/products.module";
           schema: ProductsReviewsSchema
         }
     ]),
-    ProductsModule
+    ProductsModule,
+    ApiFeatureModule
   ],
   controllers: [ProductsReviewsController],
   providers: [ProductsReviewsService],
 })
-export class ProductsReviewsModule { }
+export class ProductsReviewsModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetApiFeatureVariableForProductsReviews).forRoutes(ProductsReviewsController);
+  }
+}

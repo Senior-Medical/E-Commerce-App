@@ -1,11 +1,12 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Types } from "mongoose";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Document, Model, Types } from "mongoose";
 import { EncryptionService } from '../encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethods } from "./entities/paymentMethods.entitiy";
+import { Role } from "src/auth/enums/roles.enum";
 
 /**
  * PaymentMethodsService
@@ -17,8 +18,28 @@ import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 export class PaymentMethodsService {
   constructor(
     @InjectModel(PaymentMethods.name) private paymentMethodsModel: Model<PaymentMethods>,
+    @InjectConnection() private readonly connection: Connection,
     private readonly encryptionService: EncryptionService
   ) { }
+
+  /**
+   * Get model of this service to use it in api feature module
+   * @returns - The payment methods model
+   */
+  getModel() {
+    return this.paymentMethodsModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "cardType"
+    ];
+  }
 
   /**
    * Retrieves a list of payment methods based on the specified conditions.
@@ -26,8 +47,12 @@ export class PaymentMethodsService {
    * @param conditions - Optional: MongoDB query filter conditions.
    * @returns List of payment methods excluding the __v field.
    */
-  find(conditions: object = {}) {
-    return this.paymentMethodsModel.find(conditions).select("-__v");
+  find(req: any) {
+    const user = req.user;
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    if (user.role === Role.customer) return queryBuilder.find({ user: user._id }).select("-__v");
+    else return queryBuilder.select("-__v");
   }
 
   /**
@@ -58,20 +83,32 @@ export class PaymentMethodsService {
     });
     if (paymentMethod) throw new ConflictException("Card Number already exist");
 
-    if (paymentMethodData.isDefault) {
-      const defaultMethod = await this.paymentMethodsModel.findOne({
-        user: user._id,
-        isDefault: true
-      });
-      if (defaultMethod) await defaultMethod.set({ isDefault: false }).save();
-    }
-
     const userId = new Types.ObjectId(user._id as string);
     const inputData: PaymentMethods = {
       ...paymentMethodData,
       user: userId
     };
-    return this.paymentMethodsModel.create(inputData);
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      if (paymentMethodData.isDefault) {
+        const defaultMethod = await this.paymentMethodsModel.findOne({
+          user: user._id,
+          isDefault: true
+        });
+        if (defaultMethod) await defaultMethod.set({ isDefault: false }).save({ session });
+      }
+      const paymentMethod = (await this.paymentMethodsModel.create([inputData], { session }))[0];
+      
+      await session.commitTransaction();
+      session.endSession();
+      return paymentMethod;
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
@@ -93,19 +130,32 @@ export class PaymentMethodsService {
       });
       if (paymentMethodExist && paymentMethodExist._id.toString() !== paymentMethod._id.toString()) throw new ConflictException("Card Number already exist");
     }
-
-    if (paymentMethodData.isDefault) {
-      const defaultMethod = await this.paymentMethodsModel.findOne({
-        user: user._id,
-        isDefault: true
-      });
-      if (defaultMethod && defaultMethod._id.toString() !== paymentMethod._id.toString()) await defaultMethod.set({ isDefault: false }).save();
-    }
-
+    
     const inputData: Partial<PaymentMethods> = {
       ...paymentMethodData,
     };
-    return paymentMethod.set(inputData).save();
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      if (paymentMethodData.isDefault) {
+        const defaultMethod = await this.paymentMethodsModel.findOne({
+          user: user._id,
+          isDefault: true
+        });
+        if (defaultMethod && defaultMethod._id.toString() !== paymentMethod._id.toString()) await defaultMethod.set({ isDefault: false }).save({ session });
+      }
+  
+      await paymentMethod.set(inputData).save({ session });
+      
+      await session.commitTransaction();
+      session.endSession();
+      return paymentMethod;
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**

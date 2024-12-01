@@ -30,7 +30,6 @@
 ```
   GET /api/v1/addresses - Get user addresses.
   GET /api/v1/addresses/:addressId - Get a user address by id.
-  GET /api/v1/addresses/user/:userId - Get addresses of specific user.
   POST /api/v1/addresses - Create a user address.
   PATCH /api/v1/addresses/:addressId - Update a user address.
   DELETE /api/v1/addresses/:addressId - Delete a user address.
@@ -41,7 +40,6 @@
 ```
   GET /api/v1/payments - Get user payment methods.
   GET /api/v1/payments/:paymentMethodId - Get a user payment method.
-  GET /api/v1/payments/user/:userId - Get payments methods of specific user.
   POST /api/v1/payments - Create a user payment method.
   PATCH /api/v1/payments/:paymentMethodId - Update a user payment method.
   DELETE /api/v1/payments/:paymentMethodId - Delete a user payment method.

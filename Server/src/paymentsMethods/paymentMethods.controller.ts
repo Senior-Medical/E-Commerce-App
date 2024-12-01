@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
@@ -10,6 +10,8 @@ import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { Request } from "express";
 
 /**
  * PaymentMethodsController
@@ -32,10 +34,9 @@ export class PaymentMethodsController {
    * @returns List of payment methods.
    */
   @Get()
-  find(@UserDecorator() user: any) {
-    let conditions = {};
-    if (user.role === Role.customer) conditions = { user: user._id };
-    return this.paymentMethodsService.find(conditions).populate("user", "name username");
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request) {
+    return this.paymentMethodsService.find(req).populate("user", "name username");
   }
 
   /**
@@ -49,18 +50,6 @@ export class PaymentMethodsController {
   @UseGuards(PaymentMethodPermissionGuard)
   findOne(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document) {
     return paymentMethod.populate("user", "name username");
-  }
-
-  /**
-   * Retrieves payment methods for a specific user.
-   * - Restricted to admin and staff roles using `Roles` decorator.
-   * @param user - The validated user document.
-   * @returns Payment methods belonging to the specified user.
-   */
-  @Get("user/:userId")
-  @Roles(Role.admin, Role.staff)
-  findByUser(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
-    return this.paymentMethodsService.find({user: user._id});
   }
 
   /**

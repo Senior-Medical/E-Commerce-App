@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from "class-validator";
 
 /**
  * DTO for creating a new address.
@@ -53,4 +54,18 @@ export class CreateAddressDto {
     message: 'Landmark must be 3-50 characters long and include only valid symbols.',
   })
   landmark?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  latitude?: number;
+  
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  longitude?: number;
 }

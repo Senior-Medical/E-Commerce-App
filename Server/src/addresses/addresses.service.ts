@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Address } from "./entities/addresses.entity";
 import { Document, Model, Types } from "mongoose";
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
+import { Role } from "src/auth/enums/roles.enum";
 
 /**
  * The AddressesService contains the business logic for managing user addresses.
@@ -17,12 +18,41 @@ export class AddressesService {
   constructor(@InjectModel(Address.name) private addressesModel: Model<Address>) { }
   
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The addresses model
+   */
+  getModel() {
+    return this.addressesModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "title",
+      "addressLine",
+      "country",
+      "city",
+      "state",
+      "postalCode",
+      "landmark"
+    ]
+  }
+
+  /**
    * Retrieves addresses based on specified conditions.
    * @param conditions - Optional: Query filter for finding addresses
    * @returns A list of addresses excluding the `__v` field
    */
-  find(conditions: object = {}) {
-    return this.addressesModel.find(conditions).select("-__v");
+  find(req: any) {
+    const user = req.user;
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    if(user.role === Role.customer) return queryBuilder.find({ user: user._id }).select("-__v");
+    else return queryBuilder.select("-__v");
   }
 
   /**

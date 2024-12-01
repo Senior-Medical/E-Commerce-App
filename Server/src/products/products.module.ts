@@ -7,7 +7,7 @@ import { CategoriesModule } from "src/categories/categories.module";
 import { MulterModule } from "@nestjs/platform-express";
 import { FilesModule } from "src/files/files.module";
 import { FilesService } from "src/files/files.service";
-import { SetModelMiddleware } from "./middlewares/setModel.middleware";
+import { SetApiFeatureVariableForProduct } from "./middlewares/setApiFeatureVariablesForProduct.middleware";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
 
 /**
@@ -46,11 +46,8 @@ import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
   providers: [ProductsService],
   exports: [ProductsService]
 })
-export class ProductsModule {
+export class ProductsModule { 
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetModelMiddleware).forRoutes({
-      path: "products",
-      method: RequestMethod.GET
-    })
+    consumer.apply(SetApiFeatureVariableForProduct).forRoutes(ProductsController);
   }
 }

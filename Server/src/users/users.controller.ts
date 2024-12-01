@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
@@ -14,6 +14,8 @@ import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
 import { UserDecorator } from "./decorators/user.decorator";
 import { User } from "./entities/users.entity";
 import { FilesService } from "src/files/files.service";
+import { Request } from "express";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 
 /**
  * Handles user-related operations, including CRUD and role management.
@@ -37,8 +39,9 @@ export class UsersController{
    */
   @Get()
   @Roles(Role.admin, Role.staff)
-  find() {
-    return this.usersService.find({}).select("-password -__v");
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request) {
+    return this.usersService.find(req).select("-password");
   }
 
   /**

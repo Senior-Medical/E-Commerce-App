@@ -5,6 +5,7 @@ import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
 import { FilesService } from '../files/files.service';
+import { Request } from "express";
 
 /**
  * Service responsible for managing product-related operations.
@@ -38,11 +39,8 @@ export class ProductsService {
     return [
       "name",
       "description",
-      "code",
-      "category",
-      "createdBy",
-      "updatedBy",
-    ]
+      "code"
+    ];
   }
 
   /**
@@ -52,8 +50,10 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(conditions: object = {}) {
-    return this.productsModel.find(conditions).select("-__v");
+  find(req: any) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    return queryBuilder.select("-__v");
   }
 
   /**
@@ -121,12 +121,12 @@ export class ProductsService {
    * @throws HttpException if validation or file handling fails.
    */
   async update(product: any, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document) {
-    const existProduct = (await this.productsModel.find({
+    const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
         { code: productData.code }
       ]
-    }))[0];
+    });
     if (existProduct && existProduct._id.toString() !== product._id.toString()) throw new ConflictException("Product name or code is already exist");
 
     let imagesNames: string[] = [];
