@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
@@ -10,6 +10,8 @@ import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
 import { Role } from "src/auth/enums/roles.enum";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { Roles } from "src/auth/decorators/roles.decorator";
+import { Request } from "express";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 
 /**
  * The AddressesController handles all API requests related to user addresses.
@@ -34,10 +36,9 @@ export class AddressesController {
    * @returns List of addresses.
    */
   @Get()
-  find(@UserDecorator() user: any) {
-    let condition = {};
-    if(user.role === Role.customer) condition = { user: user._id };
-    return this.addressesService.find(condition).populate("user", "name username");
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request) {
+    return this.addressesService.find(req).populate("user", "name username");
   }
 
   /**

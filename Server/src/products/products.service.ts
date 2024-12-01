@@ -52,6 +52,7 @@ export class ProductsService {
    */
   find(req: any) {
     const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");
   }
 

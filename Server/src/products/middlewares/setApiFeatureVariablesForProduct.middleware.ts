@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
-export class SetModelMiddleware {
+export class SetApiFeatureVariableForProduct {
   constructor(private readonly productsService: ProductsService) {}
 
   use(req: any, res: any, next: () => void) {
