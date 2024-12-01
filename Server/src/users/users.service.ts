@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
@@ -24,6 +24,31 @@ export class UsersService {
   ) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The users model
+   */
+  getModel() {
+    return this.usersModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "name",
+      "username",
+      "phone",
+      "email",
+      "role",
+      "bio",
+      "company"
+    ];
+  }
+
+  /**
    * Removes sensitive fields from a user object.
    * 
    * @param user - The user document.
@@ -40,8 +65,20 @@ export class UsersService {
    * @param condition - The query condition.
    * @returns An array of matching users.
    */
-  find(condition: object = {}) {
-    return this.usersModel.find(condition);
+  find(req: any) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    return queryBuilder.select("-__v");
+  }
+
+  /**
+   * Finds a user by condition.
+   * 
+   * @param condition - Filter criteria.
+   * @returns The found user or null.
+   */
+  async findOneByCondition(condition: object) {
+    return this.usersModel.findOne(condition).select("-__v");
   }
   
   /**

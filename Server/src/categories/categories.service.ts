@@ -16,14 +16,14 @@ export class CategoriesServices{
     @InjectModel(Category.name) private categoriesModel: Model<Category>
   ) { }
 
-    /**
+  /**
    * Get model of this service to use it in api feature module
    * @returns - The categories model
    */
   getModel() {
     return this.categoriesModel;
   }
-
+  
   /**
    * Get available keys in the entity that may need in search.
    * 

@@ -37,15 +37,14 @@ export class AuthService{
    * @throws - "ForbiddenException" if any validation fails.
    */
   async validateUser(email: string, password: string) {
-    const users = await this.usersService.find({
+    const user = await this.usersService.findOneByCondition({
       $or: [
         {username: email},
         {email: email},
         {phone: email}
       ]
     });
-    
-    const user = users[0];
+
     if (!user) throw new ForbiddenException("Incorrect email or password.");
     if (!user.verified) throw new ForbiddenException("User not verified.");
 

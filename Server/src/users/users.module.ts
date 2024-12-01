@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MessagingModule } from "src/messaging/messaging.module";
@@ -12,6 +12,8 @@ import { FilesService } from "src/files/files.service";
 import { EncryptionModule } from "src/encryption/encryption.module";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { CodesService } from "./services/codes.service";
+import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
+import { SetApiFeatureVariableForUsers } from "./middlewares/setApiFeatureVariablesForUsers.middleware";
 
 /**
  * Manages user-related functionalities like account creation, updates, role management, and email/phone verification. 
@@ -61,10 +63,15 @@ import { CodesService } from "./services/codes.service";
       useFactory: (filesService: FilesService) => filesService.gitMulterOptions(),
       inject: [FilesService]
     }),
-    EncryptionModule
+    EncryptionModule,
+    ApiFeatureModule
   ],
   controllers: [UsersController],
   providers: [UsersService, CodesService],
   exports: [UsersService, CodesService]
 })
-export class UsersModule{}
+export class UsersModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetApiFeatureVariableForUsers).forRoutes(UsersController);
+  }
+}

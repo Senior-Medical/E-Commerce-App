@@ -18,7 +18,7 @@ export class CheckEmailExistPipe implements PipeTransform{
    * @returns - object containing the email and user document
    */
   async transform({email}: {email:string}, metadata: ArgumentMetadata) {
-    const user = (await this.usersService.find({ email }))[0];
+    const user = await this.usersService.findOneByCondition({ email });
     if (!user) throw new NotFoundException("User not found.");
     if (!user.verified) throw new UnauthorizedException("User not verified.");
     

@@ -14,11 +14,11 @@ export class UserValidationPipe implements PipeTransform {
     if (email) conditions.push({ email });
     if (phone) conditions.push({ phone });
     if (username) conditions.push({ username });
-    const user = (await this.usersService.find({
+    const user = await this.usersService.findOneByCondition({
       $or: [
         ...conditions
       ]
-    }))[0];
+    });
     if (user) throw new ConflictException('Email, phone or username are already exist.');
     else return body;
   }

@@ -27,7 +27,7 @@ export class ResetPasswordPipe implements PipeTransform {
    * @returns `ResetPasswordDto` object
    */
   async transform(body: ResetPasswordDto, metadata: ArgumentMetadata) {
-    const user = (await this.usersService.find({ email: body.email }))[0];
+    const user = await this.usersService.findOneByCondition({ email: body.email });
     if (!user) throw new NotFoundException("Email not correct.");
 
     const code = await this.codesService.findCode({
