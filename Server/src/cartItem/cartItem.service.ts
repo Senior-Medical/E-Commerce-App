@@ -66,7 +66,7 @@ export class CartItemService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      const cartItem = await this.cartItemModel.create([inputData], { session });
+      const cartItem = (await this.cartItemModel.create([inputData], { session }))[0];
       user.cartTotal += cost;
       await user.save({ session });
       await session.commitTransaction();

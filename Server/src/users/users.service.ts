@@ -107,7 +107,7 @@ export class UsersService {
         createUsersDto.avatar = avatar.filename;
         await this.filesService.saveFiles([avatar]);
       }
-      const user = await this.usersModel.create([{ ...createUsersDto }], {session})[0];
+      const user = (await this.usersModel.create([{ ...createUsersDto }], {session}))[0];
   
       await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user, session);
       if(createUsersDto.phone) await this.codesService.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user, session);

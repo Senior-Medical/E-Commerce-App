@@ -50,7 +50,7 @@ export class CodesService {
     const existingCode = await this.codesModel.findOne({ value });
     if(existingCode) await existingCode.deleteOne({ session });
 
-    const code = await this.codesModel.create([{ ...codeData }], { session })[0];
+    const code = (await this.codesModel.create([{ ...codeData }], { session }))[0];
     const baseUrl = this.configService.get<string>("BASE_URL");
     const message = this.getMessageForCode(baseUrl, code, purpose);
     

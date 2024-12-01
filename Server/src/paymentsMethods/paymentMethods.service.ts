@@ -99,8 +99,7 @@ export class PaymentMethodsService {
         });
         if (defaultMethod) await defaultMethod.set({ isDefault: false }).save({ session });
       }
-  
-      const paymentMethod = await this.paymentMethodsModel.create([inputData], { session });
+      const paymentMethod = (await this.paymentMethodsModel.create([inputData], { session }))[0];
       
       await session.commitTransaction();
       session.endSession();

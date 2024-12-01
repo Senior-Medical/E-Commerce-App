@@ -49,7 +49,7 @@ export class User {
   @Prop()
   phoneValidated?: boolean;
   
-  @Prop({ default: new Date() })
+  @Prop()
   lastLogin?: Date;
 
   @Prop({ default: new Date() })

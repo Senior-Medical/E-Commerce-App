@@ -96,8 +96,7 @@ export class AuthService{
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      const refreshTokenData = await this.refreshTokenModel.create([inputData], {session})[0];
-      
+      const refreshTokenData = (await this.refreshTokenModel.create([inputData], {session}))[0];
       const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
       
       await user.set({ lastLogin: new Date() }).save({session});
@@ -225,8 +224,8 @@ export class AuthService{
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save({session});
       await resetPasswordDto.codeData.deleteOne({session});
+      await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save({session});
       await session.commitTransaction();
       session.endSession();
       return {message: "Password reset successfully."};
