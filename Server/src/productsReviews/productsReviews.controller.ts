@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
@@ -9,6 +9,8 @@ import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductReviewPermissionGuard } from "./guards/productReviewPermission.guard";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { Request } from "express";
 
 /**
  * Controller for handling product review-related HTTP requests, including
@@ -17,6 +19,19 @@ import { ProductsReviewsService } from './productsReviews.service';
 @Controller("products/reviews")
 export class ProductsReviewsController {
   constructor(private readonly productsReviewsService: ProductsReviewsService) { }
+
+  /**
+   * Retrieves all reviews for a specific product.
+   * 
+   * @param productId - Unique identifier of the product.
+   * @returns Array of reviews for the specified product.
+   */
+  @Get("/product/:productId")
+  @Public()
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request, @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+    return this.productsReviewsService.find(req, product).populate("user", "name username");
+  }
 
   /**
    * Fetches a single product review by its ID with populated user and product details.
@@ -28,18 +43,6 @@ export class ProductsReviewsController {
   @Public()
   async findOne(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
     return (await review.populate("user", "name username")).populate("product", "name");
-  }
-
-  /**
-   * Retrieves all reviews for a specific product.
-   * 
-   * @param productId - Unique identifier of the product.
-   * @returns Array of reviews for the specified product.
-   */
-  @Get("/product/:productId")
-  @Public()
-  find(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
-    return this.productsReviewsService.find({product: product._id}).populate("user", "name username");
   }
 
   /**

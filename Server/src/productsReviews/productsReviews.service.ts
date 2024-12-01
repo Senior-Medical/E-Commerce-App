@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
@@ -23,13 +23,33 @@ export class ProductsReviewsService {
   ) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The product model
+   */
+  getModel() {
+    return this.productsReviewsModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "comment"
+    ];
+  }
+
+  /**
    * Retrieves a list of product reviews based on specified conditions.
    * 
    * @param conditions - Filters to apply for fetching reviews.
    * @returns Array of product reviews.
    */
-  find(conditions: object = {}) {
-    return this.productsReviewsModel.find(conditions).select("-__v");
+  find(req: any, product: Document) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    return queryBuilder.find({product: product._id}).select("-__v");
   }
 
   /**

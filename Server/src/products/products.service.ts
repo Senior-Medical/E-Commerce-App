@@ -40,7 +40,7 @@ export class ProductsService {
       "name",
       "description",
       "code"
-    ]
+    ];
   }
 
   /**

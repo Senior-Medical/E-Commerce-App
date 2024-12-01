@@ -1,3 +1,4 @@
+import { Transform } from "class-transformer";
 import { IsInt, IsMongoId, IsNotEmpty, IsString, Max, Min } from "class-validator";
 import { Types } from "mongoose";
 
@@ -10,8 +11,9 @@ export class CreateProductReviewDto {
   @IsNotEmpty()
   comment: string;
 
-  @IsInt()
+  @Transform(({value}) => parseInt(value))
   @IsNotEmpty()
+  @IsInt()
   @Min(0)
   @Max(5)
   rate: number;
