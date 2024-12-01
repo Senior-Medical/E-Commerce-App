@@ -39,10 +39,7 @@ export class ProductsService {
     return [
       "name",
       "description",
-      "code",
-      "category",
-      "createdBy",
-      "updatedBy",
+      "code"
     ]
   }
 
@@ -53,10 +50,9 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(req: any, conditions: object = {}) {
+  find(req: any) {
     const queryBuilder = req.queryBuilder;
-    if (!queryBuilder) return this.productsModel.find(conditions).select("-__v");
-    else return queryBuilder.select("-__v");
+    return queryBuilder.select("-__v");
   }
 
   /**

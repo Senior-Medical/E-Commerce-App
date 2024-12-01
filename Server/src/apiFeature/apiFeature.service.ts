@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Query } from "mongoose";
+import { Query, Types } from "mongoose";
 
 class QueryString {
   page?: number;
@@ -20,12 +20,16 @@ export class ApiFeatureService {
     delete filterObj.fields;
     delete filterObj.search;
 
-    const filterStr = JSON.stringify(filterObj).replace(
-      /\b(gt|gte|lt|lte|in)\b/g,
-      match => `$${match}`,
-    );
-
-    query.find(JSON.parse(filterStr));
+    for (const e of Object.entries(filterObj)) {
+      if (e[1].startsWith("objectid:")) e[1] = new Types.ObjectId(e[1].replace("objectid:", "") as string);
+      else if (e[1].startsWith("gt:")) e[1] = { $gt: e[1].replace("gt:", "") };
+      else if(e[1].startsWith("gte:")) e[1] = { $gte: e[1].replace("gte:", "") };
+      else if(e[1].startsWith("lt:")) e[1] = { $lt: e[1].replace("lt:", "") };
+      else if(e[1].startsWith("lte:")) e[1] = { $lte: e[1].replace("lte:", "") };
+      else if(e[1].startsWith("in:")) e[1] = { $in: e[1].replace("in:", "").split(",") };
+      filterObj[e[0]] = e[1];
+    }
+    query.find(filterObj);
     return query;
   }
   
