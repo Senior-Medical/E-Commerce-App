@@ -67,7 +67,7 @@ export class CategoriesServices{
    * @returns The created category.
    */
   async create(categoryData: CreateCategoryDto, user: Document) {
-    const category = (await this.find({ name: categoryData.name }))[0];
+    const category = await this.categoriesModel.findOne({ name: categoryData.name });
     if (category) throw new ConflictException('Category already exist.');
 
     const userId = new Types.ObjectId(user._id as string);
@@ -89,7 +89,7 @@ export class CategoriesServices{
    * @returns The updated category document.
    */
   async update(category: Document, categoryData: UpdateCategoryDto, user: Document) {
-    let categoryByName = (await this.find({ name: categoryData.name }))[0];
+    let categoryByName = await this.categoriesModel.findOne({ name: categoryData.name });
     if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new ConflictException('Category already exist.');
     
     const inputData: Partial<Category> = {

@@ -30,4 +30,6 @@ export class CartItem {
   cost: number;
 }
 
-export const CartItemSchema = SchemaFactory.createForClass(CartItem);
+const CartItemSchema = SchemaFactory.createForClass(CartItem);
+CartItemSchema.index({ user: 1, product: 1 }, { unique: true });
+export { CartItemSchema };

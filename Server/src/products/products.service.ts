@@ -121,12 +121,12 @@ export class ProductsService {
    * @throws HttpException if validation or file handling fails.
    */
   async update(product: any, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document) {
-    const existProduct = (await this.productsModel.find({
+    const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
         { code: productData.code }
       ]
-    }))[0];
+    });
     if (existProduct && existProduct._id.toString() !== product._id.toString()) throw new ConflictException("Product name or code is already exist");
 
     let imagesNames: string[] = [];

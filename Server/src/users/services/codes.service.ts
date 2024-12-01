@@ -3,7 +3,7 @@ import * as crypto from "crypto";
 import { ConfigService } from '@nestjs/config';
 import { MessagingService } from '../../messaging/messaging.service';
 import { VerificationCodes } from "../entities/verificationCodes.entity";
-import { Model } from "mongoose";
+import { ClientSession, Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { CodePurpose, CodeType } from "../enums/code.enum";
 
@@ -38,7 +38,7 @@ export class CodesService {
    * @param user - The user object to associate with the code.
    * @returns The created verification code document.
    */
-  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: any) {
+  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: any, session: ClientSession) {
     const codeData: VerificationCodes = {
       code: this.generateCode(),
       value,
@@ -48,9 +48,9 @@ export class CodesService {
     };
 
     const existingCode = await this.codesModel.findOne({ value });
-    if(existingCode) await existingCode.deleteOne();
+    if(existingCode) await existingCode.deleteOne({ session });
 
-    const code = await this.codesModel.create({ ...codeData });
+    const code = await this.codesModel.create([{ ...codeData }], { session })[0];
     const baseUrl = this.configService.get<string>("BASE_URL");
     const message = this.getMessageForCode(baseUrl, code, purpose);
     

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model } from "mongoose";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Document, Model } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { FilesService } from 'src/files/files.service';
 import { EncryptionService } from '../encryption/encryption.service';
@@ -18,6 +18,7 @@ import { CodesService } from './services/codes.service';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private usersModel: Model<User>,
+    @InjectConnection() private readonly connection: Connection,
     private readonly filesService: FilesService,
     private readonly encryptionService: EncryptionService,
     private readonly codesService: CodesService,
@@ -99,22 +100,28 @@ export class UsersService {
    * @returns The created user object without sensitive fields.
    */
   async create(createUsersDto: User, avatar: Express.Multer.File) {
-    let user: Document;
+    const session = await this.connection.startSession();
+    session.startTransaction();
     try {
       if (avatar) {
         createUsersDto.avatar = avatar.filename;
         await this.filesService.saveFiles([avatar]);
       }
-      user = await this.usersModel.create({ ...createUsersDto });
-    }catch(e) {
+      const user = await this.usersModel.create([{ ...createUsersDto }], {session})[0];
+  
+      await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user, session);
+      if(createUsersDto.phone) await this.codesService.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user, session);
+      
+      await session.commitTransaction();
+      session.endSession();
+
+      return this.getUserObject(user);
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
     }
-
-    await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, createUsersDto.email, CodeType.EMAIL, user);
-    if(createUsersDto.phone) await this.codesService.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user);
-    
-    return this.getUserObject(user);
   }
   
   /**
@@ -129,40 +136,47 @@ export class UsersService {
   async update(user: any, updateData: UpdateUsersDto, avatar: Express.Multer.File) {
     const inputData: Partial<User> = { ...updateData };
     let message: string = "";
-    
-    if (inputData.email) {
-      await this.codesService.createCode(CodePurpose.UPDATE_EMAIL, inputData.email, CodeType.EMAIL, user);
-      inputData.emailValidated = false;
-      message = "Please check your new email for verification.";
-    }
-
-    if (inputData.phone) {
-      await this.codesService.createCode(CodePurpose.UPDATE_PHONE, inputData.phone, CodeType.PHONE, user);
-      inputData.phoneValidated = false;
-      message = "Please check your new phone for verification.";
-    }
 
     if (inputData.phone && inputData.email) message = "Please check your new email and new phone for verification.";
-    
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
     try {
+      if (inputData.email) {
+        await this.codesService.createCode(CodePurpose.UPDATE_EMAIL, inputData.email, CodeType.EMAIL, user, session);
+        inputData.emailValidated = false;
+        message = "Please check your new email for verification.";
+      }
+  
+      if (inputData.phone) {
+        await this.codesService.createCode(CodePurpose.UPDATE_PHONE, inputData.phone, CodeType.PHONE, user, session);
+        inputData.phoneValidated = false;
+        message = "Please check your new phone for verification.";
+      }
+  
       let oldImage = user.avatar;
       if (avatar) {
         inputData.avatar = avatar.filename;
         await this.filesService.saveFiles([avatar]);
       }
-      await user.set(inputData).save();
+      await user.set(inputData).save({session});
       if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
-    }catch(e) {
+      
+      await session.commitTransaction();
+      session.endSession();
+      
+      message = "User updated successfully. " + message;
+      return {
+        message,
+        user: this.getUserObject(user)
+      };
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
     }
-
-    message = "User updated successfully. " + message;
-
-    return {
-      message,
-      user: this.getUserObject(user)
-    };
+    
   }
 
   /**

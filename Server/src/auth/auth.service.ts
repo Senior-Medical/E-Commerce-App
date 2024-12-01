@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
-import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Types } from "mongoose";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Document, Model, Types } from "mongoose";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { User } from "src/users/entities/users.entity";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";
@@ -20,6 +20,7 @@ import { CodesService } from '../users/services/codes.service';
 export class AuthService{
   constructor(
     @InjectModel(RefreshToken.name) private readonly refreshTokenModel: Model<RefreshToken>,
+    @InjectConnection() private readonly connection: Connection,
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -91,17 +92,29 @@ export class AuthService{
       token: refreshToken,
       user: new Types.ObjectId(user._id.toString())
     };
-    const refreshTokenData = await this.refreshTokenModel.create(inputData);
-    
-    const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
-    
-    await user.set({ lastLogin: new Date() }).save();
 
-    return {
-      accessToken,
-      refreshToken,
-      user: this.usersService.getUserObject(user)
-    };
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const refreshTokenData = await this.refreshTokenModel.create([inputData], {session})[0];
+      
+      const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
+      
+      await user.set({ lastLogin: new Date() }).save({session});
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return {
+        accessToken,
+        refreshToken,
+        user: this.usersService.getUserObject(user)
+      };
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
@@ -130,11 +143,21 @@ export class AuthService{
       }
       updateData.phoneValidated = true;
     }
-
     updateData.verified = true;
-    await user.set(updateData).save();
-    code.deleteOne();
-    return {message};
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await user.set(updateData).save({session});
+      await code.deleteOne({session});
+      await session.commitTransaction();
+      session.endSession();
+      return {message};
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
@@ -145,7 +168,7 @@ export class AuthService{
    */
   async refreshToken(refreshToken: string) {
     refreshToken = refreshToken.split(" ")[1];
-    const refreshTokenData = await this.findRefreshToken({ token: refreshToken });
+    const refreshTokenData = await this.refreshTokenModel.findOne({ token: refreshToken });
     const accessToken = this.jwtService.sign({ sub: refreshTokenData.user, refreshTokenId: refreshTokenData._id });
     return { accessToken };
   }
@@ -178,8 +201,18 @@ export class AuthService{
    * @returns - A success message.
    */
   async requestToResetPassword(requestToResetPasswordDto: RequestToResetPasswordDto) {
-    await this.codesService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user);
-    return {message: `Please check your email for password reset code.`};
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await this.codesService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user, session);
+      await session.commitTransaction();
+      session.endSession();
+      return {message: `Please check your email for password reset code.`};
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
@@ -189,9 +222,20 @@ export class AuthService{
    * @returns - A success message.
    */
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save();
-    await resetPasswordDto.codeData.deleteOne();
-    return {message: "Password reset successfully."};
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save({session});
+      await resetPasswordDto.codeData.deleteOne({session});
+      await session.commitTransaction();
+      session.endSession();
+      return {message: "Password reset successfully."};
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
+
   }
 
   /**
@@ -201,24 +245,35 @@ export class AuthService{
    * @returns - A message indicating what verification codes were sent.
    */
   async resendVerification(user: any) {
-    const { emailValidated, phoneValidated, verified } = user;
-    let message = "";
-    let email = false;
-    let phone = false;
-    if (user.email && !emailValidated) {
-      await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, user.email, CodeType.EMAIL, user);
-      email = true;
-    }
-    if (user.phone && !phoneValidated) {
-      await this.codesService.createCode(CodePurpose.VERIFY_PHONE, user.phone, CodeType.PHONE, user);
-      phone = true;
-    }
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const { emailValidated, phoneValidated } = user;
+      let email = false;
+      let phone = false;
+      if (user.email && !emailValidated) {
+        await this.codesService.createCode(CodePurpose.VERIFY_EMAIL, user.email, CodeType.EMAIL, user, session);
+        email = true;
+      }
+      if (user.phone && !phoneValidated) {
+        await this.codesService.createCode(CodePurpose.VERIFY_PHONE, user.phone, CodeType.PHONE, user, session);
+        phone = true;
+      }
+  
+      let message = "";
+      if (email && phone) message = "Please check your email and phone for verification.";
+      else if (email) message = "Please check your email for verification.";
+      else if (phone) message = "Please check your phone for verification.";
+      else message = "User already verified.";
+      
+      await session.commitTransaction();
+      session.endSession();
 
-    if (email && phone) message = "Please check your email and phone for verification.";
-    else if (email) message = "Please check your email for verification.";
-    else if (phone) message = "Please check your phone for verification.";
-    else message = "User already verified.";
-    
-    return {message};
+      return {message};
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 }

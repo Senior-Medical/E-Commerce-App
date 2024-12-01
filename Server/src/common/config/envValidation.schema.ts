@@ -54,5 +54,5 @@ export const envVariablesValidationSchema = Joi.object({
   
   // CSRF
   CSRF_SECRET: Joi.string().min(32).required(),
-  CSRF_HEADER: Joi.string().min(32).required(),
+  CSRF_HEADER: Joi.string().min(10).required(),
 });

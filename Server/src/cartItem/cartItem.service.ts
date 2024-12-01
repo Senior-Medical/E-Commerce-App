@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { CartItem } from "./entities/cartItem.entity";
-import { Document, Model, Types } from "mongoose";
+import { Connection, Document, Model, Types } from "mongoose";
 
 /**
  * Service for managing cart item operations.
@@ -10,6 +10,7 @@ import { Document, Model, Types } from "mongoose";
 export class CartItemService {
   constructor(
     @InjectModel(CartItem.name) private cartItemModel: Model<CartItem>,
+    @InjectConnection() private readonly connection: Connection
   ) { }
 
   /**
@@ -51,6 +52,9 @@ export class CartItemService {
    * @returns The created cart item.
    */
   async create(product: any, quantity: number, user: any) {
+    const existingWishList = await this.cartItemModel.findOne({ product: product._id, user: user._id });
+    if(existingWishList) throw new ConflictException("Product already in cart");
+
     const cost = quantity * product.price;
     const inputData: CartItem = {
       product: product._id,
@@ -58,10 +62,21 @@ export class CartItemService {
       quantity,
       cost
     };
-    const cartItem = await this.cartItemModel.create(inputData);
-    user.cartTotal += cost;
-    await user.save();
-    return cartItem;
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const cartItem = await this.cartItemModel.create([inputData], { session });
+      user.cartTotal += cost;
+      await user.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+      return cartItem;
+    } catch(e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
@@ -75,15 +90,27 @@ export class CartItemService {
    */
   async update(product: any, quantity: number, user: any) {
     const cartItem = await this.cartItemModel.findOne({ product: product._id, user: user._id });
-    if (!cartItem) throw new NotFoundException('CartItem not exist.');
+    if (!cartItem) throw new NotFoundException("Product wasn't in the cart.");
 
     const oldCost = cartItem.cost;
     cartItem.quantity = quantity;
     cartItem.cost = quantity * product.price;
 
     user.cartTotal += cartItem.cost - oldCost;
-    await user.save();
-    return cartItem.save();
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await cartItem.save({ session });
+      await user.save({ session });
+      await session.commitTransaction();
+      session.endSession();
+      return cartItem;
+    } catch (e) {
+      await session.abortTransaction();
+      session.endSession();
+      throw e;
+    }
   }
 
   /**
