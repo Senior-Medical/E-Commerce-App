@@ -11,14 +11,35 @@ export class CartItemService {
   constructor(
     @InjectModel(CartItem.name) private cartItemModel: Model<CartItem>,
   ) { }
+
+  /**
+   * Get model of this service to use it in api feature module
+   * @returns - The wish list model
+   */
+  getModel() {
+    return this.cartItemModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "quantity",
+      "cost"
+    ];
+  }
   
   /**
    * Retrieves all cart items for a user.
    * @param user - The user document.
    * @returns List of cart items with populated product details.
    */
-  find(user: Document) {
-    return this.cartItemModel.find({user: user._id}).populate('product', 'name description price images code salesTimes');
+  find(req: any) {
+    const user = req.user;
+    const queryBuilder = req.queryBuilder;
+    return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
   }
 
   /**

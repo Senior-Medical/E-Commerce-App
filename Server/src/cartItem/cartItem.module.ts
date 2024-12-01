@@ -1,9 +1,11 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { CartItem, CartItemSchema } from "./entities/cartItem.entity";
 import { CartItemController } from "./cartItem.controller";
 import { CartItemService } from "./cartItem.service";
 import { ProductsModule } from "src/products/products.module";
+import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
+import { SetApiFeatureVariableForCartItem } from "./middlewares/setApiFeatureVariablesForCartItem.middleware";
 
 /**
  * CartItem Module
@@ -27,9 +29,14 @@ import { ProductsModule } from "src/products/products.module";
         schema: CartItemSchema
       }
     ]),
-    ProductsModule
+    ProductsModule,
+    ApiFeatureModule
   ],
   controllers: [CartItemController],
   providers: [CartItemService]
 })
-export class CartItemModule {}
+export class CartItemModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetApiFeatureVariableForCartItem).forRoutes(CartItemController);
+  }
+}

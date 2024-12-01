@@ -9,12 +9,30 @@ export class WishListService {
   constructor(@InjectModel(WishList.name) private wishListModel: Model<WishList>) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The wish list model
+   */
+  getModel() {
+    return this.wishListModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [];
+  }
+
+  /**
    * Finds all wish list items for a user.
    * @param user - The user document.
    * @returns List of wish list items.
    */
-  find(user: Document) {
-    return this.wishListModel.find({user: user._id}).select("-__v").populate("product", "name price images description code salesTimes");
+  find(req: any) {
+    const user = req.user;
+    const queryBuilder = req.queryBuilder;
+    return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
   }
 
   /**

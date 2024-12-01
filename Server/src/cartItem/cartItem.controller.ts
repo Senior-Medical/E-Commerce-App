@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
 import { CartItemService } from './cartItem.service';
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
+import { Request } from "express";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 
 /**
  * Controller for handling cart item API endpoints.
@@ -18,8 +20,9 @@ export class CartItemController {
    * @returns List of cart items.
    */
   @Get()
-  find(@UserDecorator() user: Document) {
-    return this.cartItemService.find(user);
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request) {
+    return this.cartItemService.find(req);
   }
 
   /**

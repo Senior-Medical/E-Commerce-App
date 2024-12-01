@@ -1,9 +1,11 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Req, UseInterceptors } from "@nestjs/common";
 import { WishListService } from './wishList.service';
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { Document } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { Request } from "express";
 
 /**
  * Controller for handling wish list API endpoints.
@@ -18,8 +20,9 @@ export class WishListController {
    * @returns The list of wish list items.
    */
   @Get()
-  async find(@UserDecorator() user: Document) {
-    return this.wishListService.find(user);
+  @UseInterceptors(ApiFeatureInterceptor)
+  async find(@Req() req: Request) {
+    return this.wishListService.find(req);
   }
 
   /**
