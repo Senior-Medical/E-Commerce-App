@@ -1,8 +1,10 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Category, CategorySchema } from "./entities/categories.entity";
 import { CategoriesController } from "./categories.controller";
 import { CategoriesServices } from "./categories.service";
+import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
+import { SetApiFeatureVariableForCategories } from "./middlewares/setApiFeatureVariablesForCategories.middleware";
 
 /**
  * CategoriesModule
@@ -23,10 +25,15 @@ import { CategoriesServices } from "./categories.service";
         name: Category.name,
         schema: CategorySchema
       }
-    ])
+    ]),
+    ApiFeatureModule
   ],
   controllers: [CategoriesController],
   providers: [CategoriesServices],
   exports: [CategoriesServices]
 })
-export class CategoriesModule{ }
+export class CategoriesModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetApiFeatureVariableForCategories).forRoutes(CategoriesController);
+  }
+}

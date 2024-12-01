@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
 import { Category } from "./entities/categories.entity";
@@ -16,14 +16,36 @@ export class CategoriesServices{
     @InjectModel(Category.name) private categoriesModel: Model<Category>
   ) { }
 
+    /**
+   * Get model of this service to use it in api feature module
+   * @returns - The categories model
+   */
+  getModel() {
+    return this.categoriesModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "name",
+      "description"
+    ];
+  }
+
   /**
    * Finds categories based on specified conditions.
    * 
    * @param conditions - The search conditions.
    * @returns List of categories that match the conditions.
    */
-  find(conditions: object = {}) {
-    return this.categoriesModel.find(conditions).select("-__v");
+  find(req: any) {
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    return queryBuilder.select("-__v");
   }
 
   /**

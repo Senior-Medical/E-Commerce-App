@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
 import { Document } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
@@ -8,6 +8,8 @@ import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { Request } from "express";
 
 /**
  * Controller class that defines the HTTP endpoints for managing categories. 
@@ -27,8 +29,9 @@ export class CategoriesController{
    * @returns List of categories with populated user data.
    */
   @Get()
-  find() {
-    return this.categoriesServices.find().populate("createdBy", "name username").populate("updatedBy", "name username");
+  @UseInterceptors(ApiFeatureInterceptor)
+  find(@Req() req: Request) {
+    return this.categoriesServices.find(req).populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
   /**
