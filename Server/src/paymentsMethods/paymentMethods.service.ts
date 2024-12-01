@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Types } from "mongoose";
@@ -6,6 +6,7 @@ import { EncryptionService } from '../encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethods } from "./entities/paymentMethods.entitiy";
+import { Role } from "src/auth/enums/roles.enum";
 
 /**
  * PaymentMethodsService
@@ -21,13 +22,36 @@ export class PaymentMethodsService {
   ) { }
 
   /**
+   * Get model of this service to use it in api feature module
+   * @returns - The payment methods model
+   */
+  getModel() {
+    return this.paymentMethodsModel;
+  }
+
+  /**
+   * Get available keys in the entity that may need in search.
+   * 
+   * @returns - Array of strings that contain keys names
+   */
+  getSearchKeys() {
+    return [
+      "cardType"
+    ];
+  }
+
+  /**
    * Retrieves a list of payment methods based on the specified conditions.
    * 
    * @param conditions - Optional: MongoDB query filter conditions.
    * @returns List of payment methods excluding the __v field.
    */
-  find(conditions: object = {}) {
-    return this.paymentMethodsModel.find(conditions).select("-__v");
+  find(req: any) {
+    const user = req.user;
+    const queryBuilder = req.queryBuilder;
+    if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
+    if (user.role === Role.customer) return queryBuilder.find({ user: user._id }).select("-__v");
+    else return queryBuilder.select("-__v");
   }
 
   /**

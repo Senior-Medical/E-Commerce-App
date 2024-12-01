@@ -55,18 +55,6 @@ export class AddressesController {
   }
 
   /**
-   * Retrieves addresses for a specific user.
-   * - Restricted to admin and staff roles using `Roles` decorator.
-   * @param user - The validated user document.
-   * @returns Addresses belonging to the specified user.
-   */
-  @Get("user/:userId")
-  @Roles(Role.admin, Role.staff)
-  findByUser(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
-    return this.addressesService.find({ user: user._id }).populate("user", "name username");
-  }
-
-  /**
    * Creates a new address for the authenticated user.
    * - Validates the input DTO.
    * - Associates the address with the current user.
