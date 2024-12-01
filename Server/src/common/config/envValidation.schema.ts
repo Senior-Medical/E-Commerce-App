@@ -17,6 +17,7 @@ import * as Joi from 'joi';
  */
 export const envVariablesValidationSchema = Joi.object({
   // Server
+  NODE_ENV: Joi.string().default("development").required(),
   PORT: Joi.number().default(3000).required(),
   GLOBAL_PREFIX: Joi.string().default('api').required(),
   DB_URI: Joi.string().uri().required(),
@@ -53,4 +54,5 @@ export const envVariablesValidationSchema = Joi.object({
   
   // CSRF
   CSRF_SECRET: Joi.string().min(32).required(),
+  CSRF_HEADER: Joi.string().min(32).required(),
 });
