@@ -3,9 +3,10 @@ import * as crypto from "crypto";
 import { ConfigService } from '@nestjs/config';
 import { MessagingService } from '../../messaging/messaging.service';
 import { VerificationCodes } from "../entities/verificationCodes.entity";
-import { ClientSession, Model } from "mongoose";
+import { ClientSession, Document, Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { CodePurpose, CodeType } from "../enums/code.enum";
+import { User } from "../entities/users.entity";
 
 /**
  * Service responsible for managing verification codes used for user authentication 
@@ -38,13 +39,13 @@ export class CodesService {
    * @param user - The user object to associate with the code.
    * @returns The created verification code document.
    */
-  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: any, session: ClientSession) {
+  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: Document & User, session: ClientSession) {
     const codeData: VerificationCodes = {
       code: this.generateCode(),
       value,
       type,
       purpose,
-      user: user._id
+      user: new Types.ObjectId(user._id.toString())
     };
     const existingCode = await this.codesModel.findOne({ value });
     if(existingCode) await existingCode.deleteOne({ session });
@@ -77,7 +78,7 @@ export class CodesService {
    * @param purpose - The purpose of the code.
    * @returns The generated message.
    */
-  private getMessageForCode(baseUrl: string, code: any, purpose: CodePurpose): string {
+  private getMessageForCode(baseUrl: string, code: Document & VerificationCodes, purpose: CodePurpose): string {
     if (code.type === CodeType.EMAIL) {
       if (purpose === CodePurpose.VERIFY_EMAIL || purpose === CodePurpose.UPDATE_EMAIL) return `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}`
       else return `The code for resetting the password is: ${code.code}.`;

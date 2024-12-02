@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Types } from "mongoose";
+import { Document, Model, Query, Types } from "mongoose";
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
 import { FilesService } from '../files/files.service';
 import { Request } from "express";
+import { User } from "src/users/entities/users.entity";
 
 /**
  * Service responsible for managing product-related operations.
@@ -50,7 +51,7 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(req: any) {
+  find(req: Request & { queryBuilder: Query<Product, Document> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");
@@ -120,7 +121,7 @@ export class ProductsService {
    * @returns The updated product.
    * @throws HttpException if validation or file handling fails.
    */
-  async update(product: any, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document) {
+  async update(product: Document & Product, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document & User) {
     const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
@@ -164,7 +165,7 @@ export class ProductsService {
    * @param product - The product to delete.
    * @returns void
    */
-  async remove(product: any) {
+  async remove(product: Document & Product) {
     await this.productsModel.findByIdAndDelete(product._id);
     if (product.images) this.filesService.removeFiles(product.images);
     return;

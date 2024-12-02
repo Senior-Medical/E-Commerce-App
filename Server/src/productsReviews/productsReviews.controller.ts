@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
-import { Document } from "mongoose";
+import { Document, Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
@@ -11,6 +11,8 @@ import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
 import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Request } from "express";
+import { ProductsReviews } from "./entities/productsReviews.entity";
+import { Product } from "src/products/entities/products.entity";
 
 /**
  * Controller for handling product review-related HTTP requests, including
@@ -29,7 +31,7 @@ export class ProductsReviewsController {
   @Get("/product/:productId")
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request, @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+  find(@Req() req: Request & { queryBuilder: Query<ProductsReviews, Document> }, @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product) {
     return this.productsReviewsService.find(req, product).populate("user", "name username");
   }
 

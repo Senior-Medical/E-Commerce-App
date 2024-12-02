@@ -24,7 +24,7 @@ export class LoggerExceptionFilter extends BaseExceptionFilter implements Except
    * @param exception - The caught exception.
    * @param host - The context of the exception.
    */
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: HttpException & { contextName: string }, host: ArgumentsHost) {
     const statusCode = exception instanceof HttpException ? exception.getStatus() : 500;
     const errorMessage = exception.message || "Internal server error";
     const contextName = exception.contextName || 'Unknown';

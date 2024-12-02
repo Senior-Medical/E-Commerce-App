@@ -7,7 +7,7 @@ import { CodePurpose, CodeType } from "src/users/enums/code.enum";
 import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
 import { Document } from "mongoose";
 
-type codeDataType = Document<unknown, {}, VerificationCodes> & VerificationCodes;
+type codeDataType = Document & VerificationCodes;
 
 /**
  * - Handles sending emails via SendGrid and SMS via Twilio.

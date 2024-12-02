@@ -1,9 +1,10 @@
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Types } from "mongoose";
+import { Document, Model, Query, Types } from "mongoose";
 import { Category } from "./entities/categories.entity";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
+import { Request } from "express";
 
 /**
  * Service class that handles business logic for categories, such as creating, 
@@ -42,7 +43,7 @@ export class CategoriesServices{
    * @param conditions - The search conditions.
    * @returns List of categories that match the conditions.
    */
-  find(req: any) {
+  find(req: Request & { queryBuilder: Query<Category, Document> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");

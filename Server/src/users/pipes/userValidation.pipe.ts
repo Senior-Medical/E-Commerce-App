@@ -1,5 +1,6 @@
 import { ArgumentMetadata, ConflictException, Injectable, PipeTransform } from '@nestjs/common';
 import { UsersService } from '../users.service';
+import { CreateUsersDto } from '../dtos/createUser.dto';
 
 /**
  * Validates user data to ensure uniqueness for email, phone, or username.
@@ -8,7 +9,7 @@ import { UsersService } from '../users.service';
 export class UserValidationPipe implements PipeTransform {
   constructor(private readonly usersService: UsersService) { }
   
-  async transform(body: any, metadata: ArgumentMetadata) {
+  async transform(body: CreateUsersDto, metadata: ArgumentMetadata) {
     let { email, phone, username } = body;
     const conditions = []
     if (email) conditions.push({ email });

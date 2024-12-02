@@ -18,7 +18,7 @@ export class PaymentMethodIdValidationPipe implements PipeTransform {
    * @returns The payment method document if validation succeeds
    * @throws NotFoundException if the address does not exist
    */
-  async transform(id: any, metadata: ArgumentMetadata) {
+  async transform(id: string, metadata: ArgumentMetadata) {
     const paymentMethod = await this.paymentMethodsService.findOne(id);
     if (!paymentMethod) throw new NotFoundException("Invalid id.");
     return paymentMethod;

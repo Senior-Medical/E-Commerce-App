@@ -1,10 +1,12 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Address } from "./entities/addresses.entity";
-import { Document, Model, Types } from "mongoose";
+import { Document, Model, Query, Types } from "mongoose";
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
 import { Role } from "src/auth/enums/roles.enum";
+import { Request } from "express";
+import { User } from "src/users/entities/users.entity";
 
 /**
  * The AddressesService contains the business logic for managing user addresses.
@@ -44,10 +46,10 @@ export class AddressesService {
 
   /**
    * Retrieves addresses based on specified conditions.
-   * @param conditions - Optional: Query filter for finding addresses
+   * @param req - Request object containing the query builder and user
    * @returns A list of addresses excluding the `__v` field
    */
-  find(req: any) {
+  find(req: Request & { queryBuilder: Query<Address, Document>, user: Document & User }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
