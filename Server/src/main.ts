@@ -4,9 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { CustomLoggerService } from './logger/logger.service';
-import { DoubleCsrfConfigOptions, doubleCsrf } from 'csrf-csrf';
 import { CsrfService } from './csrf/csrf.service';
-import { Request, Response, NextFunction } from 'express';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -18,6 +17,7 @@ async function bootstrap() {
 
   app.useLogger(app.get(CustomLoggerService));
   app.use(helmet());
+  app.use(cookieParser(configService.get<string>('CSRF_SECRET')));
   app.setGlobalPrefix(globalPrefix);
   app.enableVersioning({
     type: VersioningType.URI,

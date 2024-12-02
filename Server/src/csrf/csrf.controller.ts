@@ -15,9 +15,9 @@ export class CsrfController {
   @Get("token")
   getCsrfToken(@Req() req: Request, @Res() res: Response) {
     const token = this.csrfService.generateToken(req, res);
-    const headerName = this.configService.get("CSRF_HEADER") || '__Host-psifi.x-csrf-token';
+    const CSRF_COOKIE_NAME = this.configService.get<string>('CSRF_COOKIE_NAME') || '__Host-psifi.x-csrf-token';
 
-    res.cookie(headerName, token, {
+    res.cookie(CSRF_COOKIE_NAME, token, {
       httpOnly: true,
       secure: this.configService.get("NODE_ENV") === 'production',
       sameSite: 'strict'
