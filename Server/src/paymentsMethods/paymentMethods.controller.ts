@@ -1,8 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User, UserDocument } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
@@ -34,7 +47,7 @@ export class PaymentMethodsController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: UserDocument }) {
+  find(@Req() req: Request & { queryBuilder: Query<PaymentMethods, PaymentMethodsDocument>, user: UserDocument }) {
     return this.paymentMethodsService.find(req).populate("user", "name username");
   }
 
@@ -60,7 +73,10 @@ export class PaymentMethodsController {
    * @returns The created payment method.
    */
   @Post()
-  create(@Body() paymentMethodData: CreatePaymentMethodsDto, @UserDecorator() user: UserDocument) {
+  create(
+    @Body() paymentMethodData: CreatePaymentMethodsDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.paymentMethodsService.create(paymentMethodData, user);
   }
 
@@ -76,7 +92,11 @@ export class PaymentMethodsController {
   @Patch(":paymentMethodId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(PaymentMethodPermissionGuard)
-  update(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument, @Body() paymentMethodData: UpdatePaymentMethodsDto, @UserDecorator() user: UserDocument) {
+  update(
+    @Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument,
+    @Body() paymentMethodData: UpdatePaymentMethodsDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.paymentMethodsService.update(paymentMethod, paymentMethodData, user);
   }
 

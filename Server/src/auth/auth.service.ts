@@ -1,8 +1,12 @@
+import {
+  Connection,
+  Model,
+  Types
+} from "mongoose";
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Connection, Document, Model, Types } from "mongoose";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { User, UserDocument } from "src/users/entities/users.entity";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";

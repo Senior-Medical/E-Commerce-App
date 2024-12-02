@@ -1,4 +1,9 @@
-import { ArgumentMetadata, Injectable, NotFoundException, PipeTransform } from "@nestjs/common";
+import {
+  ArgumentMetadata,
+  Injectable,
+  NotFoundException,
+  PipeTransform
+} from "@nestjs/common";
 import { PaymentMethodsService } from '../paymentMethods.service';
 
 /**

@@ -1,6 +1,9 @@
-// csrf/csrf.service.ts
+import {
+  DoubleCsrfConfigOptions,
+  DoubleCsrfUtilities,
+  doubleCsrf
+} from 'csrf-csrf';
 import { Injectable } from '@nestjs/common';
-import { DoubleCsrfConfigOptions, DoubleCsrfUtilities, doubleCsrf } from 'csrf-csrf';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 

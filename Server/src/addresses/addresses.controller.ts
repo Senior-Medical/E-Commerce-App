@@ -1,8 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User, UserDocument } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { AddressesService } from './addresses.service';
@@ -36,7 +49,7 @@ export class AddressesController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { user: UserDocument, queryBuilder: Query<Address, Document> }) {
+  find(@Req() req: Request & { user: UserDocument, queryBuilder: Query<Address, AddressDocument> }) {
     return this.addressesService.find(req).populate("user", "name username");
   }
 
@@ -62,7 +75,10 @@ export class AddressesController {
    * @returns The created address.
    */
   @Post()
-  create(@Body() addressData: CreateAddressDto, @UserDecorator() user: UserDocument) {
+  create(
+    @Body() addressData: CreateAddressDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.addressesService.create(addressData, user);
   }
 
@@ -77,7 +93,10 @@ export class AddressesController {
   @Patch(":addressId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AddressPermissionGuard)
-  update(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument, @Body() addressData: UpdateAddressDto) {
+  update(
+    @Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument,
+    @Body() addressData: UpdateAddressDto
+  ) {
     return this.addressesService.update(address, addressData);
   }
 

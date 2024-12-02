@@ -1,5 +1,12 @@
+import {
+  IsInt,
+  IsMongoId,
+  IsNotEmpty,
+  IsString,
+  Max,
+  Min
+} from "class-validator";
 import { Transform } from "class-transformer";
-import { IsInt, IsMongoId, IsNotEmpty, IsString, Max, Min } from "class-validator";
 import { Types } from "mongoose";
 
 /**

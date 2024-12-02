@@ -1,5 +1,8 @@
-import { ConfigService } from '@nestjs/config';
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
 import { Address } from "src/addresses/entities/addresses.entity";
 import { Role } from "src/auth/enums/roles.enum";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
@@ -68,7 +71,7 @@ export class User {
  * @param encryptionService - EncryptionService for password hashing.
  * @returns UserSchema - Mongoose schema for the User entity.
  */
-export const createUserSchema = (configService: ConfigService, encryptionService: EncryptionService) => {
+export const createUserSchema = (encryptionService: EncryptionService) => {
   const UserSchema = SchemaFactory.createForClass(User);
 
   UserSchema.pre('save', async function(next) {

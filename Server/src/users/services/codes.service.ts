@@ -1,7 +1,11 @@
+import {
+  ClientSession,
+  Model,
+  Types
+} from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
-import { ClientSession, Model, Types } from "mongoose";
 import { MessagingService } from '../../utils/messaging/messaging.service';
 import { UserDocument } from "../entities/users.entity";
 import { VerificationCodes, VerificationCodesDocument } from "../entities/verificationCodes.entity";

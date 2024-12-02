@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersModule } from "src/users/users.module";
 import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";

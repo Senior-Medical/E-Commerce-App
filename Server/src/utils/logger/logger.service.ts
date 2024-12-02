@@ -1,4 +1,8 @@
-import { ConsoleLogger, Injectable, LoggerService } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Injectable,
+  LoggerService
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 

@@ -1,4 +1,9 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator"
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches
+} from "class-validator"
 
 /**
  * Data transfer object used for creating a new category. It ensures that 

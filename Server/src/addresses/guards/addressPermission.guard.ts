@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  NotFoundException
+} from "@nestjs/common";
 import { AddressesService } from '../addresses.service';
 import { Role } from "src/auth/enums/roles.enum";
 

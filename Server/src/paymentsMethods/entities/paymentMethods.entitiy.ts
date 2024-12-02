@@ -1,4 +1,8 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 import { EncryptionService } from "../../utils/encryption/encryption.service";
 import { luhnCheck } from "../utils/luhnValidation";

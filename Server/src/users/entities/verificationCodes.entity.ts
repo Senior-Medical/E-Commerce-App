@@ -1,5 +1,9 @@
 import { ConfigService } from '@nestjs/config';
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { EncryptionService } from '../../utils/encryption/encryption.service';
 import { CodePurpose, CodeType } from "../enums/code.enum";

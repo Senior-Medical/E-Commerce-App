@@ -1,8 +1,17 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException
+} from "@nestjs/common";
+import {
+  Model,
+  Query,
+  Types
+} from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
-import { Document, Model, Query, Types } from "mongoose";
-import { User, UserDocument } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
@@ -51,7 +60,7 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(req: Request & { queryBuilder: Query<Product, Document> }) {
+  find(req: Request & { queryBuilder: Query<Product, ProductDocument> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");
@@ -147,16 +156,15 @@ export class ProductsService {
     }
     if (imagesNames.length) productInput.images = imagesNames;
 
-    let result: Document;
     const oldImages = product.images;
     try {
-      result = await product.set(productInput).save();
+      await product.set(productInput).save();
       if(productInput.images) this.filesService.removeFiles(oldImages);
     } catch (e) {
       if(productInput.images) this.filesService.removeFiles(productInput.images);
       throw e;
     }
-    return result;
+    return product;
   }
 
   /**

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  NotFoundException
+} from "@nestjs/common";
 import { PaymentMethodsService } from "../paymentMethods.service";
 import { Role } from "src/auth/enums/roles.enum";
 

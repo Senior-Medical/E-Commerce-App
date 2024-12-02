@@ -1,12 +1,26 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotAcceptableException,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UploadedFiles,
+  UseInterceptors
+} from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User, UserDocument } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ImagesTypes } from "src/utils/files/enums/imagesTypes";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
@@ -39,7 +53,7 @@ export class ProductsController {
   @Get()
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<Product, Document> }) {
+  find(@Req() req: Request & { queryBuilder: Query<Product, ProductDocument> }) {
     return this.productsService.find(req).populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 

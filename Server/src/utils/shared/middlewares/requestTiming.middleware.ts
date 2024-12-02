@@ -1,5 +1,9 @@
+import {
+  Request,
+  Response,
+  NextFunction
+} from 'express';
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
 
 /**
  * A middleware that sets the `startTime` property on the request object. 

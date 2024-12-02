@@ -1,9 +1,21 @@
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Document } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { User, UserDocument } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";

@@ -1,7 +1,16 @@
-import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+  UnauthorizedException
+} from "@nestjs/common";
+import {
+  Connection,
+  Model,
+  Query
+} from "mongoose";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
-import { Connection, Document, Model, Query } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { FilesService } from 'src/utils/files/files.service';
 import { EncryptionService } from '../utils/encryption/encryption.service';
@@ -67,7 +76,7 @@ export class UsersService {
    * @param condition - The query condition.
    * @returns An array of matching users.
    */
-  find(req: Request & { queryBuilder: Query<User, Document> }) {
+  find(req: Request & { queryBuilder: Query<User, UserDocument> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");

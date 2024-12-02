@@ -1,8 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
-import { Product, ProductDocument } from "src/products/entities/products.entity";
+import { ProductDocument } from "src/products/entities/products.entity";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
@@ -32,7 +45,7 @@ export class ProductsReviewsController {
   @Get("/product/:productId")
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<ProductsReviews, Document> }, @Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument) {
+  find(@Req() req: Request & { queryBuilder: Query<ProductsReviews, ProductsReviewsDocument> }, @Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument) {
     return this.productsReviewsService.find(req, product).populate("user", "name username");
   }
 
@@ -56,7 +69,10 @@ export class ProductsReviewsController {
    * @returns Created product review.
    */
   @Post()
-  create(@Body() reviewData: CreateProductReviewDto, @UserDecorator() user: UserDocument) {
+  create(
+    @Body() reviewData: CreateProductReviewDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.productsReviewsService.create(reviewData, user);
   }
 
@@ -70,7 +86,10 @@ export class ProductsReviewsController {
   @Patch(":reviewId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(ProductReviewPermissionGuard)
-  update(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument, @Body() reviewData: UpdateProductReviewDto) {
+  update(
+    @Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument,
+    @Body() reviewData: UpdateProductReviewDto
+  ) {
     return this.productsReviewsService.update(review, reviewData);
   }
 

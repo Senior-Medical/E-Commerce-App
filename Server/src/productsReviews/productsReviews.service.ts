@@ -1,11 +1,15 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Query, Types } from "mongoose";
+import { Model, Query, Types } from "mongoose";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
 import { ProductsReviews, ProductsReviewsDocument } from "./entities/productsReviews.entity";
 import { ProductsService } from "src/products/products.service";
-import { Product, ProductDocument } from "src/products/entities/products.entity";
+import { ProductDocument } from "src/products/entities/products.entity";
 import { Request } from "express";
 import { UserDocument } from "src/users/entities/users.entity";
 
@@ -49,7 +53,7 @@ export class ProductsReviewsService {
    * @param conditions - Filters to apply for fetching reviews.
    * @returns Array of product reviews.
    */
-  find(req: Request & { queryBuilder: Query<ProductsReviews, Document> }, product: ProductDocument) {
+  find(req: Request & { queryBuilder: Query<ProductsReviews, ProductsReviewsDocument> }, product: ProductDocument) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.find({product: product._id}).select("-__v");

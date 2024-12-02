@@ -1,8 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { WishList } from "./entities/wishList.entity";
+import { WishList, WishListDocument } from "./entities/wishList.entity";
 import { Model, Query } from "mongoose";
-import { Document } from "mongoose";
 import { UserDocument } from "src/users/entities/users.entity";
 import { Request } from "express";
 import { ProductDocument } from "src/products/entities/products.entity";
@@ -32,7 +31,7 @@ export class WishListService {
    * @param user - The user document.
    * @returns List of wish list items.
    */
-  find(req: Request & { queryBuilder: Query<WishList, Document>, user: UserDocument }) {
+  find(req: Request & { queryBuilder: Query<WishList, WishListDocument>, user: UserDocument }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");

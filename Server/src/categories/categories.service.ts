@@ -1,6 +1,14 @@
-import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException
+} from "@nestjs/common";
+import {
+  Model,
+  Query,
+  Types
+} from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { Document, Model, Query, Types } from "mongoose";
 import { Category, CategoryDocument } from "./entities/categories.entity";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
@@ -44,7 +52,7 @@ export class CategoriesServices{
    * @param conditions - The search conditions.
    * @returns List of categories that match the conditions.
    */
-  find(req: Request & { queryBuilder: Query<Category, Document> }) {
+  find(req: Request & { queryBuilder: Query<Category, CategoryDocument> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");

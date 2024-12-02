@@ -1,7 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
@@ -40,7 +51,7 @@ export class UsersController{
   @Get()
   @Roles(Role.admin, Role.staff)
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<User, Document> }) {
+  find(@Req() req: Request & { queryBuilder: Query<User, UserDocument> }) {
     return this.usersService.find(req).select("-password");
   }
 
@@ -95,7 +106,10 @@ export class UsersController{
    */
   @Patch("password/:userId")
   @UseGuards(UserPermissionGuard)
-  updatePassword(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument, @Body() body: UpdatePasswordDto) {
+  updatePassword(
+    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument,
+    @Body() body: UpdatePasswordDto
+  ) {
     return this.usersService.updatePassword(user, body);
   }
 

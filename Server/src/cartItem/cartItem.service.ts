@@ -1,10 +1,19 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from "@nestjs/common";
+import {
+  Connection,
+  Model,
+  Query,
+  Types
+} from "mongoose";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { CartItem } from "./entities/cartItem.entity";
-import { Connection, Document, Model, Query, Types } from "mongoose";
+import { CartItem, CartItemDocument } from "./entities/cartItem.entity";
 import { Request } from "express";
-import { User, UserDocument } from "src/users/entities/users.entity";
-import { Product, ProductDocument } from "src/products/entities/products.entity";
+import { UserDocument } from "src/users/entities/users.entity";
+import { ProductDocument } from "src/products/entities/products.entity";
 
 /**
  * Service for managing cart item operations.
@@ -40,7 +49,7 @@ export class CartItemService {
    * @param user - The user document.
    * @returns List of cart items with populated product details.
    */
-  find(req: Request & { user: UserDocument, queryBuilder: Query<CartItem, Document> }) {
+  find(req: Request & { user: UserDocument, queryBuilder: Query<CartItem, CartItemDocument> }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
