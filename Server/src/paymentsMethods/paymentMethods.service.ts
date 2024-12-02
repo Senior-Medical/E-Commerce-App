@@ -3,11 +3,11 @@ import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
 import { Connection, Document, Model, Query, Types } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { EncryptionService } from '../utils/encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
-import { PaymentMethods } from "./entities/paymentMethods.entitiy";
+import { PaymentMethods, PaymentMethodsDocument } from "./entities/paymentMethods.entitiy";
 
 /**
  * PaymentMethodsService
@@ -48,7 +48,7 @@ export class PaymentMethodsService {
    * @param conditions - Optional: MongoDB query filter conditions.
    * @returns List of payment methods excluding the __v field.
    */
-  find(req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: Document & User }) {
+  find(req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: UserDocument }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
@@ -78,7 +78,7 @@ export class PaymentMethodsService {
    * @returns The created payment method.
    * @throws ConflictException if the card number already exists.
    */
-  async create(paymentMethodData: CreatePaymentMethodsDto, user: Document) {
+  async create(paymentMethodData: CreatePaymentMethodsDto, user: UserDocument) {
     const paymentMethod = await this.paymentMethodsModel.findOne({
       cardNumber: this.encryptionService.encrypt(paymentMethodData.cardNumber)
     });
@@ -124,7 +124,7 @@ export class PaymentMethodsService {
    * @returns The updated payment method.
    * @throws ConflictException if the updated card number already exists.
    */
-  async update(paymentMethod: Document, paymentMethodData: UpdatePaymentMethodsDto, user: Document) {
+  async update(paymentMethod: PaymentMethodsDocument, paymentMethodData: UpdatePaymentMethodsDto, user: UserDocument) {
     if (paymentMethodData.cardNumber) {
       const paymentMethodExist = await this.paymentMethodsModel.findOne({
         cardNumber: paymentMethodData.cardNumber
@@ -165,7 +165,7 @@ export class PaymentMethodsService {
    * @param paymentMethod - The payment method to delete.
    * @returns The result of the deletion operation.
    */
-  remove(paymentMethod: Document) {
+  remove(paymentMethod: PaymentMethodsDocument) {
     return paymentMethod.deleteOne();
   }
 }

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Address Entity Schema
@@ -113,3 +113,5 @@ export class Address {
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address);
+
+export type AddressDocument = Document & Address;

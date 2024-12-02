@@ -9,8 +9,9 @@ import { UserDecorator } from "../users/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
-import { Category } from "./entities/categories.entity";
+import { Category, CategoryDocument } from "./entities/categories.entity";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
+import { UserDocument } from "src/users/entities/users.entity";
 
 /**
  * Controller class that defines the HTTP endpoints for managing categories. 
@@ -42,7 +43,7 @@ export class CategoriesController{
    * @returns The category with populated user data.
    */
   @Get(":categoryId")
-  async findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document) {
+  async findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument) {
     return (await category.populate("createdBy", "name username")).populate("updatedBy", "name username");
   }
 
@@ -54,7 +55,7 @@ export class CategoriesController{
    * @returns The created category.
    */
   @Post()
-  create(@Body() categoryData: CreateCategoryDto, @UserDecorator() user: Document) {
+  create(@Body() categoryData: CreateCategoryDto, @UserDecorator() user: UserDocument) {
     return this.categoriesServices.create(categoryData, user);
   }
 
@@ -68,7 +69,7 @@ export class CategoriesController{
    */
   @Patch(":categoryId")
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document, @Body() categoryData: UpdateCategoryDto, @UserDecorator() user: Document) {
+  update(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument, @Body() categoryData: UpdateCategoryDto, @UserDecorator() user: UserDocument) {
     return this.categoriesServices.update(category, categoryData, user);
   }
 
@@ -80,7 +81,7 @@ export class CategoriesController{
    */
   @Delete(":categoryId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document) {
+  async remove(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument) {
     await this.categoriesServices.remove(category);
   }
 }

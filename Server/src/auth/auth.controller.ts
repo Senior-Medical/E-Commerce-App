@@ -3,7 +3,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
@@ -45,7 +45,7 @@ export class AuthController {
    */
   @Get("resendVerification/:userId")
   @Public()
-  resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
+  resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
     return this.authService.resendVerification(user);
   }
 
@@ -101,7 +101,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Public()
-  login(@UserDecorator() user: Document) {
+  login(@UserDecorator() user: UserDocument) {
     return this.authService.login(user);
   }
 

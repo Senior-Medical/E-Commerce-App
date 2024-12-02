@@ -4,10 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as sendGrid from '@sendgrid/mail';
 import * as twilio from "twilio";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";
-import { VerificationCodes } from "src/users/entities/verificationCodes.entity";
-import { Document } from "mongoose";
-
-type codeDataType = Document & VerificationCodes;
+import { VerificationCodesDocument } from "src/users/entities/verificationCodes.entity";
 
 /**
  * - Handles sending emails via SendGrid and SMS via Twilio.
@@ -39,7 +36,7 @@ export class MessagingService {
    * send - Sends an email or SMS based on the code type.
    * @param code - The code document in the database.
    */
-  send(code: codeDataType) {
+  send(code: VerificationCodesDocument) {
     if(code.type === CodeType.EMAIL) return this.sendEmail(code);
     else return this.sendSMS(code);
   }
@@ -48,7 +45,7 @@ export class MessagingService {
    * sendEmail - Sends an email using SendGrid.
    * @param code - The data of code required to send the Email.
    */
-  private async sendEmail(code: codeDataType) {
+  private async sendEmail(code: VerificationCodesDocument) {
     const mail: MailDataRequired = {
       to: code.value,
       from: this.sendGridEmail,
@@ -67,7 +64,7 @@ export class MessagingService {
    * sendSMS - Sends an SMS using Twilio.
    * @param codeData - The data of code required to send the SMS.
    */
-  private async sendSMS(codeData: codeDataType) {
+  private async sendSMS(codeData: VerificationCodesDocument) {
     try {
       await this.twilioClient.messages.create({
         body: this.generatePhoneVerificationLinkMessage(codeData._id.toString()),
@@ -85,7 +82,7 @@ export class MessagingService {
    * @param codeData - The code document in the database..
    * @returns {string} - HTML content.
    */
-  private generateEmailHtmlContent(codeData: codeDataType): string {
+  private generateEmailHtmlContent(codeData: VerificationCodesDocument): string {
     if (codeData.purpose === CodePurpose.RESET_PASSWORD) {
       return this.generateEmailVerificationCodeHtml(codeData.code);
     } else {

@@ -3,8 +3,9 @@ import { InjectModel } from "@nestjs/mongoose";
 import { WishList } from "./entities/wishList.entity";
 import { Model, Query } from "mongoose";
 import { Document } from "mongoose";
-import { User } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { Request } from "express";
+import { ProductDocument } from "src/products/entities/products.entity";
 
 @Injectable()
 export class WishListService {
@@ -31,7 +32,7 @@ export class WishListService {
    * @param user - The user document.
    * @returns List of wish list items.
    */
-  find(req: Request & { queryBuilder: Query<WishList, Document>, user: Document & User }) {
+  find(req: Request & { queryBuilder: Query<WishList, Document>, user: UserDocument }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
@@ -44,7 +45,7 @@ export class WishListService {
    * @returns The created wish list item.
    * @throws ConflictException if the product is already in the wish list.
    */
-  async create(product: Document, user: Document) {
+  async create(product: ProductDocument, user: UserDocument) {
     const existingWishList = await this.wishListModel.findOne({ product: product._id, user: user._id });
     if(existingWishList) throw new ConflictException("Product already in wish list");
     return this.wishListModel.create({ product: product._id, user: user._id });
@@ -56,7 +57,7 @@ export class WishListService {
    * @param user - The user document.
    * @returns The deleted wish list item.
    */
-  remove(product: Document, user: Document) {
+  remove(product: ProductDocument, user: UserDocument) {
     return this.wishListModel.findOneAndDelete({ product: product._id, user: user._id });
   }
 }

@@ -1,10 +1,11 @@
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Document, Model, Query, Types } from "mongoose";
-import { Category } from "./entities/categories.entity";
+import { Category, CategoryDocument } from "./entities/categories.entity";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { Request } from "express";
+import { UserDocument } from "src/users/entities/users.entity";
 
 /**
  * Service class that handles business logic for categories, such as creating, 
@@ -67,7 +68,7 @@ export class CategoriesServices{
    * @throws ConflictException if the category already exists.
    * @returns The created category.
    */
-  async create(categoryData: CreateCategoryDto, user: Document) {
+  async create(categoryData: CreateCategoryDto, user: UserDocument) {
     const category = await this.categoriesModel.findOne({ name: categoryData.name });
     if (category) throw new ConflictException('Category already exist.');
 
@@ -89,7 +90,7 @@ export class CategoriesServices{
    * @throws ConflictException if the new category name already exists.
    * @returns The updated category document.
    */
-  async update(category: Document, categoryData: UpdateCategoryDto, user: Document) {
+  async update(category: CategoryDocument, categoryData: UpdateCategoryDto, user: UserDocument) {
     let categoryByName = await this.categoriesModel.findOne({ name: categoryData.name });
     if (categoryByName && categoryByName._id.toString() != category._id.toString()) throw new ConflictException('Category already exist.');
     
@@ -106,7 +107,7 @@ export class CategoriesServices{
    * @param category - The category document to be deleted.
    * @returns The result of the delete operation.
    */
-  remove(category: Document) {
+  remove(category: CategoryDocument) {
     return category.deleteOne();
   }
 }

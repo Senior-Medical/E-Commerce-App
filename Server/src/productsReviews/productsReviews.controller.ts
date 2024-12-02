@@ -2,17 +2,18 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
-import { Product } from "src/products/entities/products.entity";
+import { Product, ProductDocument } from "src/products/entities/products.entity";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
-import { ProductsReviews } from "./entities/productsReviews.entity";
+import { ProductsReviews, ProductsReviewsDocument } from "./entities/productsReviews.entity";
 import { ProductReviewPermissionGuard } from "./guards/productReviewPermission.guard";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
+import { UserDocument } from "src/users/entities/users.entity";
 
 /**
  * Controller for handling product review-related HTTP requests, including
@@ -31,7 +32,7 @@ export class ProductsReviewsController {
   @Get("/product/:productId")
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<ProductsReviews, Document> }, @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product) {
+  find(@Req() req: Request & { queryBuilder: Query<ProductsReviews, Document> }, @Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument) {
     return this.productsReviewsService.find(req, product).populate("user", "name username");
   }
 
@@ -43,7 +44,7 @@ export class ProductsReviewsController {
    */
   @Get(":reviewId")
   @Public()
-  async findOne(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
+  async findOne(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument) {
     return (await review.populate("user", "name username")).populate("product", "name");
   }
 
@@ -55,7 +56,7 @@ export class ProductsReviewsController {
    * @returns Created product review.
    */
   @Post()
-  create(@Body() reviewData: CreateProductReviewDto, @UserDecorator() user: Document) {
+  create(@Body() reviewData: CreateProductReviewDto, @UserDecorator() user: UserDocument) {
     return this.productsReviewsService.create(reviewData, user);
   }
 
@@ -69,7 +70,7 @@ export class ProductsReviewsController {
   @Patch(":reviewId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(ProductReviewPermissionGuard)
-  update(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document, @Body() reviewData: UpdateProductReviewDto) {
+  update(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument, @Body() reviewData: UpdateProductReviewDto) {
     return this.productsReviewsService.update(review, reviewData);
   }
 
@@ -82,7 +83,7 @@ export class ProductsReviewsController {
   @Delete(":reviewId")
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(ProductReviewPermissionGuard)
-  async remove(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: Document) {
+  async remove(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument) {
     await this.productsReviewsService.remove(review);
   }
 }

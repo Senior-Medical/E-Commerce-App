@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Connection, Document, Model, Types } from "mongoose";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";
 import { EncryptionService } from "src/utils/encryption/encryption.service";
 import { CustomLoggerService } from "src/utils/logger/logger.service";
@@ -87,7 +87,7 @@ export class AuthService{
    * @param user - The authenticated user document.
    * @returns - An object containing the access token, refresh token, and user details.
    */
-  async login(user: Document) {
+  async login(user: UserDocument) {
     const expiresIn = this.configService.get("JWT_REFRESH_EXPIRATION");
     const refreshToken = this.jwtService.sign({ sub: user._id }, { expiresIn });
     
@@ -255,7 +255,7 @@ export class AuthService{
    * @param user - The user whose verification codes need to be resent.
    * @returns - A message indicating what verification codes were sent.
    */
-  async resendVerification(user: Document & User) {
+  async resendVerification(user: UserDocument) {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {

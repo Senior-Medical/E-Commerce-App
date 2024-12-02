@@ -52,8 +52,8 @@ import { LuhnValidationConstraint } from "./utils/luhnValidation";
     MongooseModule.forFeatureAsync([{
       imports: [EncryptionModule],
       name: PaymentMethods.name,
-      useFactory: (configService: ConfigService, encryptionService: EncryptionService) => createPaymentMethodsSchema(configService, encryptionService),
-      inject: [ConfigService, EncryptionService]
+      useFactory: (encryptionService: EncryptionService) => createPaymentMethodsSchema(encryptionService),
+      inject: [EncryptionService]
     }]),
     UsersModule,
     EncryptionModule,

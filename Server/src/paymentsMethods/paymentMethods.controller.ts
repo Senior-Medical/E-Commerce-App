@@ -2,12 +2,12 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
-import { PaymentMethods } from "./entities/paymentMethods.entitiy";
+import { PaymentMethods, PaymentMethodsDocument } from "./entities/paymentMethods.entitiy";
 import { PaymentMethodPermissionGuard } from "./guard/paymentMethodPermission.guard";
 import { PaymentMethodsService } from './paymentMethods.service';
 import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
@@ -34,7 +34,7 @@ export class PaymentMethodsController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: Document & User }) {
+  find(@Req() req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: UserDocument }) {
     return this.paymentMethodsService.find(req).populate("user", "name username");
   }
 
@@ -47,7 +47,7 @@ export class PaymentMethodsController {
    */
   @Get(":paymentMethodId")
   @UseGuards(PaymentMethodPermissionGuard)
-  findOne(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document) {
+  findOne(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument) {
     return paymentMethod.populate("user", "name username");
   }
 
@@ -60,7 +60,7 @@ export class PaymentMethodsController {
    * @returns The created payment method.
    */
   @Post()
-  create(@Body() paymentMethodData: CreatePaymentMethodsDto, @UserDecorator() user: Document) {
+  create(@Body() paymentMethodData: CreatePaymentMethodsDto, @UserDecorator() user: UserDocument) {
     return this.paymentMethodsService.create(paymentMethodData, user);
   }
 
@@ -76,7 +76,7 @@ export class PaymentMethodsController {
   @Patch(":paymentMethodId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(PaymentMethodPermissionGuard)
-  update(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document, @Body() paymentMethodData: UpdatePaymentMethodsDto, @UserDecorator() user: Document) {
+  update(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument, @Body() paymentMethodData: UpdatePaymentMethodsDto, @UserDecorator() user: UserDocument) {
     return this.paymentMethodsService.update(paymentMethod, paymentMethodData, user);
   }
 
@@ -89,7 +89,7 @@ export class PaymentMethodsController {
   @Delete(":paymentMethodId")
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(PaymentMethodPermissionGuard)
-  async remove(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: Document) {
+  async remove(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument) {
     await this.paymentMethodsService.remove(paymentMethod);
   }
 }

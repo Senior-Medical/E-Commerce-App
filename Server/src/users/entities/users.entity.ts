@@ -5,6 +5,7 @@ import { Role } from "src/auth/enums/roles.enum";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
 import { EncryptionService } from '../../utils/encryption/encryption.service';
 import { VerificationCodes } from "./verificationCodes.entity";
+import { Document } from 'mongoose';
 
 /**
  * - Represents a user in the system.
@@ -88,3 +89,5 @@ export const createUserSchema = (configService: ConfigService, encryptionService
   });
   return UserSchema;
 }
+
+export type UserDocument = Document & User;

@@ -2,13 +2,13 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
-import { Address } from "./entities/addresses.entity";
+import { Address, AddressDocument } from "./entities/addresses.entity";
 import { AddressPermissionGuard } from "./guards/addressPermission.guard";
 import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
 
@@ -36,7 +36,7 @@ export class AddressesController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { user: Document & User, queryBuilder: Query<Address, Document> }) {
+  find(@Req() req: Request & { user: UserDocument, queryBuilder: Query<Address, Document> }) {
     return this.addressesService.find(req).populate("user", "name username");
   }
 
@@ -49,7 +49,7 @@ export class AddressesController {
    */
   @Get(":addressId")
   @UseGuards(AddressPermissionGuard)
-  findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
+  findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument) {
     return address.populate("user", "name username");
   }
 
@@ -62,7 +62,7 @@ export class AddressesController {
    * @returns The created address.
    */
   @Post()
-  create(@Body() addressData: CreateAddressDto, @UserDecorator() user: Document) {
+  create(@Body() addressData: CreateAddressDto, @UserDecorator() user: UserDocument) {
     return this.addressesService.create(addressData, user);
   }
 
@@ -77,7 +77,7 @@ export class AddressesController {
   @Patch(":addressId")
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AddressPermissionGuard)
-  update(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document, @Body() addressData: UpdateAddressDto) {
+  update(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument, @Body() addressData: UpdateAddressDto) {
     return this.addressesService.update(address, addressData);
   }
 
@@ -90,7 +90,7 @@ export class AddressesController {
   @Delete(":addressId")
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AddressPermissionGuard)
-  async remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: Document) {
+  async remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument) {
     await this.addressesService.remove(address);
   }
 }

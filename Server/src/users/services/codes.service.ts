@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from "@nestjs/mongoose";
 import * as crypto from "crypto";
-import { ClientSession, Document, Model, Types } from "mongoose";
+import { ClientSession, Model, Types } from "mongoose";
 import { MessagingService } from '../../utils/messaging/messaging.service';
-import { User } from "../entities/users.entity";
-import { VerificationCodes } from "../entities/verificationCodes.entity";
+import { UserDocument } from "../entities/users.entity";
+import { VerificationCodes, VerificationCodesDocument } from "../entities/verificationCodes.entity";
 import { CodePurpose, CodeType } from "../enums/code.enum";
 
 /**
@@ -17,7 +16,6 @@ export class CodesService {
   constructor(
     @InjectModel(VerificationCodes.name) private codesModel: Model<VerificationCodes>,
     private readonly messagingService: MessagingService,
-    private readonly configService: ConfigService,
   ) { }
 
   /**
@@ -39,7 +37,7 @@ export class CodesService {
    * @param user - The user object to associate with the code.
    * @returns The created verification code document.
    */
-  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: Document & User, session: ClientSession) {
+  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: UserDocument, session: ClientSession) {
     const codeData: VerificationCodes = {
       code: this.generateCode(),
       value,
@@ -78,7 +76,7 @@ export class CodesService {
    * @param purpose - The purpose of the code.
    * @returns The generated message.
    */
-  private getMessageForCode(baseUrl: string, code: Document & VerificationCodes, purpose: CodePurpose): string {
+  private getMessageForCode(baseUrl: string, code: VerificationCodesDocument, purpose: CodePurpose): string {
     if (code.type === CodeType.EMAIL) {
       if (purpose === CodePurpose.VERIFY_EMAIL || purpose === CodePurpose.UPDATE_EMAIL) return `Please visit this link to verify your email: ${baseUrl}/auth/verify/${code._id}`
       else return `The code for resetting the password is: ${code.code}.`;

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 import { ProductsReviews } from "src/productsReviews/entities/productsReviews.entity";
 
 /**
@@ -70,3 +70,5 @@ ProductSchema.post("findOneAndDelete", async function (doc, next) {
 })
 
 export { ProductSchema };
+
+export type ProductDocument = Document & Product;

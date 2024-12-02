@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { EncryptionService } from '../../utils/encryption/encryption.service';
 import { CodePurpose, CodeType } from "../enums/code.enum";
+import { Document } from 'mongoose';
 
 /**
  * Represents the structure of the VerificationCodes document in the MongoDB database.
@@ -78,3 +79,5 @@ export const getVerificationCodesSchema = (configService: ConfigService, encrypt
 
   return VerificationCodesSchema;
 };
+
+export type VerificationCodesDocument = Document & VerificationCodes;

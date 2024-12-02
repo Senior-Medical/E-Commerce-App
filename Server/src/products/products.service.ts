@@ -2,11 +2,11 @@ import { ConflictException, Injectable, InternalServerErrorException, NotAccepta
 import { InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
 import { Document, Model, Query, Types } from "mongoose";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
-import { Product } from "./entities/products.entity";
+import { Product, ProductDocument } from "./entities/products.entity";
 
 /**
  * Service responsible for managing product-related operations.
@@ -81,7 +81,7 @@ export class ProductsService {
    * @throws NotAcceptableException if validation fails.
    * @throws InternalServerErrorException for file handling or database errors.
    */
-  async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: Document) {
+  async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: UserDocument) {
     const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
@@ -121,7 +121,7 @@ export class ProductsService {
    * @returns The updated product.
    * @throws HttpException if validation or file handling fails.
    */
-  async update(product: Document & Product, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document & User) {
+  async update(product: ProductDocument, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: UserDocument) {
     const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
@@ -165,7 +165,7 @@ export class ProductsService {
    * @param product - The product to delete.
    * @returns void
    */
-  async remove(product: Document & Product) {
+  async remove(product: ProductDocument) {
     await this.productsModel.findByIdAndDelete(product._id);
     if (product.images) this.filesService.removeFiles(product.images);
     return;

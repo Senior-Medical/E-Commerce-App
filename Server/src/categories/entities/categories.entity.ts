@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Mongoose schema definition for the Category model. This schema defines 
@@ -32,3 +32,5 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+export type CategoryDocument = Document & Category;

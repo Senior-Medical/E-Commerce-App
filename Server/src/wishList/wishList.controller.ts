@@ -3,11 +3,12 @@ import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User } from "src/users/entities/users.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { WishList } from "./entities/wishList.entity";
 import { WishListService } from './wishList.service';
+import { ProductDocument } from "src/products/entities/products.entity";
 
 /**
  * Controller for handling wish list API endpoints.
@@ -23,7 +24,7 @@ export class WishListController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  async find(@Req() req: Request & { queryBuilder: Query<WishList, Document>, user: Document & User }) {
+  async find(@Req() req: Request & { queryBuilder: Query<WishList, Document>, user: UserDocument }) {
     return this.wishListService.find(req);
   }
 
@@ -34,7 +35,7 @@ export class WishListController {
    * @returns The created wish list item.
    */
   @Post("/:productId")
-  async create(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document, @UserDecorator() user: Document) {
+  async create(@Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument, @UserDecorator() user: UserDocument) {
     return this.wishListService.create(product, user);
   }
 
@@ -46,7 +47,7 @@ export class WishListController {
    */
   @Delete("/:productId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document, @UserDecorator() user: Document) {
+  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument, @UserDecorator() user: UserDocument) {
     await this.wishListService.remove(product, user);
   }
 }

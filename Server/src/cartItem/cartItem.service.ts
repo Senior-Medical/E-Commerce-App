@@ -3,8 +3,8 @@ import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { CartItem } from "./entities/cartItem.entity";
 import { Connection, Document, Model, Query, Types } from "mongoose";
 import { Request } from "express";
-import { User } from "src/users/entities/users.entity";
-import { Product } from "src/products/entities/products.entity";
+import { User, UserDocument } from "src/users/entities/users.entity";
+import { Product, ProductDocument } from "src/products/entities/products.entity";
 
 /**
  * Service for managing cart item operations.
@@ -40,7 +40,7 @@ export class CartItemService {
    * @param user - The user document.
    * @returns List of cart items with populated product details.
    */
-  find(req: Request & { user: Document & User, queryBuilder: Query<CartItem, Document> }) {
+  find(req: Request & { user: UserDocument, queryBuilder: Query<CartItem, Document> }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
@@ -54,7 +54,7 @@ export class CartItemService {
    * @param user - The user document.
    * @returns The created cart item.
    */
-  async create(product: Document & Product, quantity: number, user: Document & User) {
+  async create(product: ProductDocument, quantity: number, user: UserDocument) {
     const existingWishList = await this.cartItemModel.findOne({ product: product._id, user: user._id });
     if(existingWishList) throw new ConflictException("Product already in cart");
 
@@ -91,7 +91,7 @@ export class CartItemService {
    * @returns The updated cart item.
    * @throws NotFoundException if the cart item does not exist.
    */
-  async update(product: Document & Product, quantity: number, user: Document & User) {
+  async update(product: ProductDocument, quantity: number, user: UserDocument) {
     const cartItem = await this.cartItemModel.findOne({ product: product._id, user: user._id });
     if (!cartItem) throw new NotFoundException("Product wasn't in the cart.");
 
@@ -122,7 +122,7 @@ export class CartItemService {
    * @param product - The product document.
    * @param user - The user document.
    */
-  async remove(product: Document, user: Document) {
+  async remove(product: ProductDocument, user: UserDocument) {
     await this.cartItemModel.findOneAndDelete({ product: product._id, user: user._id });
   }
 }
