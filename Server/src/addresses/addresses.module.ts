@@ -1,11 +1,11 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Address, AddressSchema } from "./entities/addresses.entity";
+import { UsersModule } from "src/users/users.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
 import { AddressesController } from "./addresses.controller";
 import { AddressesService } from "./addresses.service";
-import { UsersModule } from "src/users/users.module";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
+import { Address, AddressSchema } from "./entities/addresses.entity";
 
 /**
  * Address Module

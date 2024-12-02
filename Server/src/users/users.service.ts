@@ -1,15 +1,15 @@
 import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Request } from "express";
 import { Connection, Document, Model, Query } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
-import { FilesService } from 'src/files/files.service';
-import { EncryptionService } from '../encryption/encryption.service';
+import { FilesService } from 'src/utils/files/files.service';
+import { EncryptionService } from '../utils/encryption/encryption.service';
 import { UpdatePasswordDto } from './dtos/updatePassword.dto';
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { User } from "./entities/users.entity";
 import { CodePurpose, CodeType } from "./enums/code.enum";
 import { CodesService } from './services/codes.service';
-import { Request } from "express";
 
 /**
  * Service responsible for managing user operations such as creation, update, and deletion. 

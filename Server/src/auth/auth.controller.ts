@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Document } from "mongoose";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
+import { User } from "src/users/entities/users.entity";
 import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { AuthService } from './auth.service';
 import { Public } from "./decorators/public.decorator";
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
@@ -15,7 +16,6 @@ import { LocalAuthGuard } from "./guards/localAuth.guard";
 import { RefreshTokenGuard } from "./guards/refreshToken.guard";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
-import { User } from "src/users/entities/users.entity";
 
 /**
  * AuthController defines the routes and handlers for user authentication-related actions,

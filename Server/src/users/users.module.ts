@@ -1,19 +1,19 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
-import { MessagingModule } from "src/messaging/messaging.module";
+import { MulterModule } from "@nestjs/platform-express";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { EncryptionModule } from "src/utils/encryption/encryption.module";
+import { EncryptionService } from "src/utils/encryption/encryption.service";
+import { FilesModule } from "src/utils/files/files.module";
+import { FilesService } from "src/utils/files/files.service";
+import { MessagingModule } from "src/utils/messaging/messaging.module";
+import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
 import { createUserSchema, User } from "./entities/users.entity";
-import { VerificationCodes, getVerificationCodesSchema } from "./entities/verificationCodes.entity";
+import { getVerificationCodesSchema, VerificationCodes } from "./entities/verificationCodes.entity";
+import { CodesService } from "./services/codes.service";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
-import { FilesModule } from "src/files/files.module";
-import { MulterModule } from "@nestjs/platform-express";
-import { FilesService } from "src/files/files.service";
-import { EncryptionModule } from "src/encryption/encryption.module";
-import { EncryptionService } from "src/encryption/encryption.service";
-import { CodesService } from "./services/codes.service";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * Manages user-related functionalities like account creation, updates, role management, and email/phone verification. 

@@ -1,9 +1,9 @@
 import { ArgumentMetadata, Injectable, NotFoundException, PipeTransform } from "@nestjs/common";
-import { EncryptionService } from "src/encryption/encryption.service";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";
-import { UsersService } from "src/users/users.service";
-import { ResetPasswordDto } from "../dtos/resetPassword.dto";
 import { CodesService } from "src/users/services/codes.service";
+import { UsersService } from "src/users/users.service";
+import { EncryptionService } from "src/utils/encryption/encryption.service";
+import { ResetPasswordDto } from "../dtos/resetPassword.dto";
 
 /**
  * Validates the user's reset password code and checks if it's expired.

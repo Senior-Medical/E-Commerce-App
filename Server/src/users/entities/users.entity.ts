@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Address } from "src/addresses/entities/addresses.entity";
 import { Role } from "src/auth/enums/roles.enum";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
-import { EncryptionService } from '../../encryption/encryption.service';
+import { EncryptionService } from '../../utils/encryption/encryption.service';
 import { VerificationCodes } from "./verificationCodes.entity";
 
 /**

@@ -1,11 +1,11 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { ProductsModule } from "src/products/products.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
 import { WishList, WishListSchema } from "./entities/wishList.entity";
 import { WishListController } from "./wishList.controller";
 import { WishListService } from "./wishList.service";
-import { ProductsModule } from "src/products/products.module";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * WishList Module

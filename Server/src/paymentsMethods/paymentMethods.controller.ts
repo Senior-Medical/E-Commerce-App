@@ -1,16 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Request } from "express";
 import { Document, Query } from "mongoose";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
+import { User } from "src/users/entities/users.entity";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
+import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 import { PaymentMethodPermissionGuard } from "./guard/paymentMethodPermission.guard";
 import { PaymentMethodsService } from './paymentMethods.service';
 import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
-import { Request } from "express";
-import { PaymentMethods } from "./entities/paymentMethods.entitiy";
-import { User } from "src/users/entities/users.entity";
 
 /**
  * PaymentMethodsController

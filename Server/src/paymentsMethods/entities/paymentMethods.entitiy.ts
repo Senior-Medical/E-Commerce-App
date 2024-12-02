@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
-import { EncryptionService } from "../../encryption/encryption.service";
+import { EncryptionService } from "../../utils/encryption/encryption.service";
 import { luhnCheck } from "../utils/luhnValidation";
 
 /**

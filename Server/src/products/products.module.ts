@@ -1,14 +1,14 @@
-import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { MulterModule } from "@nestjs/platform-express";
+import { CategoriesModule } from "src/categories/categories.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { FilesModule } from "src/utils/files/files.module";
+import { FilesService } from "src/utils/files/files.service";
+import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
 import { Product, ProductSchema } from "./entities/products.entity";
 import { ProductsController } from "./products.controller";
 import { ProductsService } from "./products.service";
-import { CategoriesModule } from "src/categories/categories.module";
-import { MulterModule } from "@nestjs/platform-express";
-import { FilesModule } from "src/files/files.module";
-import { FilesService } from "src/files/files.service";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * ProductsModule

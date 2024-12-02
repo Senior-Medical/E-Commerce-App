@@ -2,22 +2,22 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableExcep
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { Document, Query } from "mongoose";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { ImagesTypes } from "src/files/enums/imagesTypes";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { FilesService } from '../files/files.service';
+import { User } from "src/users/entities/users.entity";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ImagesTypes } from "src/utils/files/enums/imagesTypes";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
+import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
+import { Product } from "./entities/products.entity";
 import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
-import { Product } from "./entities/products.entity";
-import { User } from "src/users/entities/users.entity";
 
 /**
  * Controller for managing product-related operations.

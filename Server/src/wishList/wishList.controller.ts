@@ -1,13 +1,13 @@
 import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Req, UseInterceptors } from "@nestjs/common";
-import { WishListService } from './wishList.service';
-import { UserDecorator } from "src/users/decorators/user.decorator";
-import { Document, Query } from "mongoose";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Request } from "express";
-import { WishList } from "./entities/wishList.entity";
+import { Document, Query } from "mongoose";
+import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
+import { UserDecorator } from "src/users/decorators/user.decorator";
 import { User } from "src/users/entities/users.entity";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
+import { WishList } from "./entities/wishList.entity";
+import { WishListService } from './wishList.service';
 
 /**
  * Controller for handling wish list API endpoints.

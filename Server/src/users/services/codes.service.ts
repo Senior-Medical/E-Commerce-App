@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import * as crypto from "crypto";
 import { ConfigService } from '@nestjs/config';
-import { MessagingService } from '../../messaging/messaging.service';
-import { VerificationCodes } from "../entities/verificationCodes.entity";
-import { ClientSession, Document, Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { CodePurpose, CodeType } from "../enums/code.enum";
+import * as crypto from "crypto";
+import { ClientSession, Document, Model, Types } from "mongoose";
+import { MessagingService } from '../../utils/messaging/messaging.service';
 import { User } from "../entities/users.entity";
+import { VerificationCodes } from "../entities/verificationCodes.entity";
+import { CodePurpose, CodeType } from "../enums/code.enum";
 
 /**
  * Service responsible for managing verification codes used for user authentication 

@@ -1,16 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Request } from "express";
 import { Document, Query } from "mongoose";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
+import { User } from "src/users/entities/users.entity";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
+import { Address } from "./entities/addresses.entity";
 import { AddressPermissionGuard } from "./guards/addressPermission.guard";
 import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
-import { Request } from "express";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
-import { Address } from "./entities/addresses.entity";
-import { User } from "src/users/entities/users.entity";
 
 /**
  * The AddressesController handles all API requests related to user addresses.

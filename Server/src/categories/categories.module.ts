@@ -1,10 +1,10 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Category, CategorySchema } from "./entities/categories.entity";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
 import { CategoriesController } from "./categories.controller";
 import { CategoriesServices } from "./categories.service";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
+import { Category, CategorySchema } from "./entities/categories.entity";
 
 /**
  * CategoriesModule
