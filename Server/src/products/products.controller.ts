@@ -1,10 +1,13 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
+import { Request } from "express";
 import { Document } from "mongoose";
+import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { ImagesTypes } from "src/files/enums/imagesTypes";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { FilesService } from '../files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
@@ -13,9 +16,6 @@ import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
-import { UploadDirs } from "src/files/enums/uploadDirs.enum";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
-import { Request } from "express";
 
 /**
  * Controller for managing product-related operations.
@@ -62,7 +62,7 @@ export class ProductsController {
   @Get("images/:imageName")
   @Public()
   serveImage(@Param("imageName") imageName: string) {
-    if (!imageName.startsWith(UploadDirs.PRODUCTS)) throw new NotAcceptableException("Invalid image name");
+    if (!imageName.startsWith(ImagesTypes.PRODUCTS)) throw new NotAcceptableException("Invalid image name");
     return this.filesService.serveFile(imageName);
   }
 

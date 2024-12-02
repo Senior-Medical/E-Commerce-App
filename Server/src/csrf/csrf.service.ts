@@ -16,7 +16,6 @@ export class CsrfService {
       getSecret: () => CSRF_SECRET,
       cookieName: CSRF_COOKIE_NAME,
     };
-    console.log(doubleCsrfOptions);
     this.csrf = doubleCsrf(doubleCsrfOptions);
   }
 

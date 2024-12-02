@@ -1,6 +1,6 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
+import { ImagesTypes } from "src/files/enums/imagesTypes";
 import { FilesService } from '../../files/files.service';
-import { UploadDirs } from "src/files/enums/uploadDirs.enum";
 
 /**
  * Validates uploaded profile images.
@@ -15,7 +15,7 @@ export class ProfileImagesValidationPipe implements PipeTransform {
     if (!image) return undefined;
     const mimeType = this.filesService.getMimeType(image.buffer);
     if (!mimeType) throw new NotAcceptableException("Invalid image file.");
-    image.filename = this.filesService.generateFilename(mimeType, UploadDirs.USERS);
+    image.filename = this.filesService.generateFilename(mimeType, ImagesTypes.USERS);
     return image;
   }
 }
