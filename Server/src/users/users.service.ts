@@ -1,13 +1,22 @@
-import { Injectable, InternalServerErrorException, NotAcceptableException, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+  UnauthorizedException
+} from "@nestjs/common";
+import {
+  Connection,
+  Model,
+  Query
+} from "mongoose";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
-import { Connection, Document, Model, Query } from "mongoose";
 import { Role } from "src/auth/enums/roles.enum";
 import { FilesService } from 'src/utils/files/files.service';
 import { EncryptionService } from '../utils/encryption/encryption.service';
 import { UpdatePasswordDto } from './dtos/updatePassword.dto';
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
-import { User } from "./entities/users.entity";
+import { User, UserDocument } from "./entities/users.entity";
 import { CodePurpose, CodeType } from "./enums/code.enum";
 import { CodesService } from './services/codes.service';
 
@@ -56,7 +65,7 @@ export class UsersService {
    * @param user - The user document.
    * @returns A sanitized user object.
    */
-  getUserObject(user: Document) { 
+  getUserObject(user: UserDocument) { 
     const { password, __v, changePasswordAt, ...userObject } = user.toObject();
     return userObject;
   }
@@ -67,7 +76,7 @@ export class UsersService {
    * @param condition - The query condition.
    * @returns An array of matching users.
    */
-  find(req: Request & { queryBuilder: Query<User, Document> }) {
+  find(req: Request & { queryBuilder: Query<User, UserDocument> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");
@@ -134,7 +143,7 @@ export class UsersService {
    * @param avatar - The new avatar file (optional).
    * @returns An object containing a success message and the updated user details.
    */
-  async update(user: Document & User, updateData: UpdateUsersDto, avatar: Express.Multer.File) {
+  async update(user: UserDocument, updateData: UpdateUsersDto, avatar: Express.Multer.File) {
     const inputData: Partial<User> = { ...updateData };
     let message: string = "";
 
@@ -188,7 +197,7 @@ export class UsersService {
    * @returns A success message indicating the password has been updated.
    * @throws "NotAcceptableException" If the old password is incorrect.
    */
-  async updatePassword(user: Document & User, body: UpdatePasswordDto) {
+  async updatePassword(user: UserDocument, body: UpdatePasswordDto) {
     const { oldPassword, newPassword } = body;
     const match = await this.encryptionService.bcryptCompare(oldPassword, user.password);
     if (!match) throw new NotAcceptableException("Incorrect old password.");
@@ -204,7 +213,7 @@ export class UsersService {
    * @returns The updated user object.
    * @throws "UnauthorizedException" If the user has an admin role, since admins cannot be downgraded by non-admin users.
    */
-  updateRole(user: Document & User) {
+  updateRole(user: UserDocument) {
     if (user.role === Role.admin) throw new UnauthorizedException("Permission Denied.");
     else if (user.role === Role.staff) user.role = Role.customer;
     else user.role = Role.staff;
@@ -217,7 +226,7 @@ export class UsersService {
    * @param user - The user object to be deleted.
    * @returns Resolves once the user has been deleted.
    */
-  async remove(user: Document & User) {
+  async remove(user: UserDocument) {
     await this.usersModel.findByIdAndDelete(user._id);
     if (user.avatar) this.filesService.removeFiles([user.avatar]);
     return;

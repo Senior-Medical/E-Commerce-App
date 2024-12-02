@@ -1,4 +1,10 @@
-import { ArgumentMetadata, Injectable, NotFoundException, PipeTransform, UnauthorizedException } from "@nestjs/common";
+import {
+  ArgumentMetadata,
+  Injectable,
+  NotFoundException,
+  PipeTransform,
+  UnauthorizedException
+} from "@nestjs/common";
 import { UsersService } from '../../users/users.service';
 
 /**
@@ -22,10 +28,7 @@ export class CheckEmailExistPipe implements PipeTransform{
     if (!user) throw new NotFoundException("User not found.");
     if (!user.verified) throw new UnauthorizedException("User not verified.");
     
-    return {
-      email,
-      user
-    };
+    return { email, user };
   }
 
 }

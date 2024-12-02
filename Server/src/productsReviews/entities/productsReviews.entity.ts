@@ -1,5 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Schema definition for the product reviews collection. It includes the
@@ -30,3 +34,5 @@ export class ProductsReviews {
 }
 
 export const ProductsReviewsSchema = SchemaFactory.createForClass(ProductsReviews);
+
+export type ProductsReviewsDocument = Document & ProductsReviews;

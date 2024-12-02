@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsEmail, Matches, IsOptional } from "class-validator";
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  Matches,
+  IsOptional
+} from "class-validator";
 
 /**
  * Defines the structure and validation rules for creating a new user.

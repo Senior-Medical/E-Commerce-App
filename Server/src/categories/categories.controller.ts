@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseInterceptors
+} from "@nestjs/common";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
@@ -9,8 +21,9 @@ import { UserDecorator } from "../users/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
-import { Category } from "./entities/categories.entity";
+import { Category, CategoryDocument } from "./entities/categories.entity";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
+import { UserDocument } from "src/users/entities/users.entity";
 
 /**
  * Controller class that defines the HTTP endpoints for managing categories. 
@@ -20,9 +33,7 @@ import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
 @Controller("categories")
 @Roles(Role.admin, Role.staff)
 export class CategoriesController{
-  constructor(
-    private readonly categoriesServices: CategoriesServices
-  ) { }
+  constructor(private readonly categoriesServices: CategoriesServices) { }
   
   /**
    * Retrieves all categories with populated created and updated by user info.
@@ -31,7 +42,7 @@ export class CategoriesController{
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<Category, Document> }) {
+  find(@Req() req: Request & { queryBuilder: Query<Category, CategoryDocument> }) {
     return this.categoriesServices.find(req).populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
@@ -42,7 +53,7 @@ export class CategoriesController{
    * @returns The category with populated user data.
    */
   @Get(":categoryId")
-  async findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document) {
+  async findOne(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument) {
     return (await category.populate("createdBy", "name username")).populate("updatedBy", "name username");
   }
 
@@ -54,7 +65,10 @@ export class CategoriesController{
    * @returns The created category.
    */
   @Post()
-  create(@Body() categoryData: CreateCategoryDto, @UserDecorator() user: Document) {
+  create(
+    @Body() categoryData: CreateCategoryDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.categoriesServices.create(categoryData, user);
   }
 
@@ -68,7 +82,11 @@ export class CategoriesController{
    */
   @Patch(":categoryId")
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document, @Body() categoryData: UpdateCategoryDto, @UserDecorator() user: Document) {
+  update(
+    @Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument,
+    @Body() categoryData: UpdateCategoryDto,
+    @UserDecorator() user: UserDocument
+  ) {
     return this.categoriesServices.update(category, categoryData, user);
   }
 
@@ -80,7 +98,7 @@ export class CategoriesController{
    */
   @Delete(":categoryId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: Document) {
+  async remove(@Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument) {
     await this.categoriesServices.remove(category);
   }
 }

@@ -46,8 +46,8 @@ import { UsersService } from "./users.service";
     {
         imports: [EncryptionModule],
         name: User.name,
-        useFactory: async (configService: ConfigService, encryptionService: EncryptionService) => createUserSchema(configService, encryptionService),
-        inject: [ConfigService, EncryptionService]
+        useFactory: async (encryptionService: EncryptionService) => createUserSchema(encryptionService),
+        inject: [EncryptionService]
       },
       {
         imports: [EncryptionModule],

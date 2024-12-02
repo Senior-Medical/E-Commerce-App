@@ -1,4 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable
+} from "@nestjs/common";
 import { ProductsReviewsService } from '../productsReviews.service';
 import { Role } from "src/auth/enums/roles.enum";
 

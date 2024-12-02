@@ -1,5 +1,13 @@
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min
+} from "class-validator";
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from "class-validator";
 
 /**
  * DTO for creating a new address.

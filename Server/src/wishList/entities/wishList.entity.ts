@@ -1,5 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Schema for the WishList collection.
@@ -24,3 +28,5 @@ const WishListSchema = SchemaFactory.createForClass(WishList);
 WishListSchema.index({ user: 1, product: 1 }, { unique: true });
 
 export { WishListSchema };
+
+export type WishListDocument = Document & WishList;

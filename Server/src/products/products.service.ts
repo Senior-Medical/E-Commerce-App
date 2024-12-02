@@ -1,12 +1,21 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException
+} from "@nestjs/common";
+import {
+  Model,
+  Query,
+  Types
+} from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { Request } from "express";
-import { Document, Model, Query, Types } from "mongoose";
-import { User } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
-import { Product } from "./entities/products.entity";
+import { Product, ProductDocument } from "./entities/products.entity";
 
 /**
  * Service responsible for managing product-related operations.
@@ -51,7 +60,7 @@ export class ProductsService {
    * @param conditions - Filtering criteria for retrieving products.
    * @returns List of products matching the criteria.
    */
-  find(req: Request & { queryBuilder: Query<Product, Document> }) {
+  find(req: Request & { queryBuilder: Query<Product, ProductDocument> }) {
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");
     return queryBuilder.select("-__v");
@@ -81,7 +90,7 @@ export class ProductsService {
    * @throws NotAcceptableException if validation fails.
    * @throws InternalServerErrorException for file handling or database errors.
    */
-  async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: Document) {
+  async create(productData: CreateProductDto, images: Array<Express.Multer.File>, user: UserDocument) {
     const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
@@ -121,7 +130,7 @@ export class ProductsService {
    * @returns The updated product.
    * @throws HttpException if validation or file handling fails.
    */
-  async update(product: Document & Product, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: Document & User) {
+  async update(product: ProductDocument, productData: UpdateProductDto, images: Array<Express.Multer.File>, user: UserDocument) {
     const existProduct = await this.productsModel.findOne({
       $or: [
         { name: productData.name },
@@ -147,16 +156,15 @@ export class ProductsService {
     }
     if (imagesNames.length) productInput.images = imagesNames;
 
-    let result: Document;
     const oldImages = product.images;
     try {
-      result = await product.set(productInput).save();
+      await product.set(productInput).save();
       if(productInput.images) this.filesService.removeFiles(oldImages);
     } catch (e) {
       if(productInput.images) this.filesService.removeFiles(productInput.images);
       throw e;
     }
-    return result;
+    return product;
   }
 
   /**
@@ -165,7 +173,7 @@ export class ProductsService {
    * @param product - The product to delete.
    * @returns void
    */
-  async remove(product: Document & Product) {
+  async remove(product: ProductDocument) {
     await this.productsModel.findByIdAndDelete(product._id);
     if (product.images) this.filesService.removeFiles(product.images);
     return;

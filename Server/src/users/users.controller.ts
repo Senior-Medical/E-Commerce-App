@@ -1,7 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
@@ -10,7 +21,7 @@ import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "./decorators/user.decorator";
 import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
-import { User } from "./entities/users.entity";
+import { User, UserDocument } from "./entities/users.entity";
 import { UserPermissionGuard } from "./guards/userPermisstion.guard";
 import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
 import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
@@ -40,7 +51,7 @@ export class UsersController{
   @Get()
   @Roles(Role.admin, Role.staff)
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<User, Document> }) {
+  find(@Req() req: Request & { queryBuilder: Query<User, UserDocument> }) {
     return this.usersService.find(req).select("-password");
   }
 
@@ -51,7 +62,7 @@ export class UsersController{
    * @returns The requested image file.
    */
   @Get("avatar")
-  serveImage(@UserDecorator() user: User) {
+  serveImage(@UserDecorator() user: UserDocument) {
     return this.filesService.serveFile(user.avatar);
   }
 
@@ -63,7 +74,7 @@ export class UsersController{
    */
   @Get(":userId")
   @UseGuards(UserPermissionGuard)
-  findOne(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+  findOne(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
     return this.usersService.getUserObject(user);
   }
 
@@ -79,7 +90,7 @@ export class UsersController{
   @UseGuards(UserPermissionGuard)
   @UseInterceptors(FileInterceptor("avatar"))
   update(
-    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User,
+    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument,
     @Body(UserValidationPipe) updateData: UpdateUsersDto,
     @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
   ) {
@@ -95,7 +106,10 @@ export class UsersController{
    */
   @Patch("password/:userId")
   @UseGuards(UserPermissionGuard)
-  updatePassword(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User, @Body() body: UpdatePasswordDto) {
+  updatePassword(
+    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument,
+    @Body() body: UpdatePasswordDto
+  ) {
     return this.usersService.updatePassword(user, body);
   }
 
@@ -107,7 +121,7 @@ export class UsersController{
    */
   @Patch("role/:userId")
   @Roles(Role.admin)
-  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
+  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
     return this.usersService.updateRole(user);
   }
 
@@ -119,7 +133,7 @@ export class UsersController{
    */
   @Delete(":userId")
   @UseGuards(UserPermissionGuard)
-  remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
+  remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
     return this.usersService.remove(user);
   }
 }

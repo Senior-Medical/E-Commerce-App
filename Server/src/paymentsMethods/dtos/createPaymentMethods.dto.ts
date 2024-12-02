@@ -1,4 +1,11 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, Validate } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  Validate
+} from "class-validator";
 import { LuhnValidationConstraint } from "../utils/luhnValidation";
 
 /**

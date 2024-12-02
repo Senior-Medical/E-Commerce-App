@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UsersModule } from "src/users/users.module";
 import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
@@ -52,8 +51,8 @@ import { LuhnValidationConstraint } from "./utils/luhnValidation";
     MongooseModule.forFeatureAsync([{
       imports: [EncryptionModule],
       name: PaymentMethods.name,
-      useFactory: (configService: ConfigService, encryptionService: EncryptionService) => createPaymentMethodsSchema(configService, encryptionService),
-      inject: [ConfigService, EncryptionService]
+      useFactory: (encryptionService: EncryptionService) => createPaymentMethodsSchema(encryptionService),
+      inject: [EncryptionService]
     }]),
     UsersModule,
     EncryptionModule,

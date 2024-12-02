@@ -1,4 +1,8 @@
-import { IsNotEmpty, IsString, Matches } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  Matches
+} from "class-validator";
 /**
  * Defines the structure and validation rules for updating a user's password.
  */

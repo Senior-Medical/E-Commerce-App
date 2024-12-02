@@ -1,5 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import {
+  Prop,
+  Schema,
+  SchemaFactory
+} from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 /**
  * Schema for the CartItem collection.
@@ -33,3 +37,5 @@ export class CartItem {
 const CartItemSchema = SchemaFactory.createForClass(CartItem);
 CartItemSchema.index({ user: 1, product: 1 }, { unique: true });
 export { CartItemSchema };
+
+export type CartItemDocument = Document & CartItem;

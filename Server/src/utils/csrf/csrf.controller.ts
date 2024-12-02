@@ -1,4 +1,9 @@
-import { Controller, Get, Req, Res } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Req,
+  Res
+} from "@nestjs/common";
 import { CsrfService } from './csrf.service';
 import { Request, Response } from "express";
 import { ConfigService } from '@nestjs/config';
@@ -13,7 +18,10 @@ export class CsrfController {
   ) { }
   
   @Get("token")
-  getCsrfToken(@Req() req: Request, @Res() res: Response) {
+  getCsrfToken(
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
     const token = this.csrfService.generateToken(req, res);
     const CSRF_COOKIE_NAME = this.configService.get<string>('CSRF_COOKIE_NAME') || '__Host-psifi.x-csrf-token';
 

@@ -1,19 +1,33 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotAcceptableException,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UploadedFiles,
+  UseInterceptors
+} from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { Document, Query } from "mongoose";
+import { Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { User } from "src/users/entities/users.entity";
+import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ImagesTypes } from "src/utils/files/enums/imagesTypes";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
-import { Product } from "./entities/products.entity";
+import { Product, ProductDocument } from "./entities/products.entity";
 import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
@@ -39,7 +53,7 @@ export class ProductsController {
   @Get()
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request & { queryBuilder: Query<Product, Document> }) {
+  find(@Req() req: Request & { queryBuilder: Query<Product, ProductDocument> }) {
     return this.productsService.find(req).populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
@@ -51,7 +65,7 @@ export class ProductsController {
    */
   @Get(":productId")
   @Public()
-  async findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+  async findOne(@Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument) {
     return (await (await product.populate("category", "name")).populate("createdBy", "name username")).populate("updatedBy", "name username");
   }
 
@@ -83,7 +97,7 @@ export class ProductsController {
   create(
     @Body(CategoryIdPipe) productData: CreateProductDto,
     @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
-    @UserDecorator() user: Document
+    @UserDecorator() user: UserDocument
   ) {
     return this.productsService.create(productData, images, user);
   }
@@ -103,10 +117,10 @@ export class ProductsController {
   @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(FilesInterceptor("images", 10))
   update(
-    @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product,
+    @Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument,
     @Body(CategoryIdPipe) productData: UpdateProductDto,
     @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
-    @UserDecorator() user: Document & User
+    @UserDecorator() user: UserDocument
   ) {
     return this.productsService.update(product, productData, images, user);
   }
@@ -121,7 +135,7 @@ export class ProductsController {
   @Delete(":productId")
   @Roles(Role.admin, Role.staff)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product) {
+  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument) {
     await this.productsService.remove(product);
   }
 }

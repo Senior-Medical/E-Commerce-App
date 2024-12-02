@@ -1,6 +1,15 @@
-import { HttpStatus, MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
+import {
+  HttpStatus,
+  MiddlewareConsumer,
+  Module,
+  ValidationPipe
+} from "@nestjs/common";
+import {
+  APP_FILTER,
+  APP_GUARD,
+  APP_PIPE
+} from "@nestjs/core";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { APP_FILTER, APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AddressesModule } from "./addresses/addresses.module";

@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
+import {
+  Injectable,
+  NotAcceptableException,
+  PipeTransform
+} from "@nestjs/common";
 import { CategoriesServices } from "src/categories/categories.service";
 import { CreateProductDto } from "../dtos/createProduct.dto";
 

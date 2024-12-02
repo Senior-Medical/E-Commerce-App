@@ -1,5 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, Length, Matches } from "class-validator";
-import { Document } from "mongoose";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches
+} from "class-validator";
+import { UserDocument } from "src/users/entities/users.entity";
+import { VerificationCodesDocument } from "src/users/entities/verificationCodes.entity";
 
 /**
  * DTO for resetting password with validation for email, password, and reset code.
@@ -19,6 +26,6 @@ export class ResetPasswordDto{
   @Length(6, 6)
   readonly code: string;
 
-  codeData: Document;
-  user: Document;
+  codeData: VerificationCodesDocument;
+  user: UserDocument;
 }
