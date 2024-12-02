@@ -64,4 +64,4 @@ import { LoggerModule } from "src/logger/logger.module";
     JwtStrategy
   ],
 })
-export class AuthModule{}
+export class AuthModule {}

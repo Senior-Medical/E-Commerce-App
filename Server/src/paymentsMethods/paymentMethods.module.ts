@@ -9,7 +9,7 @@ import { UsersModule } from "src/users/users.module";
 import { EncryptionModule } from "src/encryption/encryption.module";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForPaymentMethods } from "./middlewares/setApiFeatureVariablesForPaymentMethods.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * PaymentMethodsModule
@@ -63,7 +63,9 @@ import { SetApiFeatureVariableForPaymentMethods } from "./middlewares/setApiFeat
   providers: [PaymentMethodsService, LuhnValidationConstraint],
 })
 export class PaymentMethodsModule {
+  constructor(private readonly paymentMethodsService: PaymentMethodsService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForPaymentMethods).forRoutes(PaymentMethodsController);
+    consumer.apply(setApiFeatureVariables(this.paymentMethodsService)).forRoutes(PaymentMethodsController);
   }
 }

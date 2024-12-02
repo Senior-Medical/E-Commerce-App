@@ -13,7 +13,7 @@ import { EncryptionModule } from "src/encryption/encryption.module";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { CodesService } from "./services/codes.service";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForUsers } from "./middlewares/setApiFeatureVariablesForUsers.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * Manages user-related functionalities like account creation, updates, role management, and email/phone verification. 
@@ -71,7 +71,9 @@ import { SetApiFeatureVariableForUsers } from "./middlewares/setApiFeatureVariab
   exports: [UsersService, CodesService]
 })
 export class UsersModule {
+  constructor(private readonly usersService: UsersService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForUsers).forRoutes(UsersController);
+    consumer.apply(setApiFeatureVariables(this.usersService)).forRoutes(UsersController);
   }
 }

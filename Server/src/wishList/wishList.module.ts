@@ -4,8 +4,8 @@ import { WishList, WishListSchema } from "./entities/wishList.entity";
 import { WishListController } from "./wishList.controller";
 import { WishListService } from "./wishList.service";
 import { ProductsModule } from "src/products/products.module";
-import { SetApiFeatureVariableForWishList } from "./middlewares/setApiFeatureVariablesForWishList.middleware";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * WishList Module
@@ -34,7 +34,9 @@ import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
   exports: []
 })
 export class WishListModule {
+  constructor(private readonly wishListService: WishListService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForWishList).forRoutes(WishListController);
+    consumer.apply(setApiFeatureVariables(this.wishListService)).forRoutes(WishListController);
   }
 }

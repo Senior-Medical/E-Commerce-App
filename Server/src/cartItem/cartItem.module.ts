@@ -5,7 +5,7 @@ import { CartItemController } from "./cartItem.controller";
 import { CartItemService } from "./cartItem.service";
 import { ProductsModule } from "src/products/products.module";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForCartItem } from "./middlewares/setApiFeatureVariablesForCartItem.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * CartItem Module
@@ -36,7 +36,9 @@ import { SetApiFeatureVariableForCartItem } from "./middlewares/setApiFeatureVar
   providers: [CartItemService]
 })
 export class CartItemModule {
+  constructor(private readonly cartItemService: CartItemService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForCartItem).forRoutes(CartItemController);
+    consumer.apply(setApiFeatureVariables(this.cartItemService)).forRoutes(CartItemController);
   }
 }

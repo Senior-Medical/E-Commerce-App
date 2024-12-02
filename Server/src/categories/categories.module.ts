@@ -4,7 +4,7 @@ import { Category, CategorySchema } from "./entities/categories.entity";
 import { CategoriesController } from "./categories.controller";
 import { CategoriesServices } from "./categories.service";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForCategories } from "./middlewares/setApiFeatureVariablesForCategories.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * CategoriesModule
@@ -33,7 +33,9 @@ import { SetApiFeatureVariableForCategories } from "./middlewares/setApiFeatureV
   exports: [CategoriesServices]
 })
 export class CategoriesModule {
+  constructor(private readonly categoriesServices: CategoriesServices) { }
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForCategories).forRoutes(CategoriesController);
+    consumer.apply(setApiFeatureVariables(this.categoriesServices)).forRoutes(CategoriesController);
   }
 }

@@ -17,7 +17,7 @@ export class ApiFeatureInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
-    const { model, searchArray } = request.apiFeature; // The model is attached by middleware or service logic
+    const { model, searchArray } = request.apiFeature;
     if (!model) {
       return next.handle();
     }

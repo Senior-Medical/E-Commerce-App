@@ -5,7 +5,7 @@ import { AddressesController } from "./addresses.controller";
 import { AddressesService } from "./addresses.service";
 import { UsersModule } from "src/users/users.module";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForAddresses } from "./middlewares/setApiFeatureVariablesForAddresses.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * Address Module
@@ -51,7 +51,9 @@ import { SetApiFeatureVariableForAddresses } from "./middlewares/setApiFeatureVa
   providers: [AddressesService]
 })
 export class AddressesModule {
+  constructor(private readonly addressesService: AddressesService) { }
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForAddresses).forRoutes(AddressesController);
+    consumer.apply(setApiFeatureVariables(this.addressesService)).forRoutes(AddressesController);
   }
 }

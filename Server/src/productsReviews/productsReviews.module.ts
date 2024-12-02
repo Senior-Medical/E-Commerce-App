@@ -5,7 +5,7 @@ import { ProductsReviewsController } from "./productsReviews.controller";
 import { ProductsReviewsService } from './productsReviews.service';
 import { ProductsModule } from "src/products/products.module";
 import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForProductsReviews } from "./middlewares/setApiFeatureVariablesForProductsReviews.middleware";
+import { setApiFeatureVariables } from "src/common/middlewares/apiFeature.middleware";
 
 /**
  * - The module responsible for managing product reviews.
@@ -33,7 +33,9 @@ import { SetApiFeatureVariableForProductsReviews } from "./middlewares/setApiFea
   providers: [ProductsReviewsService],
 })
 export class ProductsReviewsModule {
+  constructor(private readonly productsReviewsService: ProductsReviewsService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForProductsReviews).forRoutes(ProductsReviewsController);
+    consumer.apply(setApiFeatureVariables(this.productsReviewsService)).forRoutes(ProductsReviewsController);
   }
 }
