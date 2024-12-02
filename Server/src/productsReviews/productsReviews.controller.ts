@@ -1,18 +1,18 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { Product } from "src/products/entities/products.entity";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
 import { UpdateProductReviewDto } from "./dtos/updateProductReview.dto";
+import { ProductsReviews } from "./entities/productsReviews.entity";
 import { ProductReviewPermissionGuard } from "./guards/productReviewPermission.guard";
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
-import { Request } from "express";
-import { ProductsReviews } from "./entities/productsReviews.entity";
-import { Product } from "src/products/entities/products.entity";
 
 /**
  * Controller for handling product review-related HTTP requests, including

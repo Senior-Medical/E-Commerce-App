@@ -1,14 +1,14 @@
-import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { MulterModule } from "@nestjs/platform-express";
+import { CategoriesModule } from "src/categories/categories.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
+import { FilesModule } from "src/utils/files/files.module";
+import { FilesService } from "src/utils/files/files.service";
 import { Product, ProductSchema } from "./entities/products.entity";
 import { ProductsController } from "./products.controller";
 import { ProductsService } from "./products.service";
-import { CategoriesModule } from "src/categories/categories.module";
-import { MulterModule } from "@nestjs/platform-express";
-import { FilesModule } from "src/files/files.module";
-import { FilesService } from "src/files/files.service";
-import { SetApiFeatureVariableForProduct } from "./middlewares/setApiFeatureVariablesForProduct.middleware";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
 
 /**
  * ProductsModule
@@ -46,8 +46,10 @@ import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
   providers: [ProductsService],
   exports: [ProductsService]
 })
-export class ProductsModule { 
+export class ProductsModule {
+  constructor(private readonly productsService: ProductsService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForProduct).forRoutes(ProductsController);
+    consumer.apply(setApiFeatureVariables(this.productsService)).forRoutes(ProductsController);
   }
 }

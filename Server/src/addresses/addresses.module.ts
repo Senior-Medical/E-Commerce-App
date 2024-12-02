@@ -1,11 +1,11 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Address, AddressSchema } from "./entities/addresses.entity";
+import { UsersModule } from "src/users/users.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
 import { AddressesController } from "./addresses.controller";
 import { AddressesService } from "./addresses.service";
-import { UsersModule } from "src/users/users.module";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForAddresses } from "./middlewares/setApiFeatureVariablesForAddresses.middleware";
+import { Address, AddressSchema } from "./entities/addresses.entity";
 
 /**
  * Address Module
@@ -51,7 +51,9 @@ import { SetApiFeatureVariableForAddresses } from "./middlewares/setApiFeatureVa
   providers: [AddressesService]
 })
 export class AddressesModule {
+  constructor(private readonly addressesService: AddressesService) { }
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForAddresses).forRoutes(AddressesController);
+    consumer.apply(setApiFeatureVariables(this.addressesService)).forRoutes(AddressesController);
   }
 }

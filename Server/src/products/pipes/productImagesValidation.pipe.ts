@@ -1,6 +1,6 @@
 import { ArgumentMetadata, Injectable, NotAcceptableException, PipeTransform } from "@nestjs/common";
-import { ImagesTypes } from "src/files/enums/imagesTypes";
-import { FilesService } from '../../files/files.service';
+import { ImagesTypes } from "src/utils/files/enums/imagesTypes";
+import { FilesService } from '../../utils/files/files.service';
 
 /**
  * Validates uploaded product images.

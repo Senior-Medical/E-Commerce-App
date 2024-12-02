@@ -6,13 +6,13 @@ import { Connection, Document, Model, Types } from "mongoose";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { User } from "src/users/entities/users.entity";
 import { CodePurpose, CodeType } from "src/users/enums/code.enum";
+import { EncryptionService } from "src/utils/encryption/encryption.service";
+import { CustomLoggerService } from "src/utils/logger/logger.service";
+import { CodesService } from '../users/services/codes.service';
 import { UsersService } from '../users/users.service';
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { RefreshToken } from "./entities/refreshTokens.entity";
-import { EncryptionService } from "src/encryption/encryption.service";
-import { CodesService } from '../users/services/codes.service';
-import { CustomLoggerService } from "src/logger/logger.service";
 
 /**
  * AuthService handles the authentication logic for user registration, login, verification,

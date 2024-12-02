@@ -1,19 +1,19 @@
 import { Module } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtModule } from "@nestjs/jwt";
+import { MongooseModule } from "@nestjs/mongoose";
+import { PassportModule } from "@nestjs/passport";
+import { MulterModule } from "@nestjs/platform-express";
+import { UsersModule } from "src/users/users.module";
+import { EncryptionModule } from "src/utils/encryption/encryption.module";
+import { FilesModule } from "src/utils/files/files.module";
+import { FilesService } from "src/utils/files/files.service";
+import { LoggerModule } from "src/utils/logger/logger.module";
 import { AuthController } from './auth.controller';
 import { AuthService } from "./auth.service";
-import { UsersModule } from "src/users/users.module";
-import { PassportModule } from "@nestjs/passport";
-import { LocalStrategy } from "./strategies/local.strategy";
-import { JwtModule } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import { JwtStrategy } from "./strategies/jwt.strategy";
-import { FilesModule } from "src/files/files.module";
-import { MulterModule } from "@nestjs/platform-express";
-import { FilesService } from "src/files/files.service";
-import { MongooseModule } from "@nestjs/mongoose";
 import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.entity";
-import { EncryptionModule } from "src/encryption/encryption.module";
-import { LoggerModule } from "src/logger/logger.module";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { LocalStrategy } from "./strategies/local.strategy";
 /**
  * AuthModule encapsulates authentication-related functionalities.
  * It provides services, controllers, and dependencies for user authentication,
@@ -64,4 +64,4 @@ import { LoggerModule } from "src/logger/logger.module";
     JwtStrategy
   ],
 })
-export class AuthModule{}
+export class AuthModule {}

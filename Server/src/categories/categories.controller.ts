@@ -1,17 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
+import { Request } from "express";
 import { Document, Query } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "../users/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
-import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
-import { Request } from "express";
 import { Category } from "./entities/categories.entity";
-import { User } from "src/users/entities/users.entity";
+import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
 
 /**
  * Controller class that defines the HTTP endpoints for managing categories. 

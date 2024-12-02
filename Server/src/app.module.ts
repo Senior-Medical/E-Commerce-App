@@ -7,19 +7,19 @@ import { AddressesModule } from "./addresses/addresses.module";
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/guards/jwtAuth.guard";
 import { RolesGuard } from "./auth/guards/roles.guard";
+import { CartItemModule } from "./cartItem/cartItem.module";
 import { CategoriesModule } from "./categories/categories.module";
-import { envVariablesValidationSchema } from "./common/config/envValidation.schema";
-import { RequestTimingMiddleware } from "./common/middlewares/requestTiming.middleware";
-import { LoggerExceptionFilter } from "./logger/filters/loggerException.filter";
-import { MessagingModule } from "./messaging/messaging.module";
 import { PaymentMethodsModule } from "./paymentsMethods/paymentMethods.module";
 import { ProductsModule } from "./products/products.module";
 import { ProductsReviewsModule } from "./productsReviews/productsReviews.module";
 import { UsersModule } from "./users/users.module";
-import { LoggerModule } from "./logger/logger.module";
+import { CsrfModule } from "./utils/csrf/csrf.module";
+import { LoggerExceptionFilter } from "./utils/logger/filters/loggerException.filter";
+import { LoggerModule } from "./utils/logger/logger.module";
+import { MessagingModule } from "./utils/messaging/messaging.module";
+import { envVariablesValidationSchema } from "./utils/shared/config/envValidation.schema";
+import { RequestTimingMiddleware } from "./utils/shared/middlewares/requestTiming.middleware";
 import { WishListModule } from "./wishList/wishList.module";
-import { CartItemModule } from "./cartItem/cartItem.module";
-import { CsrfModule } from "./csrf/csrf.module";
 
 @Module({
   imports: [

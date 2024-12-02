@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
+import { LoggerModule } from "src/utils/logger/logger.module";
 import { FilesService } from "./files.service";
-import { LoggerModule } from "src/logger/logger.module";
 
 /**
  * - Provides and exports the FilesService for handling file operations.

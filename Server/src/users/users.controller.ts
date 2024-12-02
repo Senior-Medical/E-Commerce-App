@@ -1,21 +1,21 @@
 import { Body, Controller, Delete, Get, Param, Patch, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { UsersService } from "./users.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Request } from "express";
+import { Document, Query } from "mongoose";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { Document, Query } from "mongoose";
-import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
-import { UserPermissionGuard } from "./guards/userPermisstion.guard";
-import { UpdateUsersDto } from "./dtos/updateUser.dto";
-import { UserValidationPipe } from "./pipes/userValidation.pipe";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
-import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
+import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
+import { FilesService } from "src/utils/files/files.service";
+import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "./decorators/user.decorator";
+import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
+import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { User } from "./entities/users.entity";
-import { FilesService } from "src/files/files.service";
-import { Request } from "express";
-import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { UserPermissionGuard } from "./guards/userPermisstion.guard";
+import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe";
+import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
+import { UserValidationPipe } from "./pipes/userValidation.pipe";
+import { UsersService } from "./users.service";
 
 /**
  * Handles user-related operations, including CRUD and role management.

@@ -1,11 +1,11 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { ProductsModule } from "src/products/products.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
 import { WishList, WishListSchema } from "./entities/wishList.entity";
 import { WishListController } from "./wishList.controller";
 import { WishListService } from "./wishList.service";
-import { ProductsModule } from "src/products/products.module";
-import { SetApiFeatureVariableForWishList } from "./middlewares/setApiFeatureVariablesForWishList.middleware";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
 
 /**
  * WishList Module
@@ -34,7 +34,9 @@ import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
   exports: []
 })
 export class WishListModule {
+  constructor(private readonly wishListService: WishListService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForWishList).forRoutes(WishListController);
+    consumer.apply(setApiFeatureVariables(this.wishListService)).forRoutes(WishListController);
   }
 }

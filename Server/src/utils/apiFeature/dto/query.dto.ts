@@ -1,6 +1,9 @@
 import { IsOptional, IsInt, IsString, Matches, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
+/**
+ * Data Transfer Object (DTO) for validating query parameters.
+ */
 export class QueryDto {
   @IsOptional()
   @Transform(({ value }) => parseInt(value))
@@ -28,8 +31,5 @@ export class QueryDto {
   @IsString()
   search?: string;
 
-  @IsOptional()
-  @IsString()
-  @Matches(/^{.*}$/) // Simple regex to ensure it's a JSON object
-  filters?: string; // e.g: ?filters={"price":{"gte":100,"lte":500},"category":"electronics","rating":{"gte":4}}
+  [key: string]: any;
 }

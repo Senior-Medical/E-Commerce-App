@@ -5,7 +5,7 @@ import { mkdir, unlink, writeFile } from "fs/promises";
 import { lookup } from "mime-types";
 import { memoryStorage } from "multer";
 import { extname, join } from "path";
-import { CustomLoggerService } from "src/logger/logger.service";
+import { CustomLoggerService } from "src/utils/logger/logger.service";
 import { v4 as uuidv4 } from 'uuid';
 import { ImagesTypes } from "./enums/imagesTypes";
 

@@ -1,15 +1,15 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
+import { UsersModule } from "src/users/users.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
+import { EncryptionModule } from "src/utils/encryption/encryption.module";
+import { EncryptionService } from "src/utils/encryption/encryption.service";
 import { PaymentMethods, createPaymentMethodsSchema } from "./entities/paymentMethods.entitiy";
 import { PaymentMethodsController } from "./paymentMethods.controller";
 import { PaymentMethodsService } from "./paymentMethods.service";
 import { LuhnValidationConstraint } from "./utils/luhnValidation";
-import { UsersModule } from "src/users/users.module";
-import { EncryptionModule } from "src/encryption/encryption.module";
-import { EncryptionService } from "src/encryption/encryption.service";
-import { ApiFeatureModule } from "src/apiFeature/apiFeature.module";
-import { SetApiFeatureVariableForPaymentMethods } from "./middlewares/setApiFeatureVariablesForPaymentMethods.middleware";
 
 /**
  * PaymentMethodsModule
@@ -63,7 +63,9 @@ import { SetApiFeatureVariableForPaymentMethods } from "./middlewares/setApiFeat
   providers: [PaymentMethodsService, LuhnValidationConstraint],
 })
 export class PaymentMethodsModule {
+  constructor(private readonly paymentMethodsService: PaymentMethodsService) { }
+  
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetApiFeatureVariableForPaymentMethods).forRoutes(PaymentMethodsController);
+    consumer.apply(setApiFeatureVariables(this.paymentMethodsService)).forRoutes(PaymentMethodsController);
   }
 }

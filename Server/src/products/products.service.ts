@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { Request } from "express";
 import { Document, Model, Query, Types } from "mongoose";
+import { User } from "src/users/entities/users.entity";
+import { FilesService } from '../utils/files/files.service';
 import { CreateProductDto } from "./dtos/createProduct.dto";
 import { UpdateProductDto } from "./dtos/updateProduct.dto";
 import { Product } from "./entities/products.entity";
-import { FilesService } from '../files/files.service';
-import { Request } from "express";
-import { User } from "src/users/entities/users.entity";
 
 /**
  * Service responsible for managing product-related operations.

@@ -1,14 +1,13 @@
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { ConfigService } from '@nestjs/config';
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Request } from "express";
 import { Connection, Document, Model, Query, Types } from "mongoose";
-import { EncryptionService } from '../encryption/encryption.service';
+import { Role } from "src/auth/enums/roles.enum";
+import { User } from "src/users/entities/users.entity";
+import { EncryptionService } from '../utils/encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethods } from "./entities/paymentMethods.entitiy";
-import { Role } from "src/auth/enums/roles.enum";
-import { User } from "src/users/entities/users.entity";
-import { Request } from "express";
 
 /**
  * PaymentMethodsService
