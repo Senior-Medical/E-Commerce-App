@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotAcceptableException, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { Document } from "mongoose";
+import { Document, Query } from "mongoose";
 import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -16,6 +16,8 @@ import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
+import { Product } from "./entities/products.entity";
+import { User } from "src/users/entities/users.entity";
 
 /**
  * Controller for managing product-related operations.
@@ -37,7 +39,7 @@ export class ProductsController {
   @Get()
   @Public()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request) {
+  find(@Req() req: Request & { queryBuilder: Query<Product, Document> }) {
     return this.productsService.find(req).populate("category", "name").populate("createdBy", "name username").populate("updatedBy", "name username");
   }
 
@@ -101,10 +103,10 @@ export class ProductsController {
   @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(FilesInterceptor("images", 10))
   update(
-    @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document,
+    @Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product,
     @Body(CategoryIdPipe) productData: UpdateProductDto,
     @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
-    @UserDecorator() user: Document
+    @UserDecorator() user: Document & User
   ) {
     return this.productsService.update(product, productData, images, user);
   }
@@ -119,7 +121,7 @@ export class ProductsController {
   @Delete(":productId")
   @Roles(Role.admin, Role.staff)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document) {
+  async remove(@Param("productId", ObjectIdPipe, ProductIdPipe) product: Document & Product) {
     await this.productsService.remove(product);
   }
 }

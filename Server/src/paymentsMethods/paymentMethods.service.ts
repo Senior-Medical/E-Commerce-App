@@ -1,12 +1,14 @@
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Connection, Document, Model, Types } from "mongoose";
+import { Connection, Document, Model, Query, Types } from "mongoose";
 import { EncryptionService } from '../encryption/encryption.service';
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethods } from "./entities/paymentMethods.entitiy";
 import { Role } from "src/auth/enums/roles.enum";
+import { User } from "src/users/entities/users.entity";
+import { Request } from "express";
 
 /**
  * PaymentMethodsService
@@ -47,7 +49,7 @@ export class PaymentMethodsService {
    * @param conditions - Optional: MongoDB query filter conditions.
    * @returns List of payment methods excluding the __v field.
    */
-  find(req: any) {
+  find(req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: Document & User }) {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     if (!queryBuilder) throw new InternalServerErrorException("Query builder not found.");

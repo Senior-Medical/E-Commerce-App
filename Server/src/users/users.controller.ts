@@ -3,7 +3,7 @@ import { UsersService } from "./users.service";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
-import { Document } from "mongoose";
+import { Document, Query } from "mongoose";
 import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
 import { UserPermissionGuard } from "./guards/userPermisstion.guard";
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
@@ -40,7 +40,7 @@ export class UsersController{
   @Get()
   @Roles(Role.admin, Role.staff)
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request) {
+  find(@Req() req: Request & { queryBuilder: Query<User, Document> }) {
     return this.usersService.find(req).select("-password");
   }
 
@@ -79,7 +79,7 @@ export class UsersController{
   @UseGuards(UserPermissionGuard)
   @UseInterceptors(FileInterceptor("avatar"))
   update(
-    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document,
+    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User,
     @Body(UserValidationPipe) updateData: UpdateUsersDto,
     @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
   ) {
@@ -95,7 +95,7 @@ export class UsersController{
    */
   @Patch("password/:userId")
   @UseGuards(UserPermissionGuard)
-  updatePassword(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document, @Body() body: UpdatePasswordDto) {
+  updatePassword(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User, @Body() body: UpdatePasswordDto) {
     return this.usersService.updatePassword(user, body);
   }
 
@@ -107,7 +107,7 @@ export class UsersController{
    */
   @Patch("role/:userId")
   @Roles(Role.admin)
-  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
     return this.usersService.updateRole(user);
   }
 
@@ -119,7 +119,7 @@ export class UsersController{
    */
   @Delete(":userId")
   @UseGuards(UserPermissionGuard)
-  remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+  remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
     return this.usersService.remove(user);
   }
 }

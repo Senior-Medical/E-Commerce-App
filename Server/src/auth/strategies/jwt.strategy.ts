@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @param payload - JWT payload
    * @returns user document if all checks pass
    */
-  async validate(payload: any) {
+  async validate(payload: {sub: string, refreshTokenId: string, iat: number}) {
     const refreshToken = await this.authService.findRefreshToken({_id: payload.refreshTokenId});
     const user = await this.usersService.findOne(payload.sub);
 

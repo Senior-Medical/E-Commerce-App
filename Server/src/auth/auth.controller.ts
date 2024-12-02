@@ -15,6 +15,7 @@ import { LocalAuthGuard } from "./guards/localAuth.guard";
 import { RefreshTokenGuard } from "./guards/refreshToken.guard";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
+import { User } from "src/users/entities/users.entity";
 
 /**
  * AuthController defines the routes and handlers for user authentication-related actions,
@@ -44,7 +45,7 @@ export class AuthController {
    */
   @Get("resendVerification/:userId")
   @Public()
-  resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document) {
+  resendVerification(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: Document & User) {
     return this.authService.resendVerification(user);
   }
 

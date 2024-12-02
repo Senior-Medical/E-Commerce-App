@@ -13,6 +13,7 @@ import { RefreshToken } from "./entities/refreshTokens.entity";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { CodesService } from '../users/services/codes.service';
 import { CustomLoggerService } from "src/logger/logger.service";
+
 /**
  * AuthService handles the authentication logic for user registration, login, verification,
  * token management, and password reset.
@@ -254,7 +255,7 @@ export class AuthService{
    * @param user - The user whose verification codes need to be resent.
    * @returns - A message indicating what verification codes were sent.
    */
-  async resendVerification(user: any) {
+  async resendVerification(user: Document & User) {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {

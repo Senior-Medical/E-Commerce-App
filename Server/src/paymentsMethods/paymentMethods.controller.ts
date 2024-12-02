@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
-import { Document } from "mongoose";
+import { Document, Query } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
@@ -7,11 +7,10 @@ import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethodPermissionGuard } from "./guard/paymentMethodPermission.guard";
 import { PaymentMethodsService } from './paymentMethods.service';
 import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
-import { Roles } from "src/auth/decorators/roles.decorator";
-import { Role } from "src/auth/enums/roles.enum";
-import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
 import { Request } from "express";
+import { PaymentMethods } from "./entities/paymentMethods.entitiy";
+import { User } from "src/users/entities/users.entity";
 
 /**
  * PaymentMethodsController
@@ -35,7 +34,7 @@ export class PaymentMethodsController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request) {
+  find(@Req() req: Request & { queryBuilder: Query<PaymentMethods, Document>, user: Document & User }) {
     return this.paymentMethodsService.find(req).populate("user", "name username");
   }
 

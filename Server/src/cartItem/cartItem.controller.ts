@@ -1,11 +1,14 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
 import { CartItemService } from './cartItem.service';
 import { UserDecorator } from "src/users/decorators/user.decorator";
-import { Document } from "mongoose";
+import { Document, Query } from "mongoose";
 import { ObjectIdPipe } from "src/common/pipes/ObjectIdValidation.pipe";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
 import { Request } from "express";
 import { ApiFeatureInterceptor } from "src/apiFeature/interceptors/apiFeature.interceptor";
+import { CartItem } from "./entities/cartItem.entity";
+import { User } from "src/users/entities/users.entity";
+import { Product } from "src/products/entities/products.entity";
 
 /**
  * Controller for handling cart item API endpoints.
@@ -21,7 +24,7 @@ export class CartItemController {
    */
   @Get()
   @UseInterceptors(ApiFeatureInterceptor)
-  find(@Req() req: Request) {
+  find(@Req() req: Request & { user: Document & User, queryBuilder: Query<CartItem, Document> }) {
     return this.cartItemService.find(req);
   }
 
@@ -33,7 +36,7 @@ export class CartItemController {
    * @returns The created cart item.
    */
   @Post(":productId") 
-  create(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document, @Body("quantity", ParseIntPipe) quantity: number, @UserDecorator() user: Document) {
+  create(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document & Product, @Body("quantity", ParseIntPipe) quantity: number, @UserDecorator() user: Document & User) {
     return this.cartItemService.create(product, quantity, user);
   }
 
@@ -46,7 +49,7 @@ export class CartItemController {
    */
   @Patch(":productId")
   @HttpCode(HttpStatus.ACCEPTED)
-  update(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document, @Body("quantity", ParseIntPipe) quantity: number, @UserDecorator() user: Document) {
+  update(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document & Product, @Body("quantity", ParseIntPipe) quantity: number, @UserDecorator() user: Document & User) {
     return this.cartItemService.update(product, quantity, user);
   }
 
@@ -58,7 +61,7 @@ export class CartItemController {
    */
   @Delete(":productId")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document, @UserDecorator() user: any) {
+  async remove(@Param('productId', ObjectIdPipe, ProductIdPipe) product: Document, @UserDecorator() user: Document) {
     await this.cartItemService.remove(product, user);
   }
 }
