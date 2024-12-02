@@ -13,6 +13,7 @@ import { FilesService } from "src/files/files.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { getRefreshTokenSchema, RefreshToken } from "./entities/refreshTokens.entity";
 import { EncryptionModule } from "src/encryption/encryption.module";
+import { LoggerModule } from "src/logger/logger.module";
 /**
  * AuthModule encapsulates authentication-related functionalities.
  * It provides services, controllers, and dependencies for user authentication,
@@ -53,7 +54,8 @@ import { EncryptionModule } from "src/encryption/encryption.module";
         inject: [ConfigService]
       }
     ]),
-    EncryptionModule
+    EncryptionModule,
+    LoggerModule
   ],
   controllers: [AuthController],
   providers: [

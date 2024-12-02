@@ -46,24 +46,10 @@ export class CodesService {
       purpose,
       user: user._id
     };
-
     const existingCode = await this.codesModel.findOne({ value });
     if(existingCode) await existingCode.deleteOne({ session });
-
     const code = (await this.codesModel.create([{ ...codeData }], { session }))[0];
-    const baseUrl = this.configService.get<string>("BASE_URL");
-    const message = this.getMessageForCode(baseUrl, code, purpose);
-    
-    if (code.type === CodeType.EMAIL) this.messagingService.sendEmail({
-      to: code.value,
-      subject: purpose,
-      message
-    });
-    else this.messagingService.sendSMS({
-      message,
-      to: code.value 
-    });
-
+    this.messagingService.send(code)
     return code;
   }
 

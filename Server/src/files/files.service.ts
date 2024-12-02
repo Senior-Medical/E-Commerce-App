@@ -1,13 +1,13 @@
 import { Injectable, NotAcceptableException, NotFoundException, StreamableFile } from "@nestjs/common";
-import { createReadStream, existsSync } from "fs";
-import { unlink, mkdir, writeFile } from "fs/promises";
-import path, { extname, join } from "path";
 import { ConfigService } from '@nestjs/config';
+import { createReadStream, existsSync } from "fs";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import { lookup } from "mime-types";
 import { memoryStorage } from "multer";
-import {v4 as uuidv4} from 'uuid';
+import { extname, join } from "path";
 import { CustomLoggerService } from "src/logger/logger.service";
-import { UploadDirs } from "./enums/uploadDirs.enum";
+import { v4 as uuidv4 } from 'uuid';
+import { ImagesTypes } from "./enums/imagesTypes";
 
 const MAGIC_NUMBERS: Record<string, string> = {
   'FFD8FF': 'image/jpeg',               // JPEG
@@ -172,10 +172,10 @@ export class FilesService {
    * @param mimeType - The MIME type of the file.
    * @returns A unique filename with the appropriate extension.
    */
-  generateFilename(mimeType: string, dir: UploadDirs): string {
+  generateFilename(mimeType: string, imageType: ImagesTypes): string {
     const uuid = uuidv4();
     const ext = mimeType.split("/").pop();
-    return path.join(dir, `${uuid}.${ext}`);
+    return `${imageType}-${uuid}.${ext}`;
   }
 
   /**

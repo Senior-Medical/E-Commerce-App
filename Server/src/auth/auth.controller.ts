@@ -7,7 +7,6 @@ import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
 import { UserIdValidationPipe } from "src/users/pipes/userIdValidation.pipe";
 import { UserValidationPipe } from "src/users/pipes/userValidation.pipe";
-import { CodeIdVerificationPipe } from "../users/pipes/codeIdVerification.pipe";
 import { AuthService } from './auth.service';
 import { Public } from "./decorators/public.decorator";
 import { RequestToResetPasswordDto } from "./dtos/requestToResetPassword.dto";
@@ -33,8 +32,8 @@ export class AuthController {
    */
   @Get("verify/:codeId")
   @Public()
-  verify(@Param("codeId", ObjectIdPipe, CodeIdVerificationPipe) code: Document) {
-    return this.authService.verify(code);
+  verify(@Param("codeId") codeId: string) {
+    return this.authService.verify(codeId);
   }
 
   /**

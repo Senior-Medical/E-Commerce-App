@@ -12,6 +12,7 @@ import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { RefreshToken } from "./entities/refreshTokens.entity";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { CodesService } from '../users/services/codes.service';
+import { CustomLoggerService } from "src/logger/logger.service";
 /**
  * AuthService handles the authentication logic for user registration, login, verification,
  * token management, and password reset.
@@ -25,7 +26,8 @@ export class AuthService{
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly encryptionService: EncryptionService,
-    private readonly codesService: CodesService
+    private readonly codesService: CodesService,
+    private readonly loggerService: CustomLoggerService
   ) { }
 
   /**
@@ -122,24 +124,32 @@ export class AuthService{
    * @param code - The verification code.
    * @returns - A success message indicating the result of the verification.
    */
-  async verify(code: any) {
+  async verify(codeId: string) {
+    const successTitle = "Verification Successful";
+    const failTitle = "Verification Failed";
+    const loggerContext = "AuthController.verify";
+
+    if (!Types.ObjectId.isValid(codeId)) {
+      this.loggerService.error("Sorry, This link is invalid.", loggerContext);
+      return this.generateVerifyPage(failTitle, "Sorry, This link is invalid.", false);
+    }
+
+    const code = await this.codesService.findCode({_id: codeId});
+    if (!code || code.expireAt < new Date()) {
+      if (code) code.deleteOne();
+      this.loggerService.error("Sorry, This link has expired.", loggerContext);
+      return this.generateVerifyPage(failTitle, "Sorry, This link has expired.", false);;
+    };
+
     const updateData: Partial<User> = {};
     const user = await this.usersService.findOne(code.user.toString());
     
-    let message = "Account verified successfully you can now login.";
-
     if (code.type === CodeType.EMAIL) {
-      if (code.purpose === CodePurpose.UPDATE_EMAIL) {
-        updateData.email = code.value;
-        message = "Email updated successfully.";
-      }
+      if (code.purpose === CodePurpose.UPDATE_EMAIL) updateData.email = code.value;
       updateData.emailValidated = true;
     }
     else {
-      if (code.purpose === CodePurpose.UPDATE_PHONE) {
-        updateData.phone = code.value;
-        message = "Phone updated successfully.";
-      }
+      if (code.purpose === CodePurpose.UPDATE_PHONE) updateData.phone = code.value;
       updateData.phoneValidated = true;
     }
     updateData.verified = true;
@@ -147,15 +157,16 @@ export class AuthService{
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      await user.set(updateData).save({session});
+      await user.set(updateData).save({ session });
       await code.deleteOne({session});
       await session.commitTransaction();
       session.endSession();
-      return {message};
+      return this.generateVerifyPage(successTitle, "Your account has been verified successfully. You can now login.", true);
     } catch (e) {
       await session.abortTransaction();
       session.endSession();
-      throw e;
+      this.loggerService.error(e, loggerContext);
+      return this.generateVerifyPage(failTitle, "Internal server error, try again later.", false);
     }
   }
 
@@ -274,5 +285,20 @@ export class AuthService{
       session.endSession();
       throw e;
     }
+  }
+
+  generateVerifyPage(title: string, message: string, success: boolean) {
+    return `
+      <html>
+        <body style="font-family: Arial, sans-serif; color: #333; background: ${success ? "#f9f9f9" : "#c19e9e"};">
+          <div style="max-width: 1000px; margin: 5rem auto; padding: 20px; border-radius: 8px;">
+            <h2 style="text-align: center; color: ${success ? "#4CAF50" : "#c11e1e"}; margin-bottom: 3rem; font-size: 3.5rem;">${title}</h2>
+            <p style="text-align: center; font-size: 2rem; font-weight: bold;">${message}</p>
+            <p style="text-align: center; font-size: 1.5rem;">If you didn't request this, please ignore this page.</p>
+            <p style="text-align: center; font-size: 1.3rem;">Thank you for using our service.</p>
+          </div>
+        </body>
+      </html>
+    `;
   }
 }

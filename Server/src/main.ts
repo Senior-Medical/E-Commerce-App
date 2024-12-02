@@ -29,7 +29,7 @@ async function bootstrap() {
 
   await app.listen(port, () => {
     const baseUrl = configService.get<string>("BASE_URL") || `http://localhost:${port}`;
-    Logger.log(`Server listen on link: ${baseUrl}/${globalPrefix}/v${defaultVersion}`, 'Bootstrap');
+    Logger.log(`Server listen on URL: ${baseUrl}/${globalPrefix}/v${defaultVersion}`, 'Bootstrap');
   });
 }
 bootstrap();
