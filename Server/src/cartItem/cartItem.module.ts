@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ProductsModule } from "src/products/products.module";
 import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
-import { setApiFeatureVariables } from "src/utils/shared/middlewares/apiFeature.middleware";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
 import { CartItemController } from "./cartItem.controller";
 import { CartItemService } from "./cartItem.service";
 import { CartItem, CartItemSchema } from "./entities/cartItem.entity";

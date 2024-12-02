@@ -1,19 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { Query, Types } from "mongoose";
+import { QueryDto } from "./dto/query.dto";
 
-class QueryString {
-  page?: number;
-  pageSize?: number;
-  sort?: string;
-  fields?: string;
-  search?: string;
-  [key: string]: any;
-}
-
+/**
+ * Service providing utility methods to apply API features (filtering, pagination, sorting, field selection, and search) to Mongoose queries.
+ */
 @Injectable()
 export class ApiFeatureService {
-  filter(query: Query<any, any>, queryString: QueryString) {
-    const filterObj = { ...queryString };
+  /**
+   * Applies filtering to the query based on query string parameters.
+   * 
+   * @param query - The Mongoose query object.
+   * @param requestQuery - Parsed query string object.
+   * @returns The modified Mongoose query.
+   */
+  filter(query: Query<any, any>, requestQuery: QueryDto) {
+    const filterObj = { ...requestQuery };
     delete filterObj.page;
     delete filterObj.pageSize;
     delete filterObj.sort;
@@ -33,34 +35,63 @@ export class ApiFeatureService {
     return query;
   }
   
-  paginate(query: Query<any, any>, queryString: QueryString) {
-    const page = queryString.page && queryString.page > 0 ? queryString.page : 1;
-    const pageSize = queryString.pageSize && queryString.pageSize > 0 ? queryString.pageSize : 10;
+  /**
+   * Applies pagination to the query.
+   * 
+   * @param query - The Mongoose query object.
+   * @param requestQuery - Parsed query string object.
+   * @returns The modified Mongoose query.
+   */
+  paginate(query: Query<any, any>, requestQuery: QueryDto) {
+    const page = requestQuery.page && requestQuery.page > 0 ? requestQuery.page : 1;
+    const pageSize = requestQuery.pageSize && requestQuery.pageSize > 0 ? requestQuery.pageSize : 10;
     const skip = (page - 1) * pageSize;
 
     query.skip(skip).limit(pageSize);
     return query;
   }
 
-  sort(query: Query<any, any>, queryString: QueryString) {
-    if (queryString.sort) {
-      const sortBy = queryString.sort.replace(/,/g, ' ');
+  /**
+   * Applies sorting to the query.
+   * 
+   * @param query - The Mongoose query object.
+   * @param requestQuery - Parsed query string object.
+   * @returns The modified Mongoose query.
+   */
+  sort(query: Query<any, any>, requestQuery: QueryDto) {
+    if (requestQuery.sort) {
+      const sortBy = requestQuery.sort.replace(/,/g, ' ');
       query.sort(sortBy);
     }
     return query;
   }
 
-  selectFields(query: Query<any, any>, queryString: QueryString) {
-    if (queryString.fields) {
-      const fields = queryString.fields.replace(/,/g, ' ');
+  /**
+   * Selects specific fields in the query results.
+   * 
+   * @param query - The Mongoose query object.
+   * @param requestQuery - Parsed query string object.
+   * @returns The modified Mongoose query.
+   */
+  selectFields(query: Query<any, any>, requestQuery: QueryDto) {
+    if (requestQuery.fields) {
+      const fields = requestQuery.fields.replace(/,/g, ' ');
       query.select(fields);
     }
     return query;
   }
 
-  search(query: Query<any, any>, searchField: string[], queryString: QueryString) {
-    if (queryString.search) {
-      const searchRegex = new RegExp(queryString.search, 'i');
+  /**
+   * Performs a search operation on specified fields.
+   * 
+   * @param query - The Mongoose query object.
+   * @param searchField - Array of fields to perform the search on.
+   * @param requestQuery - Parsed query string object.
+   * @returns The modified Mongoose query.
+   */
+  search(query: Query<any, any>, searchField: string[], requestQuery: QueryDto) {
+    if (requestQuery.search) {
+      const searchRegex = new RegExp(requestQuery.search, 'i');
       let searchObject = searchField.map(field => ({ [field]: searchRegex }));
       query.find({ $or: searchObject });
     }
