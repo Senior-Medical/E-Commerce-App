@@ -54,5 +54,6 @@ export const envVariablesValidationSchema = Joi.object({
   
   // CSRF
   CSRF_SECRET: Joi.string().min(32).required(),
-  CSRF_HEADER: Joi.string().min(10).required(),
+  CSRF_COOKIE_NAME: Joi.string().default('__Host-psifi.x-csrf-token').required(),
+  CSRF_HEADER_NAME: Joi.string().default('x-csrf-token').required(),
 });
