@@ -29,4 +29,4 @@ WishListSchema.index({ user: 1, product: 1 }, { unique: true });
 
 export { WishListSchema };
 
-export type WishListDocument = Document & WishList;
+export type WishListDocument = Document<Types.ObjectId> & WishList;

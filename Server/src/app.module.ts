@@ -29,6 +29,7 @@ import { MessagingModule } from "./utils/messaging/messaging.module";
 import { envVariablesValidationSchema } from "./utils/shared/config/envValidation.schema";
 import { RequestTimingMiddleware } from "./utils/shared/middlewares/requestTiming.middleware";
 import { WishListModule } from "./wishList/wishList.module";
+import { OrdersModule } from "./orders/orders.module";
 
 @Module({
   imports: [
@@ -52,6 +53,8 @@ import { WishListModule } from "./wishList/wishList.module";
       inject: [ConfigService]
     }),
     LoggerModule,
+    CsrfModule,
+    MessagingModule,
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -59,10 +62,9 @@ import { WishListModule } from "./wishList/wishList.module";
     ProductsReviewsModule,
     AddressesModule,
     PaymentMethodsModule,
-    MessagingModule,
     WishListModule,
     CartItemModule,
-    CsrfModule
+    OrdersModule
   ],
   providers: [
     {

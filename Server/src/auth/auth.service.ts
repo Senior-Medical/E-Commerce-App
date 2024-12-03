@@ -1,6 +1,7 @@
 import {
   Connection,
   Model,
+  RootFilterQuery,
   Types
 } from "mongoose";
 import { ForbiddenException, Injectable } from "@nestjs/common";
@@ -97,7 +98,7 @@ export class AuthService{
     
     const inputData: RefreshToken = {
       token: refreshToken,
-      user: new Types.ObjectId(user._id.toString())
+      user: user._id
     };
 
     const session = await this.connection.startSession();
@@ -200,13 +201,13 @@ export class AuthService{
   }
 
   /**
-   * Retrieves a refresh token document based on the provided conditions.
+   * Retrieves a refresh token document based on the provided filters.
    * 
-   * @param conditions - Conditions to filter the refresh token.
+   * @param filter - filter to filter the refresh token.
    * @returns - The matching refresh token document.
    */
-  findRefreshToken(conditions: object = {}) {
-    return this.refreshTokenModel.findOne(conditions);
+  findRefreshToken(filter: RootFilterQuery<RefreshToken>) {
+    return this.refreshTokenModel.findOne(filter);
   }
 
   /**

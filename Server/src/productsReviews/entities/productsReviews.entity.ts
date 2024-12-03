@@ -35,4 +35,4 @@ export class ProductsReviews {
 
 export const ProductsReviewsSchema = SchemaFactory.createForClass(ProductsReviews);
 
-export type ProductsReviewsDocument = Document & ProductsReviews;
+export type ProductsReviewsDocument = Document<Types.ObjectId> & ProductsReviews;

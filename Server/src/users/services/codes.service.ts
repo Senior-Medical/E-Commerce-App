@@ -41,13 +41,13 @@ export class CodesService {
    * @param user - The user object to associate with the code.
    * @returns The created verification code document.
    */
-  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: UserDocument, session: ClientSession) {
+  async createCode(purpose: CodePurpose, value: string, type: CodeType, user: UserDocument, session?: ClientSession) {
     const codeData: VerificationCodes = {
       code: this.generateCode(),
       value,
       type,
       purpose,
-      user: new Types.ObjectId(user._id.toString())
+      user: user._id
     };
     const existingCode = await this.codesModel.findOne({ value });
     if(existingCode) await existingCode.deleteOne({ session });

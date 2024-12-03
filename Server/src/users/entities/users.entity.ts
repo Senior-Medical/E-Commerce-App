@@ -8,7 +8,7 @@ import { Role } from "src/auth/enums/roles.enum";
 import { PaymentMethods } from "src/paymentsMethods/entities/paymentMethods.entitiy";
 import { EncryptionService } from '../../utils/encryption/encryption.service';
 import { VerificationCodes } from "./verificationCodes.entity";
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 /**
  * - Represents a user in the system.
@@ -93,4 +93,4 @@ export const createUserSchema = (encryptionService: EncryptionService) => {
   return UserSchema;
 }
 
-export type UserDocument = Document & User;
+export type UserDocument = Document<Types.ObjectId> & User;

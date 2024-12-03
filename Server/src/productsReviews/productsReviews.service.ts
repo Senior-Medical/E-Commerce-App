@@ -50,7 +50,7 @@ export class ProductsReviewsService {
   /**
    * Retrieves a list of product reviews based on specified conditions.
    * 
-   * @param conditions - Filters to apply for fetching reviews.
+   * @param req - The request object contain query builder.
    * @returns Array of product reviews.
    */
   find(req: Request & { queryBuilder: Query<ProductsReviews, ProductsReviewsDocument> }, product: ProductDocument) {
@@ -84,7 +84,7 @@ export class ProductsReviewsService {
     reviewData.product = product._id;
     const reviewInput: ProductsReviews = {
       ...reviewData,
-      user: new Types.ObjectId(user._id as string)
+      user: user._id
     };
     return this.productsReviewsModel.create(reviewInput);
   }

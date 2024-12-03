@@ -118,4 +118,4 @@ export class Address {
 
 export const AddressSchema = SchemaFactory.createForClass(Address);
 
-export type AddressDocument = Document & Address;
+export type AddressDocument = Document<Types.ObjectId> & Address;
