@@ -33,7 +33,8 @@ import { CartItem, CartItemSchema } from "./entities/cartItem.entity";
     ApiFeatureModule
   ],
   controllers: [CartItemController],
-  providers: [CartItemService]
+  providers: [CartItemService],
+  exports: [CartItemService]
 })
 export class CartItemModule {
   constructor(private readonly cartItemService: CartItemService) { }

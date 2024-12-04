@@ -93,4 +93,4 @@ export const createPaymentMethodsSchema = (encryptionService: EncryptionService)
   return PaymentMethodsSchema;
 }
 
-export type PaymentMethodsDocument = Document & PaymentMethods;
+export type PaymentMethodsDocument = Document<Types.ObjectId> & PaymentMethods;

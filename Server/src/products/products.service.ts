@@ -57,7 +57,7 @@ export class ProductsService {
    * Retrieves all products matching the specified conditions.
    * Excludes version keys from the result.
    * 
-   * @param conditions - Filtering criteria for retrieving products.
+   * @param req - The request object contain query builder.
    * @returns List of products matching the criteria.
    */
   find(req: Request & { queryBuilder: Query<Product, ProductDocument> }) {
@@ -103,7 +103,7 @@ export class ProductsService {
     
     try {
       const imagesNames = await this.filesService.saveFiles(images);
-      const userId = new Types.ObjectId(user._id.toString());
+      const userId = user._id;
       const productInput: Product = {
         ...productData,
         images: imagesNames,
@@ -149,10 +149,9 @@ export class ProductsService {
       }
     }
 
-    const userId = new Types.ObjectId(user._id.toString());
     const productInput: Partial<Product> = {
       ...productData,
-      updatedBy: userId
+      updatedBy: user._id
     }
     if (imagesNames.length) productInput.images = imagesNames;
 

@@ -4,6 +4,7 @@ import {
   NotFoundException
 } from "@nestjs/common";
 import {
+  ClientSession,
   Connection,
   Model,
   Query,
@@ -45,7 +46,7 @@ export class CartItemService {
   }
   
   /**
-   * Retrieves all cart items for a user.
+   * Retrieves all cart items for a user depend on query params.
    * @param user - The user document.
    * @returns List of cart items with populated product details.
    */
@@ -53,6 +54,15 @@ export class CartItemService {
     const user = req.user;
     const queryBuilder = req.queryBuilder;
     return queryBuilder.find({ user: user._id }).select("-__v").populate("product", "name price images description code salesTimes");
+  }
+
+  /**
+   * Retrieves a cart item for user.
+   * @param userId - The user _id.
+   * @returns The cart item list with populated product details.
+   */
+  findByUser(userId: Types.ObjectId) {
+    return this.cartItemModel.find({ user: userId }).select("product quantity cost -_id");
   }
 
   /**
@@ -69,8 +79,8 @@ export class CartItemService {
 
     const cost = quantity * product.price;
     const inputData: CartItem = {
-      product: new Types.ObjectId(product._id.toString()),
-      user: new Types.ObjectId(user._id.toString()),
+      product: product._id,
+      user: user._id,
       quantity,
       cost
     };
@@ -133,5 +143,14 @@ export class CartItemService {
    */
   async remove(product: ProductDocument, user: UserDocument) {
     await this.cartItemModel.findOneAndDelete({ product: product._id, user: user._id });
+  }
+
+  /**
+   * Deletes cart items for a user.
+   * @param userId - The user ID.
+   * @returns The delete result.
+   */
+  async removeByUser(userId: Types.ObjectId, session?: ClientSession) {
+    await this.cartItemModel.deleteMany({ user: userId }, { session });
   }
 }

@@ -16,13 +16,13 @@ export class UserValidationPipe implements PipeTransform {
   
   async transform(body: CreateUsersDto, metadata: ArgumentMetadata) {
     let { email, phone, username } = body;
-    const conditions = []
-    if (email) conditions.push({ email });
-    if (phone) conditions.push({ phone });
-    if (username) conditions.push({ username });
+    const filters = []
+    if (email) filters.push({ email });
+    if (phone) filters.push({ phone });
+    if (username) filters.push({ username });
     const user = await this.usersService.findOneByCondition({
       $or: [
-        ...conditions
+        ...filters
       ]
     });
     if (user) throw new ConflictException('Email, phone or username are already exist.');

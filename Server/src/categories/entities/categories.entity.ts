@@ -37,4 +37,4 @@ export class Category {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
-export type CategoryDocument = Document & Category;
+export type CategoryDocument = Document<Types.ObjectId> & Category;

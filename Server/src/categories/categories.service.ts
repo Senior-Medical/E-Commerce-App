@@ -47,9 +47,9 @@ export class CategoriesServices{
   }
 
   /**
-   * Finds categories based on specified conditions.
+   * Finds categories based on specified operation of query builder.
    * 
-   * @param conditions - The search conditions.
+   * @param req - The request object contain query builder.
    * @returns List of categories that match the conditions.
    */
   find(req: Request & { queryBuilder: Query<Category, CategoryDocument> }) {
@@ -80,11 +80,10 @@ export class CategoriesServices{
     const category = await this.categoriesModel.findOne({ name: categoryData.name });
     if (category) throw new ConflictException('Category already exist.');
 
-    const userId = new Types.ObjectId(user._id as string);
     const inputData: Category = {
       ...categoryData,
-      createdBy: userId,
-      updatedBy: userId,
+      createdBy: user._id,
+      updatedBy: user._id,
     };
     return this.categoriesModel.create(inputData);
   }
@@ -104,7 +103,7 @@ export class CategoriesServices{
     
     const inputData: Partial<Category> = {
       ...categoryData,
-      updatedBy: new Types.ObjectId(user._id as string)
+      updatedBy: user._id
     };
     return category.set(inputData).save();
   }

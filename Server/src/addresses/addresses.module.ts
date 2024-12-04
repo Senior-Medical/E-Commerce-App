@@ -48,7 +48,8 @@ import { Address, AddressSchema } from "./entities/addresses.entity";
     ApiFeatureModule
   ],
   controllers: [AddressesController],
-  providers: [AddressesService]
+  providers: [AddressesService],
+  exports: [AddressesService]
 })
 export class AddressesModule {
   constructor(private readonly addressesService: AddressesService) { }

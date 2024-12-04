@@ -84,4 +84,4 @@ export const getVerificationCodesSchema = (configService: ConfigService, encrypt
   return VerificationCodesSchema;
 };
 
-export type VerificationCodesDocument = Document & VerificationCodes;
+export type VerificationCodesDocument = Document<Types.ObjectId> & VerificationCodes;

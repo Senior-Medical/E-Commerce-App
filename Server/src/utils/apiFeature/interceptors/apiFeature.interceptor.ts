@@ -47,7 +47,6 @@ export class ApiFeatureInterceptor implements NestInterceptor {
     queryBuilder = this.apiFeatureService.search(queryBuilder, searchArray, query);
 
     request.queryBuilder = queryBuilder;
-
     return next.handle();
   }
 }

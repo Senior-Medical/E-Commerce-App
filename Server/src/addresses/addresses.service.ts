@@ -15,7 +15,7 @@ import { UserDocument } from "src/users/entities/users.entity";
 /**
  * The AddressesService contains the business logic for managing user addresses.
  * It provides methods to:
- * - Find addresses based on conditions
+ * - Find addresses based on filters
  * - Find a specific address by ID
  * - Create, update, and delete addresses
  */
@@ -49,7 +49,7 @@ export class AddressesService {
   }
 
   /**
-   * Retrieves addresses based on specified conditions.
+   * Retrieves addresses based on specified query parameter.
    * @param req - Request object containing the query builder and user
    * @returns A list of addresses excluding the `__v` field
    */
@@ -79,7 +79,7 @@ export class AddressesService {
   create(addressData: CreateAddressDto, user: UserDocument) {
     const inputData: Address = {
       ...addressData,
-      user: new Types.ObjectId(user._id as string) // Converts the user ID to a valid MongoDB ObjectId
+      user: user._id // Converts the user ID to a valid MongoDB ObjectId
     };
     return this.addressesModel.create(inputData);
   }

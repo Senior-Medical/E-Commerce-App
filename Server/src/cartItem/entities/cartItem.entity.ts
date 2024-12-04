@@ -12,6 +12,16 @@ import { Document, Types } from "mongoose";
 @Schema({ timestamps: true })
 export class CartItem {
   @Prop({
+    required: true
+  })
+  quantity: number;
+
+  @Prop({
+    required: true
+  })
+  cost: number;
+
+  @Prop({
     required: true,
     ref: 'Product'
   })
@@ -22,20 +32,10 @@ export class CartItem {
     ref: 'User'
   })
   user: Types.ObjectId;
-
-  @Prop({
-    required: true
-  })
-  quantity: number;
-
-  @Prop({
-    required: true
-  })
-  cost: number;
 }
 
 const CartItemSchema = SchemaFactory.createForClass(CartItem);
 CartItemSchema.index({ user: 1, product: 1 }, { unique: true });
 export { CartItemSchema };
 
-export type CartItemDocument = Document & CartItem;
+export type CartItemDocument = Document<Types.ObjectId> & CartItem;

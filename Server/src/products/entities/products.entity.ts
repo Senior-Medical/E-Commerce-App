@@ -75,4 +75,4 @@ ProductSchema.post("findOneAndDelete", async function (doc, next) {
 
 export { ProductSchema };
 
-export type ProductDocument = Document & Product;
+export type ProductDocument = Document<Types.ObjectId> & Product;

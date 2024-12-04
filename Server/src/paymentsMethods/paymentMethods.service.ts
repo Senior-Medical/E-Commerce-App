@@ -52,9 +52,9 @@ export class PaymentMethodsService {
   }
 
   /**
-   * Retrieves a list of payment methods based on the specified conditions.
+   * Retrieves a list of payment methods based on the specified query builder.
    * 
-   * @param conditions - Optional: MongoDB query filter conditions.
+   * @param req - The request object contain query builder.
    * @returns List of payment methods excluding the __v field.
    */
   find(req: Request & { queryBuilder: Query<PaymentMethods, PaymentMethodsDocument>, user: UserDocument }) {
@@ -93,10 +93,9 @@ export class PaymentMethodsService {
     });
     if (paymentMethod) throw new ConflictException("Card Number already exist");
 
-    const userId = new Types.ObjectId(user._id as string);
     const inputData: PaymentMethods = {
       ...paymentMethodData,
-      user: userId
+      user: user._id
     };
 
     const session = await this.connection.startSession();
