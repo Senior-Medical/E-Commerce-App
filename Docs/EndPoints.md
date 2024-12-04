@@ -99,11 +99,11 @@
 
 ```
   GET /api/v1/orders - Get all orders.
-  GET /api/v1/orders/:userId - Get orders of specific user.
   GET /api/v1/orders/:orderId - Get a single order by ID.
   POST /api/v1/orders - Create a new order.
-  PUT /api/v1/orders/address/:orderId - update address of order.
-  PUT /api/v1/orders/status/:orderId - update status of order
+  PATCH /api/v1/orders/address/:orderId - update address of order.
+  PATCH /api/v1/orders/status/:orderId - update status of order
+  PATCH /api/v1/orders/cancel/:orderId - cancel a order
   DELETE /api/v1/orders/:orderId - Delete an order by ID.
 ```
 
@@ -115,17 +115,16 @@
   DELETE /api/v1/orders/orderItems/:orderId/:productId - Delete product from an order.
 ```
 
-**Reviews:**
+**Checkout:**
 
+```
+  POST /api/v1/orders/checkout - checkout the order
+```
+
+### Order Reviews
 ```
   GET /api/v1/orders/reviews/:orderId - Get the review of specific order.
   POST /api/v1/orders/reviews - Create a new review on specific order.
   PUT /api/v1/orders/reviews/:reviewId - Update a review by ID.
   DELETE /api/v1/orders/reviews/:reviewId - Delete a review by ID.
-```
-
-**Checkout:**
-
-```
-  POST /api/v1/orders/checkout - checkout the order
 ```
