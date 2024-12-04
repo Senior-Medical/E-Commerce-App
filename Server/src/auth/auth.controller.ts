@@ -13,7 +13,6 @@ import {
   UseInterceptors
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { CreateUsersDto } from "src/users/dtos/createUser.dto";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ProfileImagesValidationPipe } from "src/users/pipes/profileImageValidation.pipe";
@@ -28,6 +27,7 @@ import { LocalAuthGuard } from "./guards/localAuth.guard";
 import { RefreshTokenGuard } from "./guards/refreshToken.guard";
 import { CheckEmailExistPipe } from "./pipes/checkEmailExist.pipe";
 import { ResetPasswordPipe } from "./pipes/resetPassword.pipe";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * AuthController defines the routes and handlers for user authentication-related actions,
@@ -113,7 +113,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Public()
-  login(@UserDecorator() user: UserDocument) {
+  login(@GetObjectFromRequestDecorator('user') user: UserDocument) {
     return this.authService.login(user);
   }
 

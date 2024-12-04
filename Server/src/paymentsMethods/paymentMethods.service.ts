@@ -52,6 +52,13 @@ export class PaymentMethodsService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return PaymentMethods.name;
+  }
+
+  /**
    * Retrieves a list of payment methods based on the specified query builder.
    * 
    * @param req - The request object contain query builder.

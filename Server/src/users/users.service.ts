@@ -60,6 +60,13 @@ export class UsersService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return `W${User.name}`; // W is added to avoid conflict with other authenticaion user from JWT auth guard
+  }
+
+  /**
    * Removes sensitive fields from a user object.
    * 
    * @param user - The user document.

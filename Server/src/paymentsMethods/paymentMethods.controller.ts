@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Patch,
   Post,
   Req,
@@ -14,16 +13,14 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import { Query } from "mongoose";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
-import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreatePaymentMethodsDto } from "./dtos/createPaymentMethods.dto";
 import { UpdatePaymentMethodsDto } from "./dtos/updatePaymentMethods.dto";
 import { PaymentMethods, PaymentMethodsDocument } from "./entities/paymentMethods.entitiy";
 import { PaymentMethodPermissionGuard } from "./guard/paymentMethodPermission.guard";
 import { PaymentMethodsService } from './paymentMethods.service';
-import { PaymentMethodIdValidationPipe } from './pipes/paymentMethodIdValidation.pipe';
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * PaymentMethodsController
@@ -58,9 +55,9 @@ export class PaymentMethodsController {
    * @param paymentMethod - The validated and authorized payment method document.
    * @returns Payment method details.
    */
-  @Get(":paymentMethodId")
+  @Get(`:${PaymentMethodsService.getEntityName()}Id`)
   @UseGuards(PaymentMethodPermissionGuard)
-  findOne(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument) {
+  findOne(@GetObjectFromRequestDecorator(PaymentMethodsService.getEntityName()) paymentMethod: PaymentMethodsDocument) {
     return paymentMethod.populate("user", "name username");
   }
 
@@ -75,7 +72,7 @@ export class PaymentMethodsController {
   @Post()
   create(
     @Body() paymentMethodData: CreatePaymentMethodsDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.paymentMethodsService.create(paymentMethodData, user);
   }
@@ -89,13 +86,13 @@ export class PaymentMethodsController {
    * @param user - The authenticated user document.
    * @returns The updated payment method.
    */
-  @Patch(":paymentMethodId")
+  @Patch(`:${PaymentMethodsService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(PaymentMethodPermissionGuard)
   update(
-    @Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument,
+    @GetObjectFromRequestDecorator(PaymentMethodsService.getEntityName()) paymentMethod: PaymentMethodsDocument,
     @Body() paymentMethodData: UpdatePaymentMethodsDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.paymentMethodsService.update(paymentMethod, paymentMethodData, user);
   }
@@ -106,10 +103,10 @@ export class PaymentMethodsController {
    * - Removes the payment method from the database.
    * @param paymentMethod - The validated payment method document.
    */
-  @Delete(":paymentMethodId")
+  @Delete(`:${PaymentMethodsService.getEntityName()}Id`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(PaymentMethodPermissionGuard)
-  async remove(@Param("paymentMethodId", ObjectIdPipe, PaymentMethodIdValidationPipe) paymentMethod: PaymentMethodsDocument) {
+  async remove(@GetObjectFromRequestDecorator(PaymentMethodsService.getEntityName()) paymentMethod: PaymentMethodsDocument) {
     await this.paymentMethodsService.remove(paymentMethod);
   }
 }

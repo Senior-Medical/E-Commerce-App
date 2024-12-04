@@ -17,13 +17,13 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
-import { UserDecorator } from "../users/decorators/user.decorator";
 import { CategoriesServices } from "./categories.service";
 import { CreateCategoryDto } from "./dtos/creatCategory.dto";
 import { UpdateCategoryDto } from "./dtos/updateCategory.dto";
 import { Category, CategoryDocument } from "./entities/categories.entity";
 import { CategoryIdPipe } from "./pipes/categoryIdValidation.pipe";
 import { UserDocument } from "src/users/entities/users.entity";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Controller class that defines the HTTP endpoints for managing categories. 
@@ -67,7 +67,7 @@ export class CategoriesController{
   @Post()
   create(
     @Body() categoryData: CreateCategoryDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.categoriesServices.create(categoryData, user);
   }
@@ -85,7 +85,7 @@ export class CategoriesController{
   update(
     @Param("categoryId", ObjectIdPipe, CategoryIdPipe) category: CategoryDocument,
     @Body() categoryData: UpdateCategoryDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.categoriesServices.update(category, categoryData, user);
   }

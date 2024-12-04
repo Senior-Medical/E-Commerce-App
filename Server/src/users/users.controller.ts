@@ -18,7 +18,6 @@ import { Role } from "src/auth/enums/roles.enum";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { FilesService } from "src/utils/files/files.service";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
-import { UserDecorator } from "./decorators/user.decorator";
 import { UpdatePasswordDto } from "./dtos/updatePassword.dto";
 import { UpdateUsersDto } from "./dtos/updateUser.dto";
 import { User, UserDocument } from "./entities/users.entity";
@@ -27,6 +26,7 @@ import { ProfileImagesValidationPipe } from "./pipes/profileImageValidation.pipe
 import { UserIdValidationPipe } from "./pipes/userIdValidation.pipe";
 import { UserValidationPipe } from "./pipes/userValidation.pipe";
 import { UsersService } from "./users.service";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Handles user-related operations, including CRUD and role management.
@@ -62,7 +62,7 @@ export class UsersController{
    * @returns The requested image file.
    */
   @Get("avatar")
-  serveImage(@UserDecorator() user: UserDocument) {
+  serveImage(@GetObjectFromRequestDecorator('user') user: UserDocument) {
     return this.filesService.serveFile(user.avatar);
   }
 
@@ -72,9 +72,9 @@ export class UsersController{
    * @param user - The user object retrieved after validation.
    * @returns The user object with detailed information.
    */
-  @Get(":userId")
+  @Get(`:${UsersService.getEntityName()}Id`)
   @UseGuards(UserPermissionGuard)
-  findOne(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
+  findOne(@GetObjectFromRequestDecorator(UsersService.getEntityName()) user: UserDocument) {
     return this.usersService.getUserObject(user);
   }
 
@@ -86,11 +86,11 @@ export class UsersController{
    * @param avatar - An optional profile image file.
    * @returns The updated user object with the new details.
    */
-  @Patch(":userId")
+  @Patch(`:${UsersService.getEntityName()}Id`)
   @UseGuards(UserPermissionGuard)
   @UseInterceptors(FileInterceptor("avatar"))
   update(
-    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument,
+    @GetObjectFromRequestDecorator(UsersService.getEntityName()) user: UserDocument,
     @Body(UserValidationPipe) updateData: UpdateUsersDto,
     @UploadedFile(ProfileImagesValidationPipe) avatar: Express.Multer.File
   ) {
@@ -104,10 +104,10 @@ export class UsersController{
    * @param body - Contains the old and new passwords.
    * @returns A confirmation message or the updated user object.
    */
-  @Patch("password/:userId")
+  @Patch(`password/:${UsersService.getEntityName()}Id`)
   @UseGuards(UserPermissionGuard)
   updatePassword(
-    @Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument,
+    @GetObjectFromRequestDecorator(UsersService.getEntityName()) user: UserDocument,
     @Body() body: UpdatePasswordDto
   ) {
     return this.usersService.updatePassword(user, body);
@@ -119,9 +119,9 @@ export class UsersController{
    * @param user - The user object retrieved after validation.
    * @returns The updated user object with the new role.
    */
-  @Patch("role/:userId")
+  @Patch(`role/:${UsersService.getEntityName()}Id`)
   @Roles(Role.admin)
-  updateRole(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
+  updateRole(@Param(`${UsersService.getEntityName()}Id`, ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
     return this.usersService.updateRole(user);
   }
 
@@ -131,9 +131,9 @@ export class UsersController{
    * @param user - The user object retrieved after validation.
    * @returns A confirmation message or the deleted user object.
    */
-  @Delete(":userId")
+  @Delete(`:${UsersService.getEntityName()}Id`)
   @UseGuards(UserPermissionGuard)
-  remove(@Param("userId", ObjectIdPipe, UserIdValidationPipe) user: UserDocument) {
+  remove(@GetObjectFromRequestDecorator(UsersService.getEntityName()) user: UserDocument) {
     return this.usersService.remove(user);
   }
 }

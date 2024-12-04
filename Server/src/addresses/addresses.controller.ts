@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Patch,
   Post,
   Req,
@@ -14,16 +13,14 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import { Query } from "mongoose";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
-import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from "./dtos/createAddress.dto";
 import { UpdateAddressDto } from "./dtos/updateAddress.dto";
 import { Address, AddressDocument } from "./entities/addresses.entity";
 import { AddressPermissionGuard } from "./guards/addressPermission.guard";
-import { AddressIdPipe } from "./pipes/addressIdValidation.pipe";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * The AddressesController handles all API requests related to user addresses.
@@ -60,9 +57,9 @@ export class AddressesController {
    * @param address - The validated and authorized address document.
    * @returns Address details.
    */
-  @Get(":addressId")
+  @Get(`:${AddressesService.getEntityName()}Id`)
   @UseGuards(AddressPermissionGuard)
-  findOne(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument) {
+  findOne(@GetObjectFromRequestDecorator(AddressesService.getEntityName()) address: AddressDocument) {
     return address.populate("user", "name username");
   }
 
@@ -77,7 +74,7 @@ export class AddressesController {
   @Post()
   create(
     @Body() addressData: CreateAddressDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.addressesService.create(addressData, user);
   }
@@ -90,11 +87,11 @@ export class AddressesController {
    * @param addressData - DTO containing updated address details.
    * @returns The updated address.
    */
-  @Patch(":addressId")
+  @Patch(`:${AddressesService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AddressPermissionGuard)
   update(
-    @Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument,
+    @GetObjectFromRequestDecorator(AddressesService.getEntityName()) address: AddressDocument,
     @Body() addressData: UpdateAddressDto
   ) {
     return this.addressesService.update(address, addressData);
@@ -106,10 +103,10 @@ export class AddressesController {
    * - Removes the address from the database.
    * @param address - The validated address document.
    */
-  @Delete(":addressId")
+  @Delete(`:${AddressesService.getEntityName()}Id`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AddressPermissionGuard)
-  async remove(@Param("addressId", ObjectIdPipe, AddressIdPipe) address: AddressDocument) {
+  async remove(@GetObjectFromRequestDecorator(AddressesService.getEntityName()) address: AddressDocument) {
     await this.addressesService.remove(address);
   }
 }

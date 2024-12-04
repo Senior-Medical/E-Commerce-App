@@ -17,7 +17,6 @@ import { AddressDocument } from "src/addresses/entities/addresses.entity";
 import { AddressIdPipe } from "src/addresses/pipes/addressIdValidation.pipe";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
@@ -26,7 +25,7 @@ import { CreateOrderGuard } from "./guards/createOrder.guard";
 import { OrderPermissionGuard } from "./guards/orderPermission.guard";
 import { OrdersService } from './orders.service';
 import { OrderIdPipe } from "./pipes/orderId.pipe";
-import { OrderDecorator } from "./decorators/order.decorator";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Controller for managing orders operations
@@ -51,9 +50,9 @@ export class OrdersController {
    * @param order - The order document.
    * @returns The order document.
    */
-  @Get(":orderId")
+  @Get(`:${OrdersService.getEntityName()}Id`)
   @UseGuards(OrderPermissionGuard)
-  findOne(@OrderDecorator() order: OrderDocument) {
+  findOne(@GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument) {
     return order.populate("address", "-__v -createdAt -updatedAt");
   }
 
@@ -66,7 +65,7 @@ export class OrdersController {
   @Post()
   @UseGuards(CreateOrderGuard)
   create(
-    @UserDecorator() user: UserDocument,
+    @GetObjectFromRequestDecorator('user') user: UserDocument,
     @Body("address", ObjectIdPipe, AddressIdPipe) address: AddressDocument
   ) {
     return this.ordersService.create(user, address);
@@ -77,10 +76,10 @@ export class OrdersController {
    * @param order - The order document
    * @returns The updated order
    */
-  @Patch("status/:orderId")
+  @Patch(`status/:${OrdersService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @Roles(Role.admin, Role.staff)
-  updateStatus(@Param("orderId", ObjectIdPipe, OrderIdPipe) order: OrderDocument) {
+  updateStatus(@Param(`${OrdersService.getEntityName()}Id`, ObjectIdPipe, OrderIdPipe) order: OrderDocument) {
     return this.ordersService.updateStatus(order);
   }
 
@@ -89,10 +88,10 @@ export class OrdersController {
    * @param order - The order document
    * @returns The updated order
    */
-  @Patch("cancel/:orderId")
+  @Patch(`cancel/:${OrdersService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(OrderPermissionGuard)
-  cancelOrder(@OrderDecorator() order: OrderDocument) {
+  cancelOrder(@GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument) {
     return this.ordersService.cancelOrder(order);
   }
 
@@ -102,12 +101,12 @@ export class OrdersController {
    * @param address - The address document
    * @returns The updated order
    */
-  @Patch("address/:orderId")
+  @Patch(`address/:${OrdersService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(OrderPermissionGuard)
   updateAddress(
-    @OrderDecorator() order: OrderDocument,
-    @Body("address", ObjectIdPipe, AddressIdPipe) address: AddressDocument,
+    @GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument,
+    @Body(`address`, ObjectIdPipe, AddressIdPipe) address: AddressDocument,
   ) {
     return this.ordersService.updateAddress(order, address);
   }
@@ -117,10 +116,10 @@ export class OrdersController {
    * @param order - The order document
    * @returns void
    */
-  @Delete(":orderId")
+  @Delete(`:${OrdersService.getEntityName()}Id`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(Role.admin, Role.staff)
-  remove(@Param("orderId", ObjectIdPipe, OrderIdPipe) order: OrderDocument) {
+  remove(@Param(`${OrdersService.getEntityName()}Id`, ObjectIdPipe, OrderIdPipe) order: OrderDocument) {
     return this.ordersService.remove(order);
   }
 }
