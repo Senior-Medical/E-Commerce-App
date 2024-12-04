@@ -123,14 +123,13 @@ export class UsersService {
       if(createUsersDto.phone) await this.codesService.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user, session);
       
       await session.commitTransaction();
-      session.endSession();
-
       return this.getUserObject(user);
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
+    } finally {
+      session.endSession();
     }
   }
   
@@ -172,9 +171,7 @@ export class UsersService {
       await user.set(inputData).save({session});
       if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
       
-      await session.commitTransaction();
-      session.endSession();
-      
+      await session.commitTransaction();      
       message = "User updated successfully. " + message;
       return {
         message,
@@ -182,9 +179,10 @@ export class UsersService {
       };
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
+    } finally {
+      session.endSession();
     }
     
   }

@@ -90,14 +90,13 @@ export class OrdersService {
       user.cartTotal = 0;
       await user.save({ session });
       await this.cartItemService.removeByUser(user._id, session);
-
       await session.commitTransaction();
-      session.endSession();
       return {order: createdOrder, orderItems: createdOrderItems};
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 

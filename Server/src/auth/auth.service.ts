@@ -110,8 +110,6 @@ export class AuthService{
       await user.set({ lastLogin: new Date() }).save({session});
 
       await session.commitTransaction();
-      session.endSession();
-
       return {
         accessToken,
         refreshToken,
@@ -119,8 +117,9 @@ export class AuthService{
       };
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -166,13 +165,13 @@ export class AuthService{
       await user.set(updateData).save({ session });
       await code.deleteOne({session});
       await session.commitTransaction();
-      session.endSession();
       return this.generateVerifyPage(successTitle, "Your account has been verified successfully. You can now login.", true);
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       this.loggerService.error(e, loggerContext);
       return this.generateVerifyPage(failTitle, "Internal server error, try again later.", false);
+    } finally {
+      session.endSession();
     }
   }
 
@@ -222,12 +221,12 @@ export class AuthService{
     try {
       await this.codesService.createCode(CodePurpose.RESET_PASSWORD, requestToResetPasswordDto.email, CodeType.EMAIL, requestToResetPasswordDto.user, session);
       await session.commitTransaction();
-      session.endSession();
       return {message: `Please check your email for password reset code.`};
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -244,12 +243,12 @@ export class AuthService{
       await resetPasswordDto.codeData.deleteOne({session});
       await resetPasswordDto.user.set({ password: resetPasswordDto.password }).save({session});
       await session.commitTransaction();
-      session.endSession();
       return {message: "Password reset successfully."};
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
 
   }
@@ -283,13 +282,12 @@ export class AuthService{
       else message = "User already verified.";
       
       await session.commitTransaction();
-      session.endSession();
-
       return {message};
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 
