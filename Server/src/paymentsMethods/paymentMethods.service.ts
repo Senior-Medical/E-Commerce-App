@@ -52,6 +52,13 @@ export class PaymentMethodsService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return PaymentMethods.name;
+  }
+
+  /**
    * Retrieves a list of payment methods based on the specified query builder.
    * 
    * @param req - The request object contain query builder.
@@ -111,12 +118,12 @@ export class PaymentMethodsService {
       const paymentMethod = (await this.paymentMethodsModel.create([inputData], { session }))[0];
       
       await session.commitTransaction();
-      session.endSession();
       return paymentMethod;
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -158,12 +165,12 @@ export class PaymentMethodsService {
       await paymentMethod.set(inputData).save({ session });
       
       await session.commitTransaction();
-      session.endSession();
       return paymentMethod;
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 

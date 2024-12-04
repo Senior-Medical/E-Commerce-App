@@ -60,6 +60,13 @@ export class UsersService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return `W${User.name}`; // W is added to avoid conflict with other authenticaion user from JWT auth guard
+  }
+
+  /**
    * Removes sensitive fields from a user object.
    * 
    * @param user - The user document.
@@ -123,14 +130,13 @@ export class UsersService {
       if(createUsersDto.phone) await this.codesService.createCode(CodePurpose.VERIFY_PHONE, createUsersDto.phone, CodeType.PHONE, user, session);
       
       await session.commitTransaction();
-      session.endSession();
-
       return this.getUserObject(user);
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
+    } finally {
+      session.endSession();
     }
   }
   
@@ -172,9 +178,7 @@ export class UsersService {
       await user.set(inputData).save({session});
       if(oldImage && avatar) this.filesService.removeFiles([oldImage]);
       
-      await session.commitTransaction();
-      session.endSession();
-      
+      await session.commitTransaction();      
       message = "User updated successfully. " + message;
       return {
         message,
@@ -182,9 +186,10 @@ export class UsersService {
       };
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       if (avatar) this.filesService.removeFiles([avatar.filename]);
       throw e;
+    } finally {
+      session.endSession();
     }
     
   }

@@ -19,7 +19,6 @@ import { Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/roles.enum";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ImagesTypes } from "src/utils/files/enums/imagesTypes";
@@ -32,6 +31,7 @@ import { CategoryIdPipe } from './pipes/categoryIdValidation.pipe';
 import { ProductIdPipe } from "./pipes/productIdValidation.pipe";
 import { ProductImagesValidationPipe } from "./pipes/productImagesValidation.pipe";
 import { ProductsService } from './products.service';
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Controller for managing product-related operations.
@@ -97,7 +97,7 @@ export class ProductsController {
   create(
     @Body(CategoryIdPipe) productData: CreateProductDto,
     @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.productsService.create(productData, images, user);
   }
@@ -120,7 +120,7 @@ export class ProductsController {
     @Param("productId", ObjectIdPipe, ProductIdPipe) product: ProductDocument,
     @Body(CategoryIdPipe) productData: UpdateProductDto,
     @UploadedFiles(ProductImagesValidationPipe) images: Array<Express.Multer.File>,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.productsService.update(product, productData, images, user);
   }

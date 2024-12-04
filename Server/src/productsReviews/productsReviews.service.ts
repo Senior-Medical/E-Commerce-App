@@ -48,6 +48,13 @@ export class ProductsReviewsService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return ProductsReviews.name;
+  }
+
+  /**
    * Retrieves a list of product reviews based on specified conditions.
    * 
    * @param req - The request object contain query builder.

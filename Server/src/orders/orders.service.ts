@@ -45,6 +45,13 @@ export class OrdersService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return Order.name;
+  }
+
+  /**
    * Retrieves orders based on specified query parameter.
    * @param req - Request object containing the query builder and user
    * @returns A list of orders excluding the `__v` field
@@ -90,14 +97,13 @@ export class OrdersService {
       user.cartTotal = 0;
       await user.save({ session });
       await this.cartItemService.removeByUser(user._id, session);
-
       await session.commitTransaction();
-      session.endSession();
-      return {order: createdOrder, orderItems: createdOrderItems};
+      return { order: createdOrder, orderItems: createdOrderItems };
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 

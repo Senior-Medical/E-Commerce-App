@@ -49,6 +49,13 @@ export class AddressesService {
   }
 
   /**
+   * Get the key that is used to save entity in the request and used to name the id in urls.
+   */
+  static getEntityName() {
+    return Address.name;
+  }
+
+  /**
    * Retrieves addresses based on specified query parameter.
    * @param req - Request object containing the query builder and user
    * @returns A list of addresses excluding the `__v` field

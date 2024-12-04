@@ -92,12 +92,12 @@ export class CartItemService {
       user.cartTotal += cost;
       await user.save({ session });
       await session.commitTransaction();
-      session.endSession();
       return cartItem;
     } catch(e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -126,12 +126,12 @@ export class CartItemService {
       await cartItem.save({ session });
       await user.save({ session });
       await session.commitTransaction();
-      session.endSession();
       return cartItem;
     } catch (e) {
       await session.abortTransaction();
-      session.endSession();
       throw e;
+    } finally {
+      session.endSession();
     }
   }
 

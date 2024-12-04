@@ -16,7 +16,7 @@ export class CreateOrderGuard implements CanActivate {
   constructor(private readonly addressesService: AddressesService) { }
 
   async canActivate(context: ExecutionContext) {
-    const addressId = context.switchToHttp().getRequest().body.addressId;
+    const addressId = context.switchToHttp().getRequest().body.address;
     if (!addressId) throw new BadRequestException("Address id is required");
 
     const address = await this.addressesService.findOne(addressId);

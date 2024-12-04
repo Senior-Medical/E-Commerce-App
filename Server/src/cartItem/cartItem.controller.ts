@@ -14,14 +14,14 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import { Query } from "mongoose";
-import { Product, ProductDocument } from "src/products/entities/products.entity";
+import { ProductDocument } from "src/products/entities/products.entity";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { UserDocument } from "src/users/entities/users.entity";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CartItemService } from './cartItem.service';
 import { CartItem, CartItemDocument } from "./entities/cartItem.entity";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Controller for handling cart item API endpoints.
@@ -52,7 +52,7 @@ export class CartItemController {
   create(
     @Param('productId', ObjectIdPipe, ProductIdPipe) product: ProductDocument,
     @Body("quantity", ParseIntPipe) quantity: number,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.cartItemService.create(product, quantity, user);
   }
@@ -69,7 +69,7 @@ export class CartItemController {
   update(
     @Param('productId', ObjectIdPipe, ProductIdPipe) product: ProductDocument,
     @Body("quantity", ParseIntPipe) quantity: number,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.cartItemService.update(product, quantity, user);
   }
@@ -84,7 +84,7 @@ export class CartItemController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(
     @Param('productId', ObjectIdPipe, ProductIdPipe) product: ProductDocument,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     await this.cartItemService.remove(product, user);
   }

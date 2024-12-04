@@ -17,7 +17,6 @@ import { Query } from "mongoose";
 import { Public } from "src/auth/decorators/public.decorator";
 import { ProductDocument } from "src/products/entities/products.entity";
 import { ProductIdPipe } from "src/products/pipes/productIdValidation.pipe";
-import { UserDecorator } from "src/users/decorators/user.decorator";
 import { ApiFeatureInterceptor } from "src/utils/apiFeature/interceptors/apiFeature.interceptor";
 import { ObjectIdPipe } from "src/utils/shared/pipes/ObjectIdValidation.pipe";
 import { CreateProductReviewDto } from "./dtos/createProductReview.dto";
@@ -27,6 +26,7 @@ import { ProductReviewPermissionGuard } from "./guards/productReviewPermission.g
 import { ProductReviewIdPipe } from "./pipes/productReviewIdValidation.pipe";
 import { ProductsReviewsService } from './productsReviews.service';
 import { UserDocument } from "src/users/entities/users.entity";
+import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
 
 /**
  * Controller for handling product review-related HTTP requests, including
@@ -71,7 +71,7 @@ export class ProductsReviewsController {
   @Post()
   create(
     @Body() reviewData: CreateProductReviewDto,
-    @UserDecorator() user: UserDocument
+    @GetObjectFromRequestDecorator('user') user: UserDocument
   ) {
     return this.productsReviewsService.create(reviewData, user);
   }
@@ -83,11 +83,11 @@ export class ProductsReviewsController {
    * @param reviewData - Data to update the review with.
    * @returns Updated product review.
    */
-  @Patch(":reviewId")
+  @Patch(`:${ProductsReviewsService.getEntityName()}Id`)
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(ProductReviewPermissionGuard)
   update(
-    @Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument,
+    @GetObjectFromRequestDecorator(ProductsReviewsService.getEntityName()) review: ProductsReviewsDocument,
     @Body() reviewData: UpdateProductReviewDto
   ) {
     return this.productsReviewsService.update(review, reviewData);
@@ -99,10 +99,10 @@ export class ProductsReviewsController {
    * @param reviewId - Unique identifier of the review to delete.
    * @returns No content response.
    */
-  @Delete(":reviewId")
+  @Delete(`:${ProductsReviewsService.getEntityName()}Id`)
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(ProductReviewPermissionGuard)
-  async remove(@Param("reviewId", ObjectIdPipe, ProductReviewIdPipe) review: ProductsReviewsDocument) {
+  async remove(@GetObjectFromRequestDecorator(ProductsReviewsService.getEntityName()) review: ProductsReviewsDocument) {
     await this.productsReviewsService.remove(review);
   }
 }
