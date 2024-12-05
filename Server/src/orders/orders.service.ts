@@ -5,14 +5,15 @@ import {
   NotFoundException
 } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Connection, Model, Query } from "mongoose";
+import { ClientSession, Connection, Model, Query, Types } from "mongoose";
 import { AddressDocument } from "src/addresses/entities/addresses.entity";
 import { Role } from "src/auth/enums/roles.enum";
 import { CartItemService } from "src/cartItem/cartItem.service";
 import { UserDocument } from "src/users/entities/users.entity";
 import { Order, OrderDocument } from "./entities/orders.entity";
-import { OrderItemsService } from "./services/orderItem.service";
 import { OrderStatus } from "./enums/orderStatus.enum";
+import { OrderItem, OrderItemDocument } from "./entities/orderItem.entity";
+import { CartItemDocument } from "src/cartItem/entities/cartItem.entity";
 
 /**
  * Service for managing orders operations
@@ -21,9 +22,9 @@ import { OrderStatus } from "./enums/orderStatus.enum";
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItem>,
     @InjectConnection() private readonly connection: Connection,
-    private readonly orderItemService: OrderItemsService,
-    private readonly cartItemService: CartItemService,
+    private readonly cartItemService: CartItemService
   ) { }
 
   /**
@@ -52,6 +53,13 @@ export class OrdersService {
   }
 
   /**
+   * Get the entity name for use in permission guards.
+   */
+  static getItemEntityName() {
+    return OrderItem.name;
+  }
+
+  /**
    * Retrieves orders based on specified query parameter.
    * @param req - Request object containing the query builder and user
    * @returns A list of orders excluding the `__v` field
@@ -74,6 +82,24 @@ export class OrdersService {
   }
 
   /**
+   * Find order items by order ID.
+   * @param orderId - The order ID.
+   * @returns The order items.
+   */
+  async findItems(orderId: Types.ObjectId) {
+    return this.orderItemModel.find({ order: orderId });
+  }
+
+  /**
+   * Find order item by ID.
+   * @param orderItemId - The order item ID.
+   * @returns The order item.
+   */
+  async findOneItem(orderItemId: string) {
+    return this.orderItemModel.findById(orderItemId);
+  }
+
+  /**
    * Create a new order
    * @param user - The user document
    * @param address - The address document
@@ -93,7 +119,7 @@ export class OrdersService {
     session.startTransaction();
     try {
       const createdOrder = (await this.orderModel.create([order], { session }))[0];
-      const createdOrderItems = await this.orderItemService.create(cartItems, createdOrder._id, session);
+      const createdOrderItems = await this.createItem(cartItems, createdOrder._id, session);
       user.cartTotal = 0;
       await user.save({ session });
       await this.cartItemService.removeByUser(user._id, session);
@@ -105,6 +131,25 @@ export class OrdersService {
     } finally {
       session.endSession();
     }
+  }
+
+    /**
+   * Create order items for an order.
+   * @param cartItems - The cart items to create order items from.
+   * @param orderId - The order id.
+   * @param session - The session to use for the operation.
+   * @returns The created order items.
+   */
+  async createItem(cartItems: CartItemDocument[], orderId: Types.ObjectId, session?: ClientSession) {
+    const orderItems: OrderItem[] = cartItems.map((cartItem) => {
+      return {
+        quantity: cartItem.quantity,
+        cost: cartItem.cost,
+        product: cartItem.product,
+        order: orderId
+      }
+    });
+    return this.orderItemModel.create(orderItems, { session });
   }
 
   /**
@@ -154,11 +199,71 @@ export class OrdersService {
   }
 
   /**
+   * Update the cost of the order
+   * @param orderId - The order Id
+   * @param cost - The cost
+   * @returns The updated order
+   */
+  async updateCost(orderId: string, cost: number, session: ClientSession) {
+    return this.orderModel.findByIdAndUpdate(orderId, { $inc: { cost } }, { new: true, session });
+  }
+
+    /**
+   * Update quantity of product in an order item.
+   * @param orderItem - The order item document.
+   * @param quantity - The quantity to update.
+   * @returns The updated order item.
+   */
+  async updateItemQuantity(orderItem: OrderItemDocument, quantity: number) {
+    if (![OrderStatus.PROCESSING, OrderStatus.PENDING].includes((orderItem.order as any).status)) throw new ForbiddenException("Cannot update order item quantity for order with status other than 'Processing' or 'Pending'");
+    
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const oldCost = orderItem.cost;
+      orderItem.quantity = quantity;
+      orderItem.cost = (orderItem.product as any).price * quantity;
+      await orderItem.save({ session });
+      await this.updateCost(orderItem.order._id.toString(), orderItem.cost - oldCost, session);
+      await session.commitTransaction();
+      return orderItem;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  /**
    * Remove the order
    * @param order - The order document
    * @returns void
    */
   async remove(order: OrderDocument) {
     await order.deleteOne();
+  }
+
+  /**
+   * Remove order item by ID.
+   * @param orderItemId - The order item ID.
+   * @returns The removed order item.
+   */
+  async removeItem(orderItem: OrderItemDocument) {
+    if (![OrderStatus.PROCESSING, OrderStatus.PENDING].includes((orderItem.order as any).status)) throw new ForbiddenException("Cannot remove order item for order with status other than 'Processing' or 'Pending'");
+    
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await this.updateCost(orderItem.order._id.toString(), -orderItem.cost, session);
+      await orderItem.deleteOne({ session });
+      await session.commitTransaction();
+      return orderItem;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }

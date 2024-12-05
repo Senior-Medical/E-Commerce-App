@@ -110,9 +110,9 @@
 **OrderItem:**
 
 ```
-  POST /api/v1/orders/orderItems/:orderId/:productId - Add product to a specific order.
-  PUT /api/v1/orders/orderItems/:orderId/:productId - Update quantity of product in a specific order.
-  DELETE /api/v1/orders/orderItems/:orderId/:productId - Delete product from an order.
+GET /api/v1/orderItems/:orderId - Get order items of specific order.
+PATCH /api/v1/orderItems/:orderId/:productId - Update quantity of a product.
+DELETE /api/v1/orderItems/:orderId/:productId - Delete product from an order.
 ```
 
 **Checkout:**
