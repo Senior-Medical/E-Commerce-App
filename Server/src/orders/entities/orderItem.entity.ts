@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
+import { ProductDocument } from "src/products/entities/products.entity";
+import { OrderDocument } from "./orders.entity";
 
 /**
  * Order item entity.

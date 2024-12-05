@@ -1,14 +1,14 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AddressesModule } from "src/addresses/addresses.module";
+import { CartItemModule } from "src/cartItem/cartItem.module";
+import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
+import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
+import { Order, OrderSchema } from "./entities/orders.entity";
 import { OrdersController } from "./orders.controller";
 import { OrdersService } from "./orders.service";
-import { MongooseModule } from "@nestjs/mongoose";
-import { Order, OrderSchema } from "./entities/orders.entity";
-import { CartItemModule } from "src/cartItem/cartItem.module";
-import { AddressesModule } from "src/addresses/addresses.module";
-import { OrderItemsService } from "./services/orderItem.service";
+import { OrderItemController } from "./orderItem.controller";
 import { OrderItem, OrderItemSchema } from "./entities/orderItem.entity";
-import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeature.middleware";
-import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
 
 @Module({
   imports: [
@@ -26,8 +26,11 @@ import { ApiFeatureModule } from "src/utils/apiFeature/apiFeature.module";
     AddressesModule,
     ApiFeatureModule
   ],
-  controllers: [OrdersController],
-  providers: [OrdersService, OrderItemsService]
+  controllers: [
+    OrdersController,
+    OrderItemController
+  ],
+  providers: [OrdersService]
 })
 export class OrdersModule {
   constructor(private readonly ordersService: OrdersService) { }
