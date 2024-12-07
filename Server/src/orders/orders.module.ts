@@ -7,7 +7,6 @@ import { setApiFeatureVariables } from "src/utils/apiFeature/middlewares/apiFeat
 import { Order, OrderSchema } from "./entities/orders.entity";
 import { OrdersController } from "./orders.controller";
 import { OrdersService } from "./orders.service";
-import { OrderItemController } from "./orderItem.controller";
 import { OrderItem, OrderItemSchema } from "./entities/orderItem.entity";
 
 @Module({
@@ -26,10 +25,7 @@ import { OrderItem, OrderItemSchema } from "./entities/orderItem.entity";
     AddressesModule,
     ApiFeatureModule
   ],
-  controllers: [
-    OrdersController,
-    OrderItemController
-  ],
+  controllers: [OrdersController],
   providers: [OrdersService]
 })
 export class OrdersModule {

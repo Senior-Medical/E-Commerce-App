@@ -7,7 +7,23 @@ import { OrderStatus } from "../enums/orderStatus.enum";
 import { Document, Types } from "mongoose";
 
 /**
- * Order entity.
+ * Schema definition for the order reviews collection. It includes the review rate and comment.
+ */
+class OrderReview {
+  @Prop()
+  comment: string;
+
+  @Prop({
+    required: true,
+    max: 5,
+    min: 0
+  })
+  rate: number;
+}
+
+/**
+ * Schema definition for the orders collection. It includes the order cost,
+ * status, review, and references to the associated user and address.
  */
 @Schema()
 export class Order {
@@ -21,6 +37,12 @@ export class Order {
     default: OrderStatus.PENDING,
   })
   status?: OrderStatus;
+
+  @Prop({
+    type: OrderReview,
+    _id: false
+  })
+  review?: OrderReview;
 
   @Prop({
     ref: 'User',

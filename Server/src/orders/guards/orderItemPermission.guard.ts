@@ -14,7 +14,9 @@ export class OrderItemPermissionGuard extends PermissionBaseGuard {
   }
 
   async findEntity(id: string): Promise<any> {
-    return (await (await this.ordersService.findOneItem(id)).populate("product")).populate("order");
+    const product = await this.ordersService.findOneItem(id);
+    if (!product) return null;
+    return (await product.populate("product")).populate("order");
   }
   getEntityOwnerId(entity: any): string {
     return entity.order.user.toString();

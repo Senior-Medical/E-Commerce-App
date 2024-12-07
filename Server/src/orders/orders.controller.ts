@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -26,6 +27,10 @@ import { OrderPermissionGuard } from "./guards/orderPermission.guard";
 import { OrdersService } from './orders.service';
 import { OrderIdPipe } from "./pipes/orderId.pipe";
 import { GetObjectFromRequestDecorator } from "src/utils/shared/decorators/getObjectFromRequest.decorator";
+import { CreateOrderReviewDto } from './dto/createOrderReview.dto';
+import { UpdateOrderReviewDto } from './dto/updateOrderReview.dto';
+import { OrderItemPermissionGuard } from "./guards/orderItemPermission.guard";
+import { OrderItemDocument } from "./entities/orderItem.entity";
 
 /**
  * Controller for managing orders operations
@@ -57,6 +62,17 @@ export class OrdersController {
   }
 
   /**
+   * Retrieves order items by order ID.
+   * @param order - The order document.
+   * @returns The order document.
+   */
+  @Get(`items/:${OrdersService.getEntityName()}Id`)
+  @UseGuards(OrderPermissionGuard)
+  findItems(@GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument) {
+    return this.ordersService.findItems(order._id);
+  }
+
+  /**
    * Create a new order
    * @param user - The user document
    * @param address - The address document
@@ -69,6 +85,21 @@ export class OrdersController {
     @Body("address", ObjectIdPipe, AddressIdPipe) address: AddressDocument
   ) {
     return this.ordersService.create(user, address);
+  }
+
+  /**
+   * Create Review for the order by ID
+   * @param order - The order document
+   * @param createOrderReviewDto - The review data
+   * @returns The updated order
+   */
+  @Post(`review/:${OrdersService.getEntityName()}Id`)
+  @UseGuards(OrderPermissionGuard)
+  createReview(
+    @GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument,
+    @Body() createOrderReviewDto: CreateOrderReviewDto
+  ) {
+    return this.ordersService.createReview(order, createOrderReviewDto);
   }
 
   /**
@@ -112,6 +143,36 @@ export class OrdersController {
   }
 
   /**
+   * Updates order items by order item ID.
+   * @param orderItem - The order Item document.
+   * @returns The updated order Item document.
+   */
+  @Patch(`items/:${OrdersService.getItemEntityName()}Id`)
+  @UseGuards(OrderItemPermissionGuard)
+  updateItemQuantity(
+    @GetObjectFromRequestDecorator(OrdersService.getItemEntityName()) orderItem: OrderItemDocument,
+    @Body('quantity', ParseIntPipe) quantity: number
+  ) {
+    return this.ordersService.updateItemQuantity(orderItem, quantity);
+  }
+
+  /**
+   * Update review for the order by order ID
+   * @param order - The order document
+   * @param updateOrderReviewDto - The review data
+   * @returns The updated order
+   */
+  @Patch(`review/:${OrdersService.getEntityName()}Id`)
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseGuards(OrderPermissionGuard)
+  updateReview(
+    @GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument,
+    @Body() updateOrderReviewDto: UpdateOrderReviewDto
+  ) {
+    return this.ordersService.updateReview(order, updateOrderReviewDto);
+  }
+
+  /**
    * Remove the order by ID
    * @param order - The order document
    * @returns void
@@ -121,5 +182,27 @@ export class OrdersController {
   @Roles(Role.admin, Role.staff)
   remove(@Param(`${OrdersService.getEntityName()}Id`, ObjectIdPipe, OrderIdPipe) order: OrderDocument) {
     return this.ordersService.remove(order);
+  }
+
+  /**
+   * Remove order items by order item ID.
+   * @param orderItem - The order Item document.
+   */
+  @Delete(`items/:${OrdersService.getItemEntityName()}Id`)
+  @UseGuards(OrderItemPermissionGuard)
+  async removeItem(@GetObjectFromRequestDecorator(OrdersService.getItemEntityName()) orderItem: OrderItemDocument) {
+    await this.ordersService.removeItem(orderItem);
+  }
+
+  /**
+   * Remove the review of the order by ID
+   * @param order - The order document
+   * @returns void
+   */
+  @Delete(`review/:${OrdersService.getEntityName()}Id`)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(OrderPermissionGuard)
+  async removeReview(@GetObjectFromRequestDecorator(OrdersService.getEntityName()) order: OrderDocument) {
+    await this.ordersService.removeReview(order);
   }
 }

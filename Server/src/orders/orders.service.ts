@@ -4,8 +4,14 @@ import {
   InternalServerErrorException,
   NotFoundException
 } from "@nestjs/common";
+import {
+  ClientSession,
+  Connection,
+  Model,
+  Query,
+  Types
+} from "mongoose";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { ClientSession, Connection, Model, Query, Types } from "mongoose";
 import { AddressDocument } from "src/addresses/entities/addresses.entity";
 import { Role } from "src/auth/enums/roles.enum";
 import { CartItemService } from "src/cartItem/cartItem.service";
@@ -14,6 +20,8 @@ import { Order, OrderDocument } from "./entities/orders.entity";
 import { OrderStatus } from "./enums/orderStatus.enum";
 import { OrderItem, OrderItemDocument } from "./entities/orderItem.entity";
 import { CartItemDocument } from "src/cartItem/entities/cartItem.entity";
+import { CreateOrderReviewDto } from "./dto/createOrderReview.dto";
+import { UpdateOrderReviewDto } from "./dto/updateOrderReview.dto";
 
 /**
  * Service for managing orders operations
@@ -40,9 +48,7 @@ export class OrdersService {
    * @returns - Array of strings that contain keys names
    */
   getSearchKeys() {
-    return [
-      "cost"
-    ];
+    return [];
   }
 
   /**
@@ -87,7 +93,7 @@ export class OrdersService {
    * @returns The order items.
    */
   async findItems(orderId: Types.ObjectId) {
-    return this.orderItemModel.find({ order: orderId });
+    return this.orderItemModel.find({ order: orderId }).populate("product", "-__v -createdAt -updatedAt");
   }
 
   /**
@@ -108,7 +114,6 @@ export class OrdersService {
   async create(user: UserDocument, address: AddressDocument) {
     const cartItems = await this.cartItemService.findByUser(user._id);
     if (cartItems.length === 0) throw new NotFoundException("Cart is empty");
-    console.log("cartItems: ", cartItems);
     const order: Order = {
       cost: user.cartTotal,
       user: user._id,
@@ -153,6 +158,17 @@ export class OrdersService {
   }
 
   /**
+   * Create Review for the order by ID
+   * @param order - The order document
+   * @param review - The review data
+   * @returns The updated order
+   */
+  async createReview(order: OrderDocument, review: CreateOrderReviewDto) {
+    order.review = review;
+    return order.save();
+  }
+
+  /**
    * Update order status
    * @param order - The order document
    * @returns The updated order
@@ -192,9 +208,8 @@ export class OrdersService {
    * @returns The updated order
    */
   async updateAddress(order: Partial<OrderDocument>, address: AddressDocument) {
-    if(order.user.toString() !== address.user.toString()) throw new ForbiddenException("You can't set a user's address to order of another user");
+    if(order.user.toString() !== address.user.toString()) throw new ForbiddenException("Address doesn't belong to the user");
     order.address = address._id;
-    console.log(order);
     return order.save();
   }
 
@@ -223,7 +238,7 @@ export class OrdersService {
       const oldCost = orderItem.cost;
       orderItem.quantity = quantity;
       orderItem.cost = (orderItem.product as any).price * quantity;
-      await orderItem.save({ session });
+      (await orderItem.save({ session })).populate("order", "-__v");
       await this.updateCost(orderItem.order._id.toString(), orderItem.cost - oldCost, session);
       await session.commitTransaction();
       return orderItem;
@@ -233,6 +248,21 @@ export class OrdersService {
     } finally {
       session.endSession();
     }
+  }
+
+  /**
+   * Update order review.
+   * @param order - The order document.
+   * @param review - The review data.
+   * @returns The updated order.
+   */
+  async updateReview(order: OrderDocument, review: UpdateOrderReviewDto) {
+    if(!order.review) throw new NotFoundException("This order doesn't have a review");
+    order.review = {
+      ...order.review,
+      ...review,
+    };
+    return order.save();
   }
 
   /**
@@ -265,5 +295,16 @@ export class OrdersService {
     } finally {
       session.endSession();
     }
+  }
+
+  /**
+   * Remove review for the order by.
+   * @param order - The order document.
+   * @returns The updated order.
+   */
+  async removeReview(order: OrderDocument) {
+    if (!order.review) throw new NotFoundException("This order doesn't have a review");
+    order.review = undefined;
+    return order.save();
   }
 }
